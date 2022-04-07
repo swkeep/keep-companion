@@ -1,0 +1,244 @@
+/* 
+  See full code at https://github.com/t1m0n/wheel-menu 
+  Best viewed on full screen.
+
+  Tested in Chrome and Firefox
+*/
+
+
+/* -------------------------------------------------
+    Page general styles
+   ------------------------------------------------- */
+
+.header {
+    color: #fff;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 100;
+    font-size: 32px;
+    padding-top: 42px;
+}
+
+body,
+html {
+    height: 100%;
+    width: 100%;
+}
+
+$duration: 350ms;
+
+/* -------------------------------------------------
+    Wheel menu general
+   ------------------------------------------------- */
+
+.-wheel-menu-visible- {
+    cursor: none;
+    user-select: none;
+}
+
+.wheel-menu-container {
+    left: -9999px;
+    top: 0;
+    position: absolute;
+    transition: left 0s $duration;
+    &.active {
+        left: 0;
+        transition-delay: 0s
+    }
+}
+
+
+/* -------------------------------------------------
+    Wheel menu ring
+   ------------------------------------------------- */
+
+$radius: 100px;
+.wheel-menu--ring {
+    box-sizing: border-box;
+    opacity: 0;
+    width: $radius;
+    height: $radius;
+    border-radius: 50%;
+    border: 1px gold solid;
+    position: absolute;
+    transform: scale(.1);
+    transition: top 0s $duration, left 0s $duration, opacity $duration .15s, transform $duration .15s;
+    &.active {
+        opacity: .6;
+        transform: scale(1);
+        transition: top 0s 0s, left 0s 0s, opacity $duration 0s, transform $duration 0s;
+        .-item-activated- & {
+            opacity: 1;
+        }
+    }
+}
+
+.-wheel-menu-moving- {
+    .wheel-menu--ring {
+        transition: opacity .3s;
+    }
+}
+
+
+/* -------------------------------------------------
+    Wheel menu cursor
+   ------------------------------------------------- */
+
+$pointerDuration: .3s;
+.wheel-menu--pointer {
+    background: #f4777f;
+    width: 8px;
+    height: 2px;
+    position: absolute;
+    left: -1000px;
+    top: -1000px;
+    opacity: 0;
+    transition: opacity $pointerDuration, transform $pointerDuration;
+    &.active {
+        opacity: 1;
+    }
+}
+
+.-wheel-menu-moving- {
+    .wheel-menu--pointer {
+        transition: opacity $pointerDuration;
+    }
+}
+
+
+/* -------------------------------------------------
+    Menu cursor
+   ------------------------------------------------- */
+
+.wheel-menu--cursor {
+    border: 1px solid #ff9ca6;
+    border-radius: 50%;
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    box-sizing: border-box;
+    opacity: 0;
+    transform: scale(.4);
+    transition: transform $duration 0s, opacity $duration 0s;
+    &.active {
+        opacity: .6;
+        transform: scale(1);
+        transition: transform $duration .1s, opacity $duration .1s;
+    }
+}
+
+.active.-item-activated- .wheel-menu--cursor {
+    opacity: 1;
+    transition: transform $duration 0s, opacity $duration 0s;
+}
+
+
+/* -------------------------------------------------
+    Wheel menu item
+   ------------------------------------------------- */
+
+.wheel-menu--items {
+    position: absolute;
+    transform: scale(.3);
+    transition: transform $duration .0s;
+    &.active {
+        transform: scale(1);
+        transition: transform $duration .1s;
+    }
+    z-index: 100;
+}
+
+.wheel-menu--item {
+    position: absolute;
+    color: #333;
+    font-family: Tahoma, sans-serif;
+    font-size: 14px;
+    text-align: center;
+    opacity: 0;
+    border-radius: 2px;
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.10);
+    white-space: nowrap;
+    transform: scale(.1);
+    transition: transform $duration, opacity $duration;
+    .active & {
+        opacity: .7;
+        transition: transform $duration, opacity $duration;
+        transform: scale(1);
+        @for $i from 1 through 8 {
+            &:nth-child(#{$i}n) {
+                transition-delay: 40ms * $i;
+            }
+        }
+        .-wheel-menu-moving- & {
+            transition-delay: 0s;
+        }
+    }
+    //  Active state
+    // -------------------------------------------------
+    &.active {
+        background: #ff9ca6;
+    }
+}
+
+
+/* -------------------------------------------------
+    Dota styles
+   ------------------------------------------------- */
+
+.-dota- {
+    //  Ring
+    // -------------------------------------------------
+    .wheel-menu--ring {
+        border: none;
+        &:after {
+            content: '';
+            background: url(./img/wheel.png) left top no-repeat;
+            width: 208px;
+            height: 208px;
+            position: absolute;
+            left: -33px;
+            top: -18px;
+        }
+    }
+    //  Pointer
+    // -------------------------------------------------
+    .wheel-menu--pointer {
+        border: none;
+        background: url(./img/pointer.png) left top no-repeat;
+        width: 33px;
+        height: 66px;
+        position: absolute;
+    }
+    //  Cursor
+    // -------------------------------------------------
+    .wheel-menu--cursor {
+        border: none;
+        background: url(./img/cursor.png) left top no-repeat;
+        width: 60px;
+        height: 63px;
+    }
+    //  Item
+    // -------------------------------------------------
+    .wheel-menu--item {
+        background: none;
+        font-family: 'Source Sans Pro', sans-serif;
+        font-size: 24px;
+        color: #fff;
+        text-shadow: 0 1px 4px #000;
+        line-height: 1;
+        padding: 0;
+        &.active {
+            background: none;
+            font-size: 36px;
+        }
+    }
+    .-wheel-menu-moving- & {
+        .wheel-menu--item {
+            &.active {
+                opacity: 1;
+                transition: none;
+            }
+        }
+    }
+}
