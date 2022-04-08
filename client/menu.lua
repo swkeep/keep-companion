@@ -7,17 +7,15 @@ local inRadialMenu = false
 local menu = {
     [1] = {
         lable = 'Follow',
-        action = function()
-            local plyped = PlayerPedId()
-            local ped = ActivePed:read().entity
-            doSomethingIfPedIsInsideVehicle(ped)
-            TaskFollowTargetedPlayer(ped, plyped, 3.0)
+        action = function(plyped, activePed)
+            doSomethingIfPedIsInsideVehicle(activePed.entity)
+            TaskFollowTargetedPlayer(activePed.entity, plyped, 3.0)
         end
     },
     [2] = {
         lable = "Hunt",
-        action = function()
-            if ActivePed:read().level >= 0 then
+        action = function(plyped, activePed)
+            if activePed.level >= Config.Settings.minHuntingAbilityLevel then
                 attackLogic()
             else
                 TriggerEvent('QBCore:Notify', "Not enoght levels")
@@ -26,32 +24,32 @@ local menu = {
     },
     [3] = {
         lable = "Change Color",
-        action = function()
-            local ped = ActivePed:read().entity
-            local model = ActivePed:read().model
-            waitForAnimation('creatures@retriever@amb@world_dog_barking@idle_a')
-            TaskPlayAnim(ped, 'creatures@retriever@amb@world_dog_barking@idle_a', 'idle_c', 8.0, -8, -1, 1, 0, false,
-                false, false)
+        action = function(plyped, activePed)
+            PetVariation:setPedVariation(activePed.entity, activePed.model, 'white')
+            Wait(5000)
+            PetVariation:setPedVariation(activePed.entity, activePed.model, 'brown')
+
+            Wait(5000)
+            PetVariation:setPedVariation(activePed.entity, activePed.model, 'dark')
+
         end
     },
     [4] = {
         lable = "There",
-        action = function()
-            local ped = ActivePed:read().entity
-            doSomethingIfPedIsInsideVehicle(ped)
-            goThere(ped)
+        action = function(plyped, activePed)
+            doSomethingIfPedIsInsideVehicle(activePed.entity)
+            goThere(activePed.entity)
         end
     },
     [5] = {
         lable = "Wait",
-        action = function()
-            local ped = ActivePed:read().entity
-            ClearPedTasks(ped)
+        action = function(plyped, activePed)
+            ClearPedTasks(activePed.entity)
         end
     },
     [6] = {
         lable = "Get in Car",
-        action = function()
+        action = function(plyped, activePed)
             getIntoCar()
         end
     }
@@ -130,7 +128,7 @@ RegisterNUICallback('request', function(req)
     -- what player asked to do
     for key, value in pairs(menu) do
         if req.content == value.lable then
-            value.action()
+            value.action(PlayerPedId(), ActivePed:read())
         end
     end
 end)
