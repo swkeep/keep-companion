@@ -1,20 +1,72 @@
 QBCore = exports['qb-core']:GetCoreObject()
 PlayerData = QBCore.Functions.GetPlayerData()
 
-local menu = Config.RadialMeneu
 local names = {}
 local inRadialMenu = false
 
+local menu = {
+    [1] = {
+        lable = 'Follow',
+        action = function()
+            local plyped = PlayerPedId()
+            local ped = ActivePed:read().entity
+            doSomethingIfPedIsInsideVehicle(ped)
+            TaskFollowTargetedPlayer(ped, plyped, 3.0)
+        end
+    },
+    [2] = {
+        lable = "Hunt",
+        action = function()
+            if ActivePed:read().level >= 0 then
+                attackLogic()
+            else
+                TriggerEvent('QBCore:Notify', "Not enoght levels")
+            end
+        end
+    },
+    [3] = {
+        lable = "Change Color",
+        action = function()
+            local ped = ActivePed:read().entity
+            local model = ActivePed:read().model
+            waitForAnimation('creatures@retriever@amb@world_dog_barking@idle_a')
+            TaskPlayAnim(ped, 'creatures@retriever@amb@world_dog_barking@idle_a', 'idle_c', 8.0, -8, -1, 1, 0, false,
+                false, false)
+        end
+    },
+    [4] = {
+        lable = "There",
+        action = function()
+            local ped = ActivePed:read().entity
+            doSomethingIfPedIsInsideVehicle(ped)
+            goThere(ped)
+        end
+    },
+    [5] = {
+        lable = "Wait",
+        action = function()
+            local ped = ActivePed:read().entity
+            ClearPedTasks(ped)
+        end
+    },
+    [6] = {
+        lable = "Get in Car",
+        action = function()
+            getIntoCar()
+        end
+    }
+}
+
 RegisterNetEvent("onResourceStart", function()
     Wait(100)
-    for key, name in pairs(Config.RadialMeneu) do
+    for key, name in pairs(menu) do
         names[key] = name.lable
     end
     SendNUIMessage({
         type = "ui",
         display = false,
         initData = names,
-        customKey = Config.WheelHotKey
+        customKey = 'o'
     })
     PlayerData = QBCore.Functions.GetPlayerData()
 end)
@@ -23,14 +75,14 @@ end)
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     Wait(100)
     PlayerData = QBCore.Functions.GetPlayerData()
-    for key, name in pairs(Config.RadialMeneu) do
+    for key, name in pairs(menu) do
         names[key] = name.lable
     end
     SendNUIMessage({
         type = "ui",
         display = false,
         initData = names,
-        customKey = Config.WheelHotKey
+        customKey = 'o'
     })
 end)
 

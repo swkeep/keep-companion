@@ -132,17 +132,57 @@ end
 --          Item
 -- ============================
 
-QBCore.Functions.CreateUseableItem("huntinghusky", function(source, item)
-    if item.name == 'huntinghusky' then
-        local model = 'a_c_husky'
-        local cooldown = PlayersCooldown:isOnCooldown(source)
-        if cooldown > 0 then
-            TriggerClientEvent('QBCore:Notify', source, "On cooldown remaining: " .. (cooldown / 1000) .. "sec")
-        else
-            Pet:spawnPet(source, model, item)
+for key, value in pairs(Config.Products["petShop"]) do
+    QBCore.Functions.CreateUseableItem(value.name, function(source, item)
+        if item.name == value.name then
+            local model = value.model
+            if type(item.info) == "table" and next(item.info) ~= nil then
+                local cooldown = PlayersCooldown:isOnCooldown(source)
+                if cooldown > 0 then
+                    TriggerClientEvent('QBCore:Notify', source, "On cooldown remaining: " .. (cooldown / 1000) .. "sec")
+                else
+                    Pet:spawnPet(source, model, item)
+                end
+            else
+                -- init
+                initItem(source, item)
+            end
         end
+    end)
+end
+
+function initItem(source, item)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    local random = math.random(1, 2)
+    local gender = {true, false}
+    local gen = gender[random]
+    item.info.hash = tostring(QBCore.Shared.RandomInt(2) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(1) ..
+                                  QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
+    item.info.name = NameGenerator('dog', random)
+    item.info.gender = gen
+    item.info.age = 0
+    item.info.food = 100
+    item.info.health = 100
+    -- state = alive or dead
+    item.info.state = true
+    -- owener data
+    item.info.owner = Player.PlayerData.charinfo
+    -- inital level and xp
+    item.info.level = 0
+    item.info.XP = 0
+    -- inital variation
+    local petVariation = PetVariation:getRandomPedVariationsName('a_c_husky', true)
+    item.info.variation = petVariation
+    initInfoHelper(Player, item.slot, item.info)
+end
+
+function initInfoHelper(Player, slot, data)
+    if Player.PlayerData.items[slot] then
+        Player.PlayerData.items[slot].info = data
     end
-end)
+    Player.Functions.SetInventory(Player.PlayerData.items, true)
+end
 
 -- ================================================
 --          Item - Updating Information
@@ -247,7 +287,8 @@ end
 --          Commands
 -- ============================
 
-QBCore.Commands.Add('addhusky', 'add husky to player inventory (Admin Only)', {}, false, function(source)
+QBCore.Commands.Add('addpet', 'add a pet to player inventory (Admin Only)', {}, false, function(source, args)
+    local PETname = args[1]
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     local itemData = {
@@ -275,8 +316,8 @@ QBCore.Commands.Add('addhusky', 'add husky to player inventory (Admin Only)', {}
     local petVariation = PetVariation:getRandomPedVariationsName('a_c_husky', true)
     itemData.info.variation = petVariation
 
-    Player.Functions.AddItem("huntinghusky", 1, nil, itemData.info)
-    TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["huntinghusky"], "add")
+    Player.Functions.AddItem(PETname, 1, nil, itemData.info)
+    TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items[PETname], "add")
 end, 'admin')
 
 QBCore.Commands.Add('addItem', 'add item to player inventory (Admin Only)', {}, false, function(source, item)
