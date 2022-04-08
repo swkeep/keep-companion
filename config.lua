@@ -4,6 +4,15 @@ Config.DEBUG = false -- make sure it's false
 
 Config.callingCompanionDuration = 1000
 
+Config.Settings = {
+    callCompanionDuration = 2, -- sec
+    despawnDuration = 3, -- sec
+    itemUsageCooldown = 5, -- sec
+    minHuntingAbilityLevel = 25, -- level
+    changePetNameDuration = 5, -- sec
+    carFlipingDuration = 5 -- sec
+}
+
 -- Config.pedModels = {
 --     [1] = {
 --         model = 'A_C_Cat_01',

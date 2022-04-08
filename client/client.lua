@@ -115,8 +115,8 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
 
     whistleAnimation(plyPed, 1500)
 
-    CoreName.Functions.Progressbar("callCompanion", "Calling companion", Config.callingCompanionDuration, false, false,
-        {
+    CoreName.Functions.Progressbar("callCompanion", "Calling companion", Config.Settings.callCompanionDuration * 1000,
+        false, false, {
             disableMovement = true,
             disableCarMovement = false,
             disableMouse = false,
@@ -204,7 +204,7 @@ AddEventHandler('keep-companion:client:despawn', function(ped)
     }
     whistleAnimation(plyPed, 1500)
 
-    CoreName.Functions.Progressbar("despawn", "despawning", Config.callingCompanionDuration, false, false, {
+    CoreName.Functions.Progressbar("despawn", "despawning", Config.Settings.despawnDuration * 1000, false, false, {
         disableMovement = true,
         disableCarMovement = false,
         disableMouse = false,
@@ -245,8 +245,8 @@ AddEventHandler('keep-companion:client:getActivePet', function(name)
         }
 
         if next(currentItem) ~= nil and type(name) == "string" and validation == false then
-            CoreName.Functions.Progressbar("waitingForName", "waiting for Name", Config.callingCompanionDuration, false,
-                false, {
+            CoreName.Functions.Progressbar("waitingForName", "waiting for Name",
+                Config.Settings.changePetNameDuration * 1000, false, false, {
                     disableMovement = false,
                     disableCarMovement = false,
                     disableMouse = false,
@@ -282,8 +282,8 @@ exports['qb-target']:AddTargetBone(bones, {
         label = "Flip",
         action = function(entity)
             local plyped = PlayerPedId()
-            CoreName.Functions.Progressbar("flipingcAr", "Fliping car", Config.callingCompanionDuration, false, false,
-                {
+            CoreName.Functions.Progressbar("flipingcAr", "Fliping car", Config.Settings.carFlipingDuration * 1000,
+                false, false, {
                     disableMovement = true,
                     disableCarMovement = true,
                     disableMouse = true,
