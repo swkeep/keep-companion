@@ -44,7 +44,7 @@ Config.Products = {
             amount = 5,
             info = {},
             type = 'item',
-            slot = 1
+            slot = 2
         },
         [3] = {
             name = 'keepcompanionretriever',
@@ -54,7 +54,7 @@ Config.Products = {
             amount = 5,
             info = {},
             type = 'item',
-            slot = 1
+            slot = 3
         },
         [4] = {
             name = 'keepcompanionretriever',
@@ -64,7 +64,7 @@ Config.Products = {
             amount = 5,
             info = {},
             type = 'item',
-            slot = 1
+            slot = 4
         },
         [5] = {
             name = 'keepcompanionpug',
@@ -74,7 +74,7 @@ Config.Products = {
             amount = 5,
             info = {},
             type = 'item',
-            slot = 1
+            slot = 5
         },
         [6] = {
             name = 'keepcompanionpoodle',
@@ -84,18 +84,18 @@ Config.Products = {
             amount = 5,
             info = {},
             type = 'item',
-            slot = 1
+            slot = 6
         },
 
         [7] = {
-            name = 'keepcompanionmtLion',
+            name = 'keepcompanionmtLion2',
             model = 'A_C_Panther',
             distinct = 'cat',
             price = 50000,
             amount = 5,
             info = {},
             type = 'item',
-            slot = 1
+            slot = 7
         },
         [8] = {
             name = 'keepcompanionmtLion',
@@ -105,7 +105,7 @@ Config.Products = {
             amount = 5,
             info = {},
             type = 'item',
-            slot = 1
+            slot = 8
         },
         [9] = {
             name = 'keepcompanionhusky',
@@ -115,7 +115,7 @@ Config.Products = {
             amount = 5,
             info = {},
             type = 'item',
-            slot = 1
+            slot = 9
         }
     }
 }
