@@ -145,12 +145,15 @@ for key, value in pairs(Config.Products["petShop"]) do
                 end
             else
                 -- init
+                TriggerClientEvent('QBCore:Notify', source, "your pet is warming up!")
                 initItem(source, item)
             end
         end
     end)
 end
-
+--- inital pet data after player bought pet
+---@param source any
+---@param item any
 function initItem(source, item)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
@@ -172,7 +175,12 @@ function initItem(source, item)
     item.info.level = 0
     item.info.XP = 0
     -- inital variation
-    local petVariation = PetVariation:getRandomPedVariationsName('a_c_husky', true)
+    local petVariation = ''
+    for k, v in pairs(Config.Products.petShop) do
+        if v.name == item.name then
+            petVariation = PetVariation:getRandomPedVariationsName(v.model, true)
+        end
+    end
     item.info.variation = petVariation
     initInfoHelper(Player, item.slot, item.info)
 end
@@ -313,7 +321,12 @@ QBCore.Commands.Add('addpet', 'add a pet to player inventory (Admin Only)', {}, 
     itemData.info.level = 0
     itemData.info.XP = 0
     -- inital variation
-    local petVariation = PetVariation:getRandomPedVariationsName('a_c_husky', true)
+    local petVariation = ''
+    for k, v in pairs(Config.Products.petShop) do
+        if v.name == PETname then
+            petVariation = PetVariation:getRandomPedVariationsName(v.model, true)
+        end
+    end
     itemData.info.variation = petVariation
 
     Player.Functions.AddItem(PETname, 1, nil, itemData.info)
@@ -339,7 +352,7 @@ end)
 -- ============================
 
 -- #region
-local usageCooldown = 5000
+local usageCooldown = Config.Settings.itemUsageCooldown * 1000
 PlayersCooldown = {
     players = {}
 }
