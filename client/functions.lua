@@ -218,8 +218,36 @@ function attackLogic()
         Draw2DText('PRESS ~g~E~w~ TO ATTACK TARGET', 4, {255, 255, 255}, 0.4, 0.43, 0.888 + 0.025)
         if IsControlJustReleased(0, 38) then
             if IsEntityAPed(entity) then
-                SetEntityAsMissionEntity(entity, true, true)
-                AttackTargetedPed(ActivePed:read().entity, entity)
+
+                CreateThread(function()
+                    SetEntityAsMissionEntity(entity, true, true)
+                    AttackTargetedPed(ActivePed:read().entity, entity)
+
+                    while IsPedDeadOrDying(entity) == false do
+                        Wait(1000)
+                    end
+                    -- #TODO give combat XP need better function
+                    local pedData = ActivePed.read() or {}
+                    local activeped = ActivePed:read()
+                    if next(pedData) ~= nil then
+                        local Xp = pedData.XP
+                        local level = pedData.level
+                        local currentMaxXP = currentLvlExp(level)
+                        if level == Config.Balance.maximumLevel then
+                            return
+                        end
+
+                        local Xp = Xp + (calNextXp(level) * 3)
+                        if Xp >= currentMaxXP then
+                            ActivePed:update(nil, nil, nil, nil, Xp, level + 1)
+                            TriggerEvent('QBCore:Notify',
+                                activeped.itemData.info.name .. "level up to " .. activeped.level)
+                        else
+                            ActivePed:update(nil, nil, nil, nil, Xp, nil)
+                        end
+                    end
+                end)
+
             end
             activeLaser = false
         end
