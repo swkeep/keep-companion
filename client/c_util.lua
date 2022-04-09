@@ -115,3 +115,37 @@ if Config.Locations.petShop.showblip == true then
         shortRange = true
     })
 end
+
+-- flip car if needed 
+local bones = {'bodyshell'}
+exports['qb-target']:AddTargetBone(bones, {
+    options = {{ -- This is the first table with options, you can make as many options inside the options table as you want
+        type = "client",
+        event = "farming:harvestPlant",
+        icon = "fa-solid fa-scythe",
+        label = "Flip",
+        action = function(entity)
+            local plyped = PlayerPedId()
+            CoreName.Functions.Progressbar("flipingcAr", "Fliping car", Config.Settings.carFlipingDuration * 1000,
+                false, false, {
+                    disableMovement = true,
+                    disableCarMovement = true,
+                    disableMouse = true,
+                    disableCombat = true
+                }, {}, {}, {}, function()
+                    ClearPedTasks(plyped)
+                    Citizen.CreateThread(function()
+                        local coord = GetEntityCoords(entity)
+                        local x, y, z = table.unpack(coord)
+                        local xx, yy, zz = GetEntityRotation(entity, 5)
+                        ground, posZ = GetGroundZFor_3dCoord(x + .0, y + .0, z, true)
+
+                        SetEntityRotation(entity, 0.0, yy, zz)
+                        SetEntityCoords(entity, x, y, posZ, 1, 0, 0, 1)
+                    end)
+                end)
+
+        end
+    }},
+    distance = 2.0
+})
