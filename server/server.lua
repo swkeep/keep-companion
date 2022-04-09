@@ -202,9 +202,8 @@ RegisterNetEvent('keep-companion:server:updatePedData', function(item, model, en
 end)
 
 RegisterNetEvent('keep-companion:server:updateAllowedInfo', function(item, data)
-    -- #TODO make general data update event
     -- #TODO optimize to just use one updateInfoHelper()
-    -- #TODO put alot of validation for recived informations
+    -- #TODO data validation
     local Player = QBCore.Functions.GetPlayer(source)
     local requestedItem = Player.PlayerData.items[item.slot] -- ask item's data from sever
     data = data or {}
@@ -270,6 +269,7 @@ function updateInfoHelper(Player, slot, data)
 end
 
 RegisterNetEvent('keep-companion:server:onPlayerUnload', function(item)
+    -- save pet's Information when player logout
     Pet:setAsDespawned(source, item)
 end)
 -- ============================

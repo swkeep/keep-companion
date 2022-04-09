@@ -15,10 +15,15 @@ local menu = {
     [2] = {
         lable = "Hunt",
         action = function(plyped, activePed)
-            if activePed.level >= Config.Settings.minHuntingAbilityLevel then
-                attackLogic()
+            if activePed.canHunt == true then
+                if activePed.level >= Config.Settings.minHuntingAbilityLevel then
+                    attackLogic()
+                else
+                    TriggerEvent('QBCore:Notify',
+                        "Not enough levels to hunt (min " .. Config.Settings.minHuntingAbilityLevel .. ')')
+                end
             else
-                TriggerEvent('QBCore:Notify', "Not enoght levels")
+                TriggerEvent('QBCore:Notify', "Your pet can't hunt!")
             end
         end
     },
@@ -28,10 +33,8 @@ local menu = {
             PetVariation:setPedVariation(activePed.entity, activePed.model, 'white')
             Wait(5000)
             PetVariation:setPedVariation(activePed.entity, activePed.model, 'brown')
-
             Wait(5000)
             PetVariation:setPedVariation(activePed.entity, activePed.model, 'dark')
-
         end
     },
     [4] = {
