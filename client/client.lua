@@ -16,6 +16,8 @@ ActivePed = {
         time = nil
     }
 }
+-- itemData.name is item's name
+-- itemData.info.name is pet's name
 
 --- inital pet data
 function ActivePed:new(model, hostile, item, ped)
@@ -28,6 +30,20 @@ function ActivePed:new(model, hostile, item, ped)
     self.data.lastCoord = GetEntityCoords(ped) -- if we don't have coord we know entity is missing
     self.data.variation = item.info.variation
     self.data.time = 1
+    -- set modelString and canHunt 
+    for key, information in pairs(Config.Products.petShop) do
+        if information.name == item.name then
+            self.data.modelString = information.model
+            for w in information.distinct:gmatch("%S+") do
+                if w == 'yes' then
+                    self.data.canHunt = true
+                elseif w == 'no' then
+                    self.data.canHunt = false
+                end
+            end
+            return
+        end
+    end
 end
 --- return current active pet
 function ActivePed:read()
@@ -63,10 +79,6 @@ function addXpForDistanceMoved()
     if next(pedData) ~= nil then
         local currentCoord = GetEntityCoords(pedData.entity)
         local distance = #(currentCoord - pedData.lastCoord)
-        local currentItem = {
-            hash = activeped.itemData.info.hash,
-            slot = activeped.itemData.slot
-        }
         distance = math.floor(distance)
         ActivePed:update()
 
@@ -78,25 +90,27 @@ function addXpForDistanceMoved()
             if level == Config.Balance.maximumLevel then
                 return
             end
-            local toNext
-            if level ~= 0 then
-                toNext = Xp + ((1 / level) * (currentMaxXP / 10))
-            else
-                toNext = Xp + ((1 / 1) * (currentMaxXP / 10))
-            end
-            if toNext >= currentMaxXP then
-                ActivePed:update(nil, nil, nil, nil, toNext, level + 1)
+
+            local Xp = Xp + calNextXp(level)
+            if Xp >= currentMaxXP then
+                ActivePed:update(nil, nil, nil, nil, Xp, level + 1)
                 TriggerEvent('QBCore:Notify', activeped.itemData.info.name .. "level up to " .. activeped.level)
             else
-                ActivePed:update(nil, nil, nil, nil, toNext, nil)
+                ActivePed:update(nil, nil, nil, nil, Xp, nil)
             end
-            TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
-                key = 'XP',
-                content = Xp
-            })
         end
     end
 end
+
+function calNextXp(level)
+    local maxExp = math.floor(math.floor((level + 300) * (2 ^ (level / 7))) / 4)
+    local minExp = math.floor(math.floor(((level - 1) + 300) * (2 ^ ((level - 1) / 7))) / 4)
+    local dif = maxExp - minExp
+    local pr = math.floor(maxExp / minExp)
+    local multi = 1
+    return math.floor(dif / (multi * (level + 1) * pr))
+end
+
 --- return max xp for current level
 ---@param level integer
 function currentLvlExp(level)
@@ -188,6 +202,8 @@ end
 ---@param ped any
 function creatActivePetThread(ped)
     local goWanderingAfter = Config.Balance.goWander
+    local count = 10
+    local tmpcount = 0
     CreateThread(function()
         -- it's table just to have passed by reference.
         local timeOut = {0}
@@ -195,6 +211,23 @@ function creatActivePetThread(ped)
             addXpForDistanceMoved()
             afkWandering(timeOut, goWanderingAfter)
             increasePetAge()
+
+            -- update every 10 sec 
+            if tmpcount >= count then
+                print(tmpcount, ActivePed:read().XP)
+                local activeped = ActivePed:read()
+                local currentItem = {
+                    hash = activeped.itemData.info.hash,
+                    slot = activeped.itemData.slot
+                }
+
+                TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
+                    key = 'XP',
+                    content = activeped.XP
+                })
+                tmpcount = 0
+            end
+            tmpcount = tmpcount + 1
             Wait(1000)
         end
     end)
@@ -244,23 +277,25 @@ end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     local activeped = ActivePed:read()
-    local currentItem = {
-        hash = activeped.itemData.info.hash,
-        slot = activeped.itemData.slot
-    }
-    TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
-        key = 'state',
-        content = IsPedDeadOrDying(activeped.entity, 1)
-    })
-    if activeped.time ~= nil then
+    if activeped ~= nil then
+        local currentItem = {
+            hash = activeped.itemData.info.hash,
+            slot = activeped.itemData.slot
+        }
         TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
-            key = 'age',
-            content = activeped.time
+            key = 'state',
+            content = IsPedDeadOrDying(activeped.entity, 1)
         })
+        if activeped.time ~= nil then
+            TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
+                key = 'age',
+                content = activeped.time
+            })
+        end
+        TriggerServerEvent('keep-companion:server:onPlayerUnload', activeped.itemData)
+        DeletePed(activeped.entity)
+        ActivePed:remove()
     end
-    TriggerServerEvent('keep-companion:server:onPlayerUnload', activeped.itemData)
-    DeletePed(activeped.entity)
-    ActivePed:remove()
     PlayerData = {} -- empty playerData
 end)
 
@@ -274,7 +309,7 @@ AddEventHandler('keep-companion:client:getActivePet', function(name)
     local activePed = ActivePed:read() or nil
 
     if activePed ~= nil then
-        local validation = ValidatePetName(name, 12) -- #TODO this sould be inside server
+        local validation = ValidatePetName(name, 12) -- #TODO this sould be inside server/if needed
         local currentItem = {
             hash = activePed.itemData.info.hash or nil,
             slot = activePed.itemData.slot or nil
@@ -309,35 +344,3 @@ AddEventHandler('keep-companion:client:getActivePet', function(name)
     end
 end)
 
-local bones = {'bodyshell'}
-exports['qb-target']:AddTargetBone(bones, {
-    options = {{ -- This is the first table with options, you can make as many options inside the options table as you want
-        type = "client",
-        event = "farming:harvestPlant",
-        icon = "fa-solid fa-scythe",
-        label = "Flip",
-        action = function(entity)
-            local plyped = PlayerPedId()
-            CoreName.Functions.Progressbar("flipingcAr", "Fliping car", Config.Settings.carFlipingDuration * 1000,
-                false, false, {
-                    disableMovement = true,
-                    disableCarMovement = true,
-                    disableMouse = true,
-                    disableCombat = true
-                }, {}, {}, {}, function()
-                    ClearPedTasks(plyped)
-                    Citizen.CreateThread(function()
-                        local coord = GetEntityCoords(entity)
-                        local x, y, z = table.unpack(coord)
-                        local xx, yy, zz = GetEntityRotation(entity, 5)
-                        ground, posZ = GetGroundZFor_3dCoord(x + .0, y + .0, z, true)
-
-                        SetEntityRotation(entity, 0.0, yy, zz)
-                        SetEntityCoords(entity, x, y, posZ, 1, 0, 0, 1)
-                    end)
-                end)
-
-        end
-    }},
-    distance = 2.0
-})
