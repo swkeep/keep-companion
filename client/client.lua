@@ -106,13 +106,14 @@ function addXpForDistanceMoved()
                 return
             end
 
-            local Xp = Xp + calNextXp(level)
+            Xp = Xp + calNextXp(level)
             if Xp >= currentMaxXP then
                 ActivePed:update{
-                    xp = Xp,
+                    xp = Xp
+                }
+                ActivePed:update{
                     level = level + 1
                 }
-
                 TriggerEvent('QBCore:Notify', activeped.itemData.info.name .. "level up to " .. activeped.level)
             else
                 ActivePed:update{

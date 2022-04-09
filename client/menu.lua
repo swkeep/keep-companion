@@ -30,11 +30,18 @@ local menu = {
     [3] = {
         lable = "Change Color",
         action = function(plyped, activePed)
-            PetVariation:setPedVariation(activePed.entity, activePed.model, 'white')
-            Wait(5000)
-            PetVariation:setPedVariation(activePed.entity, activePed.model, 'brown')
-            Wait(5000)
-            PetVariation:setPedVariation(activePed.entity, activePed.model, 'dark')
+
+            CreateThread(function()
+                while true do
+                    -- draw every frame
+                    Wait(0)
+
+                    local pedCoords = GetEntityCoords(PlayerPedId())
+                    DrawMarker(2, pedCoords.x, pedCoords.y, pedCoords.z + 2, 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, 1.0, 1.0,
+                        1.0, 255, 128, 0, 50, false, true, 2, nil, nil, false)
+                end
+            end)
+
         end
     },
     [4] = {

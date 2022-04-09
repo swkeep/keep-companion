@@ -16,7 +16,8 @@ Config.Settings = {
         sprite = 442,
         colour = 2,
         shortRange = false
-    }
+    },
+    chaseDistance = 50.0
 }
 
 Config.Balance = {
