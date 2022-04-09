@@ -84,11 +84,6 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     })
 end)
 
--- Sets the playerdata to an empty table when the player has quit or did /logout
-RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
-    PlayerData = {}
-end)
-
 -- This will update all the PlayerData that doesn't get updated with a specific event other than this like the metadata
 RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
     PlayerData = val

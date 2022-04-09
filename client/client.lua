@@ -150,50 +150,57 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
 
                 -- send ped data to server
                 TriggerServerEvent('keep-companion:server:updatePedData', item, model, ped)
-                -- add ped data to client
+                -- init ped data inside client
                 ActivePed:new(modelName, hostileTowardPlayer, item, ped)
+                -- check for variation data
                 local variation = ActivePed:read().variation
                 if variation ~= nil then
                     PetVariation:setPedVariation(ped, modelName, variation)
                 end
+                -- add pet to active thread
                 creatActivePetThread(ped)
             end)
         end)
 end)
 
-local function liveTracker(timeOut, afkAnimalWandring)
+--- when the player is AFK for a certain time pet will wander around
+---@param timeOut table
+---@param goWanderingAfter number
+local function afkWandering(timeOut, goWanderingAfter)
     -- #TODO follow player when not afk
     local ped = ActivePed:read().entity
     local plyPed = PlayerPedId()
     local coord = GetEntityCoords(plyPed)
     if IsPedStopped(plyPed) then
-        if timeOut[1] ~= (afkAnimalWandring + 1) then
+        if timeOut[1] ~= (goWanderingAfter + 1) then
             timeOut[1] = timeOut[1] + 1
         end
-        if timeOut[1] == afkAnimalWandring then
+        if timeOut[1] == goWanderingAfter then
             -- player is stoped more than 10sec
-            TaskWanderInArea(ped, coord, 8.0, 1.0, 5.0)
+            TaskWanderInArea(ped, coord, 4.0, 2, 8.0)
         end
     else
         timeOut[1] = 0
     end
 end
 
+--- this set of Functions will executed evetry sec to tracker pet's behaviour.
+---@param ped any
 function creatActivePetThread(ped)
-    local afkAnimalWandring = 60
+    local goWanderingAfter = Config.Balance.goWander
     CreateThread(function()
-        -- it's table just to be passed by reference
+        -- it's table just to have passed by reference.
         local timeOut = {0}
         while DoesEntityExist(ped) do
             addXpForDistanceMoved()
-            liveTracker(timeOut, afkAnimalWandring)
-            incrementTime()
+            afkWandering(timeOut, goWanderingAfter)
+            increasePetAge()
             Wait(1000)
         end
     end)
 end
 
-function incrementTime()
+function increasePetAge()
     if ActivePed.data.time ~= nil then
         ActivePed.data.time = ActivePed.data.time + 1
     end
@@ -233,6 +240,28 @@ AddEventHandler('keep-companion:client:despawn', function(ped)
             ActivePed:remove()
         end)
     end)
+end)
+
+RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
+    local activeped = ActivePed:read()
+    local currentItem = {
+        hash = activeped.itemData.info.hash,
+        slot = activeped.itemData.slot
+    }
+    TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
+        key = 'state',
+        content = IsPedDeadOrDying(activeped.entity, 1)
+    })
+    if activeped.time ~= nil then
+        TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
+            key = 'age',
+            content = activeped.time
+        })
+    end
+    TriggerServerEvent('keep-companion:server:onPlayerUnload', activeped.itemData)
+    DeletePed(activeped.entity)
+    ActivePed:remove()
+    PlayerData = {} -- empty playerData
 end)
 
 -- =========================================

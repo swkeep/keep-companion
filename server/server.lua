@@ -269,6 +269,9 @@ function updateInfoHelper(Player, slot, data)
     Player.Functions.SetInventory(Player.PlayerData.items, true)
 end
 
+RegisterNetEvent('keep-companion:server:onPlayerUnload', function(item)
+    Pet:setAsDespawned(source, item)
+end)
 -- ============================
 --         Calculation
 -- ============================
