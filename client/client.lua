@@ -59,12 +59,13 @@ end
 --- call xp for distance moved by ped
 function addXpForDistanceMoved()
     local pedData = ActivePed.read() or {}
+    local activeped = ActivePed:read()
     if next(pedData) ~= nil then
         local currentCoord = GetEntityCoords(pedData.entity)
         local distance = #(currentCoord - pedData.lastCoord)
         local currentItem = {
-            hash = ActivePed:read().itemData.info.hash,
-            slot = ActivePed:read().itemData.slot
+            hash = activeped.itemData.info.hash,
+            slot = activeped.itemData.slot
         }
         distance = math.floor(distance)
         ActivePed:update()
@@ -74,7 +75,7 @@ function addXpForDistanceMoved()
             local Xp = pedData.XP
             local level = pedData.level
             local currentMaxXP = currentLvlExp(level)
-            if level == 50 then
+            if level == Config.Balance.maximumLevel then
                 return
             end
             local toNext
@@ -85,8 +86,7 @@ function addXpForDistanceMoved()
             end
             if toNext >= currentMaxXP then
                 ActivePed:update(nil, nil, nil, nil, toNext, level + 1)
-                TriggerEvent('QBCore:Notify',
-                    ActivePed:read().itemData.info.name .. "level up to " .. ActivePed:read().level)
+                TriggerEvent('QBCore:Notify', activeped.itemData.info.name .. "level up to " .. activeped.level)
             else
                 ActivePed:update(nil, nil, nil, nil, toNext, nil)
             end
@@ -152,8 +152,9 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                 TriggerServerEvent('keep-companion:server:updatePedData', item, model, ped)
                 -- add ped data to client
                 ActivePed:new(modelName, hostileTowardPlayer, item, ped)
-                if ActivePed:read().variation ~= nil then
-                    PetVariation:setPedVariation(ped, modelName, ActivePed:read().variation)
+                local variation = ActivePed:read().variation
+                if variation ~= nil then
+                    PetVariation:setPedVariation(ped, modelName, variation)
                 end
                 creatActivePetThread(ped)
             end)
@@ -201,11 +202,12 @@ end
 RegisterNetEvent('keep-companion:client:despawn')
 AddEventHandler('keep-companion:client:despawn', function(ped)
     local plyPed = PlayerPedId()
+    local activeped = ActivePed:read()
     SetCurrentPedWeapon(plyPed, 0xA2719263, true)
     ClearPedTasks(plyPed)
     local currentItem = {
-        hash = ActivePed:read().itemData.info.hash,
-        slot = ActivePed:read().itemData.slot
+        hash = activeped.itemData.info.hash,
+        slot = activeped.itemData.slot
     }
     whistleAnimation(plyPed, 1500)
 
@@ -221,10 +223,10 @@ AddEventHandler('keep-companion:client:despawn', function(ped)
                 key = 'state',
                 content = IsPedDeadOrDying(ped, 1)
             })
-            if ActivePed:read().time ~= nil then
+            if activeped.time ~= nil then
                 TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
                     key = 'age',
-                    content = ActivePed:read().time
+                    content = activeped.time
                 })
             end
             DeletePed(ped)

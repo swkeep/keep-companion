@@ -19,6 +19,10 @@ Config.Settings = {
     }
 }
 
+Config.Balance = {
+    maximumLevel = 50 -- xp callculation only work util level 99 don't set it to higher values
+}
+
 Config.Products = {
     ["petShop"] = {
         [1] = {
