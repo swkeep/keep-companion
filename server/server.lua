@@ -166,7 +166,6 @@ function initItem(source, item)
     item.info.gender = gen
     item.info.age = 0
     item.info.food = 100
-    item.info.health = 100
     -- state = alive or dead
     item.info.state = true
     -- owener data
@@ -176,12 +175,15 @@ function initItem(source, item)
     item.info.XP = 0
     -- inital variation
     local petVariation = ''
+    local maxHealth = 200
     for k, v in pairs(Config.Products.petShop) do
         if v.name == item.name then
             petVariation = PetVariation:getRandomPedVariationsName(v.model, true)
+            maxHealth = v.maxHealth
         end
     end
     item.info.variation = petVariation
+    item.info.health = maxHealth
     initInfoHelper(Player, item.slot, item.info)
 end
 
@@ -231,6 +233,11 @@ RegisterNetEvent('keep-companion:server:updateAllowedInfo', function(item, data)
                 })
             end
         elseif data.key == 'food' then
+        elseif data.key == 'health' then
+            if data.content ~= requestedItem.info.health then
+                -- need to get maxHealth
+                updateInfoHelper(Player, item.slot, data)
+            end
         elseif data.key == 'state' then
             -- update pet state
             updateInfoHelper(Player, item.slot, data)
@@ -315,7 +322,6 @@ QBCore.Commands.Add('addpet', 'add a pet to player inventory (Admin Only)', {}, 
     itemData.info.gender = gen
     itemData.info.age = 0
     itemData.info.food = 100
-    itemData.info.health = 100
     -- state = alive or dead
     itemData.info.state = true
     -- owener data
@@ -325,13 +331,15 @@ QBCore.Commands.Add('addpet', 'add a pet to player inventory (Admin Only)', {}, 
     itemData.info.XP = 0
     -- inital variation
     local petVariation = ''
+    local maxHealth = 200
     for k, v in pairs(Config.Products.petShop) do
         if v.name == PETname then
             petVariation = PetVariation:getRandomPedVariationsName(v.model, true)
+            maxHealth = v.maxHealth
         end
     end
     itemData.info.variation = petVariation
-
+    itemData.info.health = maxHealth
     Player.Functions.AddItem(PETname, 1, nil, itemData.info)
     TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items[PETname], "add")
 end, 'admin')

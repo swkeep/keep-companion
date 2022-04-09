@@ -13,7 +13,8 @@ ActivePed = {
         itemData = nil,
         lastCoord = nil,
         variation = nil,
-        time = nil
+        time = nil,
+        health = nil
     }
 }
 -- itemData.name is item's name
@@ -30,10 +31,12 @@ function ActivePed:new(model, hostile, item, ped)
     self.data.lastCoord = GetEntityCoords(ped) -- if we don't have coord we know entity is missing
     self.data.variation = item.info.variation
     self.data.time = 1
+    self.data.health = item.info.health
     -- set modelString and canHunt 
     for key, information in pairs(Config.Products.petShop) do
         if information.name == item.name then
             self.data.modelString = information.model
+            self.data.maxHealth = information.maxHealth
             for w in information.distinct:gmatch("%S+") do
                 if w == 'yes' then
                     self.data.canHunt = true
@@ -58,14 +61,24 @@ end
 ---@param ped 'ped'
 ---@param xp integer
 ---@param level integer
-function ActivePed:update(model, hostile, item, ped, xp, level)
-    self.data.model = model or self.data.model
-    self.data.entity = ped or self.data.entity
-    self.data.hostile = hostile or self.data.hostile
-    self.data.XP = xp or self.data.XP
-    self.data.level = level or self.data.level
-    self.data.itemData = item or self.data.itemData
-    self.data.lastCoord = GetEntityCoords(self.data.entity)
+function ActivePed:update(options)
+    if options.model ~= nil then
+        self.data.model = options.model or self.data.model
+    elseif options.hostile ~= nil then
+        self.data.hostile = options.hostile or self.data.hostile
+    elseif options.itemData ~= nil then
+        self.data.itemData = options.itemData or self.data.itemData
+    elseif options.entity ~= nil then
+        self.data.entity = options.entity or self.data.entity
+    elseif options.xp ~= nil then
+        self.data.XP = options.xp or self.data.XP
+    elseif options.level ~= nil then
+        self.data.level = options.level or self.data.level
+    elseif options.health ~= nil then
+        self.data.health = options.health or self.data.health
+    elseif options.lastCoord ~= nil then
+        self.data.lastCoord = GetEntityCoords(self.data.entity)
+    end
 end
 --- clean current ped data
 function ActivePed:remove()
@@ -80,7 +93,9 @@ function addXpForDistanceMoved()
         local currentCoord = GetEntityCoords(pedData.entity)
         local distance = #(currentCoord - pedData.lastCoord)
         distance = math.floor(distance)
-        ActivePed:update()
+        ActivePed:update{
+            lastCoord = 1
+        }
 
         if distance > 0 and IsPedInAnyVehicle(pedData.entity, true) ~= 1 then
 
@@ -93,10 +108,16 @@ function addXpForDistanceMoved()
 
             local Xp = Xp + calNextXp(level)
             if Xp >= currentMaxXP then
-                ActivePed:update(nil, nil, nil, nil, Xp, level + 1)
+                ActivePed:update{
+                    xp = Xp,
+                    level = level + 1
+                }
+
                 TriggerEvent('QBCore:Notify', activeped.itemData.info.name .. "level up to " .. activeped.level)
             else
-                ActivePed:update(nil, nil, nil, nil, Xp, nil)
+                ActivePed:update{
+                    xp = Xp
+                }
             end
         end
     end
@@ -131,10 +152,10 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
 
     CoreName.Functions.Progressbar("callCompanion", "Calling companion", Config.Settings.callCompanionDuration * 1000,
         false, false, {
-            disableMovement = true,
+            disableMovement = false,
             disableCarMovement = false,
             disableMouse = false,
-            disableCombat = true
+            disableCombat = false
         }, {}, {}, {}, function()
             ClearPedTasks(plyPed)
             local forward = GetEntityForwardVector(plyPed)
@@ -161,7 +182,6 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                     end
                     SetEntityAsMissionEntity(ped, true, true)
                 end
-
                 -- send ped data to server
                 TriggerServerEvent('keep-companion:server:updatePedData', item, model, ped)
                 -- init ped data inside client
@@ -171,6 +191,10 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                 if variation ~= nil then
                     PetVariation:setPedVariation(ped, modelName, variation)
                 end
+                SetEntityMaxHealth(ped, ActivePed.read().maxHealth)
+
+                SetEntityHealth(ped, ActivePed.read().health)
+
                 -- add pet to active thread
                 creatActivePetThread(ped)
             end)
@@ -214,7 +238,6 @@ function creatActivePetThread(ped)
 
             -- update every 10 sec 
             if tmpcount >= count then
-                print(tmpcount, ActivePed:read().XP)
                 local activeped = ActivePed:read()
                 local currentItem = {
                     hash = activeped.itemData.info.hash,
@@ -228,6 +251,27 @@ function creatActivePetThread(ped)
                 tmpcount = 0
             end
             tmpcount = tmpcount + 1
+
+            -- update health
+            local currentHealth = GetEntityHealth(ActivePed:read().entity)
+            if IsPedDeadOrDying(ActivePed:read().entity) == false and ActivePed:read().maxHealth ~= currentHealth and
+                ActivePed:read().health ~= currentHealth then
+                -- ped is still alive
+                local activeped = ActivePed:read()
+                local currentItem = {
+                    hash = activeped.itemData.info.hash,
+                    slot = activeped.itemData.slot
+                }
+                -- SetEntityMaxHealth(entity, value)
+                TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
+                    key = 'health',
+                    content = GetEntityHealth(ActivePed:read().entity)
+                })
+                -- update current health value inside client
+                ActivePed:update{
+                    health = GetEntityHealth(ActivePed:read().entity)
+                }
+            end
             Wait(1000)
         end
     end)
