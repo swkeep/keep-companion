@@ -127,22 +127,27 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
             local x, y, z = table.unpack(coord + forward * 1.0)
 
             Citizen.CreateThread(function()
-                waitForModel(model)
-                ped = CreatePed(5, model, x, y, z, 0.0, true, false)
+                local pos = vector3(x, y, z)
+                ped = CreateAPed(model, pos)
 
                 if hostileTowardPlayer == true then
                     -- if player is not owner of pet it will attack player
                     taskAttackTarget(ped, plyPed, 10000)
                 else
-                    SetBlockingOfNonTemporaryEvents(ped, true)
-                    SetPedFleeAttributes(ped, 0, 0)
                     TaskFollowTargetedPlayer(ped, plyPed, 3.0)
-                    createBlip(ped)
+                    -- add blip to entity
+                    if Config.Settings.PetMiniMap.showblip ~= nil and Config.Settings.PetMiniMap.showblip == true then
+                        createBlip({
+                            entity = ped,
+                            sprite = Config.Settings.PetMiniMap.sprite,
+                            colour = Config.Settings.PetMiniMap.colour,
+                            text = item.info.name,
+                            shortRange = false
+                        })
+                    end
                     SetEntityAsMissionEntity(ped, true, true)
                 end
 
-                -- delete model 
-                SetModelAsNoLongerNeeded(ped)
                 -- send ped data to server
                 TriggerServerEvent('keep-companion:server:updatePedData', item, model, ped)
                 -- add ped data to client

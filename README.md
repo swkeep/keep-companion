@@ -2,27 +2,27 @@
 
 ## Features
 
--- xp and level system
--- food and health system
--- auto naming & renaming system
--- random pet variation
--- command pet by menu
--- pet shop
--- pet animation
--- ...
+- xp and level system
+- food and health system
+- auto naming & renaming system
+- random pet variation
+- command pet by menu
+- pet shop
+- pet animation
+- ...
 
-# WIP state:
+# WIP status:
 
 Note that project still not ready yet. but you can still test it and help me in development.
 
--- xp and level system ==> basic implementation
--- food and health system ==> not implemented
--- auto naming & renaming system ==> implemented
--- random pet variation ==> implemented
--- command pet by menu ==> implemented
--- pet shop ==> implemented
--- pet animation ==> not implemented
--- ...
+- xp and level system ==> basic implementation
+- food and health system ==> not implemented
+- auto naming & renaming system ==> implemented
+- random pet variation ==> implemented
+- command pet by menu ==> implemented
+- pet shop ==> implemented
+- pet animation ==> not implemented
+- ...
 
 ## Previews
 
@@ -161,9 +161,9 @@ Note that project still not ready yet. but you can still test it and help me in 
 
 # step 3: tooltip
 
--- i'm using lj-inventory just find where tooltip codes are!
--- in inventory\js\app.js find FormatItemInfo() there is if statement like: if (itemData.name == "id_card")
--- track where all of elseif statments ends then add else if below at there
+- i'm using lj-inventory just find where tooltip codes are!
+- in inventory\js\app.js find FormatItemInfo() there is if statement like: if (itemData.name == "id_card")
+- track where all of elseif statments ends then add else if below at there
 
 ```javascript
 else if (
@@ -202,7 +202,7 @@ else if (
         }
 ```
 
--- and add this codes at end of inventory\js\app.js
+- and add this codes at end of inventory\js\app.js
 
 ```javascript
 function callAge(age) {

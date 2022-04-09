@@ -121,3 +121,13 @@ exports['qb-target']:SpawnPed({
         distance = 2.5 -- This is the distance for you to be at for the target to turn blue, this is in GTA units and has to be a float value
     }
 })
+
+if Config.Locations.petShop.showblip == true then
+    createBlip({
+        petShop = Config.Locations[shop]["coords"][1],
+        sprite = Config.Locations.petShop.blipsprite,
+        colour = Config.Locations.petShop.colour,
+        text = Config.Locations.petShop.label,
+        shortRange = true
+    })
+end

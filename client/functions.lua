@@ -101,15 +101,27 @@ function waitForModel(model)
     return true
 end
 
---- make blip for entity
----@param entity 'entity'
-function createBlip(entity)
-    local blip = AddBlipForEntity(entity)
-    SetBlipSprite(blip, 442)
-    SetBlipColour(blip, 2)
-    SetBlipAsFriendly(blip, true)
+--- make blip
+---@param data table
+function createBlip(data)
+    local blip = nil
+    if data.petShop ~= nil then
+        -- make blip for shop
+        blip = AddBlipForCoord(data.petShop.x, data.petShop.y, data.petShop.z)
+    elseif data.entity ~= nil then
+        -- make blip for entities
+        blip = AddBlipForEntity(data.entity)
+    end
+    if data.shortRange ~= nil and data.shortRange == true then
+        SetBlipAsShortRange(blip, true)
+    elseif data.shortRange == false then
+        SetBlipAsShortRange(blip, false)
+    end
+
+    SetBlipSprite(blip, data.sprite)
+    SetBlipColour(blip, data.colour)
     BeginTextCommandSetBlipName("STRING")
-    AddTextComponentString("Your Husky")
+    AddTextComponentString(data.text)
     EndTextCommandSetBlipName(blip)
     return blip
 end
@@ -121,19 +133,15 @@ function DeletePed(ped)
 end
 
 function CreateAPed(hash, pos)
-    local handle = nil
-    RequestModel(hash)
-    while not HasModelLoaded(hash) do
-        Citizen.Wait(1)
-    end
+    local ped = nil
+    waitForModel(hash)
 
-    handle = CreatePed(5, hash, pos.x, pos.y, pos.z, rot, false, true)
+    ped = CreatePed(5, hash, pos.x, pos.y, pos.z, 0.0, true, false)
 
-    SetEntityInvincible(handle, true)
-    SetBlockingOfNonTemporaryEvents(handle, true)
-    SetPedFleeAttributes(handle, 0, 0)
-    SetModelAsNoLongerNeeded(hash)
-    return handle
+    SetBlockingOfNonTemporaryEvents(ped, true)
+    SetPedFleeAttributes(ped, 0, 0)
+    SetModelAsNoLongerNeeded(ped)
+    return ped
 end
 
 --- creates laser and force ped to move toward coord

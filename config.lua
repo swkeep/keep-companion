@@ -10,20 +10,15 @@ Config.Settings = {
     itemUsageCooldown = 5, -- sec
     minHuntingAbilityLevel = 25, -- level
     changePetNameDuration = 5, -- sec
-    carFlipingDuration = 5 -- sec
+    carFlipingDuration = 5, -- sec
+    PetMiniMap = {
+        showblip = true,
+        sprite = 442,
+        colour = 2,
+        shortRange = false
+    }
 }
 
--- Config.pedModels = {
---     [1] = {
---         model = 'A_C_Cat_01',
---         type = 'cat',
---         itemName = 'A_C_Cat_01',
---         price = 50000
---     },
-
--- }
--- A_C_Chop_02
--- A_C_Chop
 Config.Products = {
     ["petShop"] = {
         [1] = {
@@ -98,8 +93,8 @@ Config.Products = {
             slot = 7
         },
         [8] = {
-            name = 'keepcompanionmtLion',
-            model = 'A_C_MtLion',
+            name = 'keepcompanionmtLion3',
+            model = 'A_C_Cat_01',
             distinct = 'cat',
             price = 50000,
             amount = 5,
@@ -108,6 +103,16 @@ Config.Products = {
             slot = 8
         },
         [9] = {
+            name = 'keepcompanionmtLion',
+            model = 'A_C_MtLion',
+            distinct = 'cat',
+            price = 50000,
+            amount = 5,
+            info = {},
+            type = 'item',
+            slot = 9
+        },
+        [10] = {
             name = 'keepcompanionhusky',
             model = 'A_C_Husky',
             distinct = 'cat',
@@ -115,7 +120,7 @@ Config.Products = {
             amount = 5,
             info = {},
             type = 'item',
-            slot = 9
+            slot = 10
         }
     }
 }
@@ -132,6 +137,7 @@ Config.Locations = {
         ["radius"] = 1.5,
         ["products"] = Config.Products["petShop"],
         ["showblip"] = true,
-        ["blipsprite"] = 52
+        ["blipsprite"] = 267,
+        ["colour"] = 5
     }
 }
