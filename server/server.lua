@@ -1,5 +1,5 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-
+local balanceBettings = Config.Balance
 -- pet system
 local maxLimit = 1
 
@@ -224,13 +224,13 @@ RegisterNetEvent('keep-companion:server:updateAllowedInfo', function(item, data)
             local server_cXP = requestedItem.info.XP
             local server_Level = requestedItem.info.level
 
-            -- updateInfoHelper(Player, item.slot, mData)
-            -- if server_Level ~= level then
-            --     updateInfoHelper(Player, item.slot, {
-            --         key = 'level',
-            --         content = level
-            --     })
-            -- end
+            updateInfoHelper(Player, item.slot, mData)
+            if server_Level ~= level and (level >= 0 and level <= balanceBettings.maximumLevel) then
+                updateInfoHelper(Player, item.slot, {
+                    key = 'level',
+                    content = level
+                })
+            end
         elseif data.key == 'food' then
         elseif data.key == 'state' then
             -- update pet state
@@ -265,7 +265,7 @@ function updateInfoHelper(Player, slot, data)
     if Player.PlayerData.items[slot] then
         Player.PlayerData.items[slot].info[data.key] = data.content
     end
-    print('updating: ' .. Player.PlayerData.citizenid, "whichPart: " .. data.key)
+    -- print('updating: ' .. Player.PlayerData.citizenid, "whichPart: " .. data.key)
     Player.Functions.SetInventory(Player.PlayerData.items, true)
 end
 
