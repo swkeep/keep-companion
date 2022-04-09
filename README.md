@@ -24,6 +24,10 @@ Note that project still not ready yet. but you can still test it and help me in 
 - pet animation ==> not implemented
 - ...
 
+## Hotkey
+
+- open the menu with "o"
+
 ## Previews
 
 ![shop](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/shop.png)
