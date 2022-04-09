@@ -28,20 +28,77 @@ local menu = {
         end
     },
     [3] = {
-        lable = "Change Color",
+        lable = "Hunt and Grab",
         action = function(plyped, activePed)
+            local activeLaser = true
+            while activeLaser do
+                Wait(0)
+                local color = {
+                    r = 2,
+                    g = 241,
+                    b = 181,
+                    a = 200
+                }
+                local plyped = PlayerPedId()
+                local position = GetEntityCoords(plyped)
+                local coords, entity = RayCastGamePlayCamera(1000.0)
+                Draw2DText('Press ~g~E~w~ To go there', 4, {255, 255, 255}, 0.4, 0.43, 0.888 + 0.025)
+                if IsControlJustReleased(0, 38) then
+                    local dragger = activePed.entity
+                    CreateThread(function()
+                        local finished = false
+                        TaskFollowToOffsetOfEntity(dragger, entity, 0.0, 0.0, 0.0, 5.0, 10.0, 1.0, 1)
+                        waitForAnimation('creatures@retriever@melee@streamed_core@')
+                        while finished == false do
+                            local pedCoord = GetEntityCoords(entity)
+                            local petCoord = GetEntityCoords(dragger)
+                            local distance = GetDistanceBetweenCoords(pedCoord, petCoord)
+                            if distance < 5.0 then
+                                AttackTargetedPed(dragger, entity)
+                                while IsPedDeadOrDying(entity) == false do
 
-            CreateThread(function()
-                while true do
-                    -- draw every frame
-                    Wait(0)
+                                    Wait(250)
+                                end
+                                SetEntityCoords(entity, GetOffsetFromEntityInWorldCoords(dragger, 0.0, 0.25, 0.0))
+                                AttachEntityToEntity(entity, dragger, 11816, 0.05, 0.05, 0.5, 0.0, 0.0, 0.0, false,
+                                    false, false, false, 2, true)
+                                -- TaskPlayAnim(dragger, 'creatures@retriever@melee@streamed_core@', 'ground_attack_0',
+                                --     8.0, 1.0, -1, 49, 0, 0, 0, 0)
+                                -- pedCoord = GetEntityCoords(entity)
+                                -- TaskPlayAnimAdvanced(dragger --[[ Ped ]] , 'creatures@retriever@melee@streamed_core@' --[[ string ]] ,
+                                --     'ground_attack_0' --[[ string ]] , pedCoord.x --[[ number ]] , pedCoord.y --[[ number ]] ,
+                                --     pedCoord.z --[[ number ]] , 0 --[[ number ]] , 0 --[[ number ]] , 0 --[[ number ]] ,
+                                --     0.5 --[[ number ]] , 0.5 --[[ number ]] , 10.0 --[[ integer ]] , 49 --[[ Any ]] ,
+                                --     0.5 --[[ number ]] , 0 --[[ Any ]] , 0 --[[ Any ]] )
+                                finished = true
+                            end
+                            Wait(1000)
+                        end
+                        CreateThread(function()
+                            local finished2 = false
+                            local playerPed = PlayerPedId()
+                            TaskFollowToOffsetOfEntity(dragger, playerPed, 2.0, 2.0, 2.0, 1.0, 10.0, 3.0, 1)
+                            while finished2 == false do
+                                local pedCoord = GetEntityCoords(playerPed)
+                                local petCoord = GetEntityCoords(dragger)
+                                local distance = GetDistanceBetweenCoords(pedCoord, petCoord)
+                                if distance < 3.0 then
+                                    DetachEntity(entity, true, false)
+                                    ClearPedSecondaryTask(dragger)
+                                    finished2 = true
+                                end
+                                Wait(1000)
 
-                    local pedCoords = GetEntityCoords(PlayerPedId())
-                    DrawMarker(2, pedCoords.x, pedCoords.y, pedCoords.z + 2, 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, 1.0, 1.0,
-                        1.0, 255, 128, 0, 50, false, true, 2, nil, nil, false)
+                            end
+                        end)
+                    end)
+                    activeLaser = false
                 end
-            end)
-
+                DrawLine(position.x, position.y, position.z, coords.x, coords.y, coords.z, color.r, color.g, color.b,
+                    color.a)
+                DrawMarker(28, coords.x, coords.y, coords.z, 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, 0.1, 0.1, 0.1, color.r,
+                    color.g, color.b, color.a, false, true, 2, nil, nil, false)
+            end
         end
     },
     [4] = {
