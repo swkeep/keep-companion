@@ -16,11 +16,7 @@
 Note that project still not ready yet. but you can still test it and help me in development.
 
 - xp and level system ==> basic implementation
-- food and health system ==> not implemented
-- auto naming & renaming system ==> implemented
-- random pet variation ==> implemented
-- command pet by menu ==> implemented
-- pet shop ==> implemented
+- food ==> not implemented
 - pet animation ==> not implemented
 - ...
 
