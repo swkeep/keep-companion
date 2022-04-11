@@ -91,7 +91,7 @@ function waitForAnimation(animation)
     return true
 end
 
---- wait until model loaded 
+--- wait until model loaded
 ---@param model 'model'
 function waitForModel(model)
     RequestModel(model)
@@ -159,7 +159,7 @@ function goThere(ped)
         local plyped = PlayerPedId()
         local position = GetEntityCoords(plyped)
         local coords, entity = RayCastGamePlayCamera(1000.0)
-        Draw2DText('Press ~g~E~w~ To go there', 4, {255, 255, 255}, 0.4, 0.43, 0.888 + 0.025)
+        Draw2DText('Press ~g~E~w~ To go there', 4, { 255, 255, 255 }, 0.4, 0.43, 0.888 + 0.025)
         if IsControlJustReleased(0, 38) then
             TaskGoToCoordAnyMeans(ped, coords, 10.0, 0, 0, 0, 0)
             activeLaser = false
@@ -215,7 +215,7 @@ function attackLogic()
         local plyped = PlayerPedId()
         local position = GetEntityCoords(plyped)
         local coords, entity = RayCastGamePlayCamera(1000.0)
-        Draw2DText('PRESS ~g~E~w~ TO ATTACK TARGET', 4, {255, 255, 255}, 0.4, 0.43, 0.888 + 0.025)
+        Draw2DText('PRESS ~g~E~w~ TO ATTACK TARGET', 4, { 255, 255, 255 }, 0.4, 0.43, 0.888 + 0.025)
         if IsControlJustReleased(0, 38) then
             ClearPedTasks(ActivePed:read().entity)
             if IsEntityAPed(entity) then
@@ -249,7 +249,7 @@ function attackLogic()
                         end
 
                         local Xp = Xp + (calNextXp(level) * 3)
-                        ActivePed:update{
+                        ActivePed:update {
                             xp = Xp
                         }
                     end
@@ -282,7 +282,7 @@ function doSomethingIfPedIsInsideVehicle(ped)
     end
 end
 
---- plays requested animation 
+--- plays requested animation
 ---@param ped 'ped'
 ---@param animation 'animation name'
 function playerAnimation(ped, animation)
@@ -368,7 +368,7 @@ function AttackTargetedPed(AttackerPed, targetPed)
     CreateThread(function()
         while not IsPedDeadOrDying(targetPed) do
             Wait(2000)
-            -- skip 
+            -- skip
         end
         TaskFollowTargetedPlayer(AttackerPed, PlayerPedId(), 3.0)
     end)

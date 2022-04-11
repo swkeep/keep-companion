@@ -39,10 +39,10 @@ function RayCastGamePlayCamera(distance)
     return c, e
 end
 
--- flip car if needed 
-local bones = {'bodyshell'}
+-- flip car if needed
+local bones = { 'bodyshell' }
 exports['qb-target']:AddTargetBone(bones, {
-    options = {{ -- This is the first table with options, you can make as many options inside the options table as you want
+    options = { { -- This is the first table with options, you can make as many options inside the options table as you want
         type = "client",
         event = "farming:harvestPlant",
         icon = "fa-solid fa-scythe",
@@ -69,6 +69,6 @@ exports['qb-target']:AddTargetBone(bones, {
                 end)
 
         end
-    }},
+    } },
     distance = 2.0
 })

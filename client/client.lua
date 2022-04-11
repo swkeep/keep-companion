@@ -32,7 +32,7 @@ function ActivePed:new(model, hostile, item, ped)
     self.data.variation = item.info.variation
     self.data.time = 1
     self.data.health = item.info.health
-    -- set modelString and canHunt 
+    -- set modelString and canHunt
     for key, information in pairs(Config.pets) do
         if information.name == item.name then
             self.data.modelString = information.model
@@ -48,12 +48,14 @@ function ActivePed:new(model, hostile, item, ped)
         end
     end
 end
+
 --- return current active pet
 function ActivePed:read()
     if next(ActivePed.data) ~= nil then
         return ActivePed.data
     end
 end
+
 --- update requested value inside pet class
 ---@param model 'model'
 ---@param hostile boolean
@@ -80,6 +82,7 @@ function ActivePed:update(options)
         self.data.lastCoord = GetEntityCoords(self.data.entity)
     end
 end
+
 --- clean current ped data
 function ActivePed:remove()
     self.data = {}
@@ -93,7 +96,7 @@ function addXpForDistanceMoved()
         local currentCoord = GetEntityCoords(pedData.entity)
         local distance = #(currentCoord - pedData.lastCoord)
         distance = math.floor(distance)
-        ActivePed:update{
+        ActivePed:update {
             lastCoord = 1
         }
 
@@ -108,15 +111,15 @@ function addXpForDistanceMoved()
 
             Xp = Xp + calNextXp(level)
             if Xp >= currentMaxXP then
-                ActivePed:update{
+                ActivePed:update {
                     xp = Xp
                 }
-                ActivePed:update{
+                ActivePed:update {
                     level = level + 1
                 }
                 TriggerEvent('QBCore:Notify', activeped.itemData.info.name .. "level up to " .. activeped.level)
             else
-                ActivePed:update{
+                ActivePed:update {
                     xp = Xp
                 }
             end
@@ -200,7 +203,7 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                 creatActivePetThread(ped)
 
                 exports['qb-target']:AddTargetEntity(ped, {
-                    options = {{
+                    options = { {
                         icon = "fas fa-sack-dollar",
                         label = "pet",
                         -- canInteract = function(entity)
@@ -232,7 +235,7 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                             -- TriggerEvent('keep-hunting:client:slaughterAnimal', entity)
                             return true
                         end
-                    }},
+                    } },
                     distance = 1.5
                 })
             end)
@@ -279,13 +282,13 @@ function creatActivePetThread(ped)
     local tmpcount = 0
     CreateThread(function()
         -- it's table just to have passed by reference.
-        local timeOut = {0}
+        local timeOut = { 0 }
         while DoesEntityExist(ped) do
             addXpForDistanceMoved()
             afkWandering(timeOut, goWanderingAfter)
             increasePetAge()
 
-            -- update every 10 sec 
+            -- update every 10 sec
             if tmpcount >= count then
                 local activeped = ActivePed:read()
                 local currentItem = {
@@ -306,8 +309,8 @@ function creatActivePetThread(ped)
             if IsPedDeadOrDying(ActivePed:read().entity) == false and ActivePed:read().maxHealth ~= currentHealth and
                 ActivePed:read().health ~= currentHealth then
                 -- ped is still alive
-                local retval --[[ boolean ]] , outBone --[[ integer ]] =
-                    GetPedLastDamageBone(ActivePed:read().entity --[[ Ped ]] )
+                local retval--[[ boolean ]] , outBone--[[ integer ]]  =
+                GetPedLastDamageBone(ActivePed:read().entity--[[ Ped ]] )
                 print(outBone)
                 local activeped = ActivePed:read()
                 local currentItem = {
@@ -320,7 +323,7 @@ function creatActivePetThread(ped)
                     content = GetEntityHealth(ActivePed:read().entity)
                 })
                 -- update current health value inside client
-                ActivePed:update{
+                ActivePed:update {
                     health = GetEntityHealth(ActivePed:read().entity)
                 }
             end
@@ -401,7 +404,7 @@ end)
 
 RegisterNetEvent('keep-companion:client:getActivePet')
 AddEventHandler('keep-companion:client:getActivePet', function(name)
-    -- process of updating pet's name 
+    -- process of updating pet's name
     local activePed = ActivePed:read() or nil
 
     if activePed ~= nil then
@@ -439,4 +442,3 @@ AddEventHandler('keep-companion:client:getActivePet', function(name)
         TriggerEvent('QBCore:Notify', "no active pet found!")
     end
 end)
-

@@ -42,7 +42,7 @@ local menu = {
                 local plyped = PlayerPedId()
                 local position = GetEntityCoords(plyped)
                 local coords, entity = RayCastGamePlayCamera(1000.0)
-                Draw2DText('Press ~g~E~w~ To go there', 4, {255, 255, 255}, 0.4, 0.43, 0.888 + 0.025)
+                Draw2DText('Press ~g~E~w~ To go there', 4, { 255, 255, 255 }, 0.4, 0.43, 0.888 + 0.025)
                 if IsControlJustReleased(0, 38) then
                     local dragger = activePed.entity
                     CreateThread(function()

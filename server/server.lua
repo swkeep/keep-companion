@@ -11,7 +11,7 @@ local Pet = {
     players = {}
 }
 
---- search for player(source) item's hash inside Pet list 
+--- search for player(source) item's hash inside Pet list
 ---@param source integer
 ---@param item table
 function Pet:isSpawned(source, item)
@@ -36,6 +36,7 @@ function Pet:setAsSpawned(source, item, model, entity)
     self.players[source][item.info.hash].model = model
     self.players[source][item.info.hash].entity = entity
 end
+
 --- removes pet from Pet table
 ---@param source integer
 ---@param item table
@@ -44,7 +45,7 @@ function Pet:setAsDespawned(source, item)
     self.players[source][item.info.hash] = nil
 end
 
---- start spawn chain 
+--- start spawn chain
 ---@param source integer
 ---@param model string
 ---@param item table
@@ -83,7 +84,7 @@ function Pet:spawnPet(source, model, item)
         end
     end
     -- create active thread inside source client to track entity state ( death food etc )
-    -- add it to server active pets 
+    -- add it to server active pets
 end
 
 --- check if player reached maximum allowed pet
@@ -104,11 +105,12 @@ function Pet:isMaxLimitPedReached(source)
         end
     end
 end
+
 --- depsawn helper
 ---@param source integer
 ---@param item table
 function Pet:despawnPet(source, item)
-    -- despawn pet 
+    -- despawn pet
     -- save all data after despawning pet
     TriggerClientEvent('keep-companion:client:despawn', source, self.players[source][item.info.hash].entity)
     Pet:setAsDespawned(source, item)
@@ -158,10 +160,10 @@ function initItem(source, item)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     local random = math.random(1, 2)
-    local gender = {true, false}
+    local gender = { true, false }
     local gen = gender[random]
     item.info.hash = tostring(QBCore.Shared.RandomInt(2) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(1) ..
-                                  QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
+    QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
     item.info.name = NameGenerator('dog', random)
     item.info.gender = gen
     item.info.age = 0
@@ -261,7 +263,7 @@ RegisterNetEvent('keep-companion:server:updateAllowedInfo', function(item, data)
             end
 
         elseif data.key == 'owner' then
-            -- #TODO data.owner add later  
+            -- #TODO data.owner add later
 
         end
     end
@@ -313,11 +315,11 @@ QBCore.Commands.Add('addpet', 'add a pet to player inventory (Admin Only)', {}, 
         info = {}
     }
     local random = math.random(1, 2)
-    local gender = {true, false}
+    local gender = { true, false }
     local gen = gender[random]
     itemData.info.hash = tostring(
         QBCore.Shared.RandomInt(2) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(1) ..
-            QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
+        QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
     itemData.info.name = NameGenerator('dog', random)
     itemData.info.gender = gen
     itemData.info.age = 0
@@ -350,7 +352,7 @@ QBCore.Commands.Add('addItem', 'add item to player inventory (Admin Only)', {}, 
     TriggerClientEvent("inventory:client:ItemBox", source, QBCore.Shared.Items[item[1]], "add")
 end, 'admin')
 
-QBCore.Commands.Add('changePetName', 'change pet name', {{"name", "new pet name"}}, false, function(source, args)
+QBCore.Commands.Add('changePetName', 'change pet name', { { "name", "new pet name" } }, false, function(source, args)
     TriggerClientEvent("keep-companion:client:getActivePet", source, args[1])
 end, 'admin')
 

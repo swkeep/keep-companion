@@ -25,8 +25,8 @@ Config.Balance = {
     goWander = 60 -- sec pet gonna go wandering around player after player is AFK for a certain time
 }
 
--- distincts are needed for animations and to know if pet can hunt or not 
--- in my testing generaly small animals can't hunt. 
+-- distincts are needed for animations and to know if pet can hunt or not
+-- in my testing generaly small animals can't hunt.
 -- so potentially you won't need to change distinct value!
 -- distinct = "yes dog" ==> means this pet can hunt
 -- distinct = "no dog" ==> means this dog can't hunt
@@ -95,4 +95,3 @@ Config.pets = {
         distinct = 'yes dog'
     }
 }
-
