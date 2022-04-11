@@ -35,6 +35,8 @@ Note that project still not ready yet. but you can still test it and help me in 
 
 ## installation
 
+- The installation may seem a bit longer than it should be, but it's just a lot of text
+
 # step 1: Dependencies
 
 - [qb-target](https://github.com/BerkieBb/qb-target)
@@ -161,7 +163,7 @@ Note that project still not ready yet. but you can still test it and help me in 
 
 # step 3: qb-shop
 
-- Here add this to codes to qb-shops/config.lua
+- Here is tables qb-shops/config.lua
 
 ```lua
 -- add it at end of Config.Products table
@@ -251,9 +253,7 @@ Note that project still not ready yet. but you can still test it and help me in 
 
 ```
 
-and here is Config.Locations table
-
-```Lua
+```lua
 -- add it at end of Config.Locations table
     ["petShop"] = {
         ["label"] = "Pet Shop",
@@ -270,8 +270,6 @@ and here is Config.Locations table
         ["colour"] = 5
     }
 ```
-
-````
 
 # step 4: tooltip
 
@@ -314,7 +312,7 @@ else if (
                 "</span></p>"
             );
         }
-````
+```
 
 - and add this codes at end of inventory\js\app.js
 
