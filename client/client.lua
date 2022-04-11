@@ -33,7 +33,7 @@ function ActivePed:new(model, hostile, item, ped)
     self.data.time = 1
     self.data.health = item.info.health
     -- set modelString and canHunt 
-    for key, information in pairs(Config.Products.petShop) do
+    for key, information in pairs(Config.pets) do
         if information.name == item.name then
             self.data.modelString = information.model
             self.data.maxHealth = information.maxHealth
@@ -198,9 +198,57 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
 
                 -- add pet to active thread
                 creatActivePetThread(ped)
+
+                exports['qb-target']:AddTargetEntity(ped, {
+                    options = {{
+                        icon = "fas fa-sack-dollar",
+                        label = "pet",
+                        -- canInteract = function(entity)
+                        --     if not IsPedAPlayer(entity) then
+                        --         return (entity and IsEntityDead(entity))
+                        --     end
+                        -- end,
+                        action = function(entity)
+                            makeEntityFaceEntity(PlayerPedId(), entity)
+                            makeEntityFaceEntity(entity, PlayerPedId())
+
+                            local playerPed = PlayerPedId()
+                            local coords = GetEntityCoords(playerPed)
+                            local forward = GetEntityForwardVector(playerPed)
+                            local x, y, z = table.unpack(coords + forward * 1.0)
+
+                            SetEntityCoords(entity, x, y, z, 0, 0, 0, 0)
+                            TaskPause(entity, 5000)
+
+                            waitForAnimation('amb@medic@standing@kneel@base')
+                            waitForAnimation('anim@gangops@facility@servers@bodysearch@')
+                            TaskPlayAnim(PlayerPedId(), "amb@medic@standing@kneel@base", "base", 8.0, -8.0, -1, 1, 0,
+                                false, false, false)
+                            TaskPlayAnim(PlayerPedId(), "anim@gangops@facility@servers@bodysearch@", "player_search",
+                                8.0, -8.0, -1, 48, 0, false, false, false)
+                            -- if IsPedAPlayer(entity) and IsEntityDead(entity) then
+                            --     return false
+                            -- end
+                            -- TriggerEvent('keep-hunting:client:slaughterAnimal', entity)
+                            return true
+                        end
+                    }},
+                    distance = 1.5
+                })
             end)
         end)
 end)
+
+function makeEntityFaceEntity(entity1, entity2)
+    local p1 = GetEntityCoords(entity1, true)
+    local p2 = GetEntityCoords(entity2, true)
+
+    local dx = p2.x - p1.x
+    local dy = p2.y - p1.y
+
+    local heading = GetHeadingFromVector_2d(dx, dy)
+    SetEntityHeading(entity1, heading)
+end
 
 --- when the player is AFK for a certain time pet will wander around
 ---@param timeOut table
@@ -258,6 +306,9 @@ function creatActivePetThread(ped)
             if IsPedDeadOrDying(ActivePed:read().entity) == false and ActivePed:read().maxHealth ~= currentHealth and
                 ActivePed:read().health ~= currentHealth then
                 -- ped is still alive
+                local retval --[[ boolean ]] , outBone --[[ integer ]] =
+                    GetPedLastDamageBone(ActivePed:read().entity --[[ Ped ]] )
+                print(outBone)
                 local activeped = ActivePed:read()
                 local currentItem = {
                     hash = activeped.itemData.info.hash,

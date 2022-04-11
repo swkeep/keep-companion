@@ -159,7 +159,121 @@ Note that project still not ready yet. but you can still test it and help me in 
     }
 ```
 
-# step 3: tooltip
+# step 3: qb-shop
+
+- Here add this to codes to qb-shops/config.lua
+
+```lua
+-- add it at end of Config.Products table
+    ["petShop"] = {
+        [1] = {
+            name = 'keepcompanionwesty',
+            price = 50000,
+            amount = 5,
+            info = {},
+            type = 'item',
+            slot = 1
+        },
+        [2] = {
+            name = 'keepcompanionshepherd',
+            price = 150000,
+            amount = 5,
+            info = {},
+            type = 'item',
+            slot = 2
+        },
+        [3] = {
+            name = 'keepcompanionretriever',
+            price = 50000,
+            amount = 5,
+            info = {},
+            type = 'item',
+            slot = 3
+        },
+        [4] = {
+            name = 'keepcompanionretriever',
+            price = 75000,
+            amount = 5,
+            info = {},
+            type = 'item',
+            slot = 4
+        },
+        [5] = {
+            name = 'keepcompanionpug',
+            price = 95000,
+            amount = 5,
+            info = {},
+            type = 'item',
+            slot = 5
+        },
+        [6] = {
+            name = 'keepcompanionpoodle',
+            price = 50000,
+            amount = 5,
+            info = {},
+            type = 'item',
+            slot = 6
+        },
+
+        [7] = {
+            name = 'keepcompanionmtLion2',
+            price = 50000,
+            amount = 5,
+            info = {},
+            type = 'item',
+            slot = 7
+        },
+        [8] = {
+            name = 'keepcompanionmtLion3',
+            price = 50000,
+            amount = 5,
+            info = {},
+            type = 'item',
+            slot = 8
+        },
+        [9] = {
+            name = 'keepcompanionmtLion',
+            price = 50000,
+            amount = 5,
+            info = {},
+            type = 'item',
+            slot = 9
+        },
+        [10] = {
+            name = 'keepcompanionhusky',
+            price = 50000,
+            amount = 5,
+            info = {},
+            type = 'item',
+            slot = 10
+        }
+    }
+
+```
+
+and here is Config.Locations table
+
+```Lua
+-- add it at end of Config.Locations table
+    ["petShop"] = {
+        ["label"] = "Pet Shop",
+        ["coords"] = {
+            [1] = vector4(-3225.63, 928.89, 13.9, 297.06)
+        },
+        ["ped"] = {
+            ["model"] = 'S_M_M_StrVend_01'
+        },
+        ["radius"] = 1.5,
+        ["products"] = Config.Products["petShop"],
+        ["showblip"] = true,
+        ["blipsprite"] = 267,
+        ["colour"] = 5
+    }
+```
+
+````
+
+# step 4: tooltip
 
 - i'm using lj-inventory just find where tooltip codes are!
 - in inventory\js\app.js find FormatItemInfo() there is if statement like: if (itemData.name == "id_card")
@@ -200,7 +314,7 @@ else if (
                 "</span></p>"
             );
         }
-```
+````
 
 - and add this codes at end of inventory\js\app.js
 

@@ -132,7 +132,7 @@ end
 --          Item
 -- ============================
 
-for key, value in pairs(Config.Products["petShop"]) do
+for key, value in pairs(Config.pets) do
     QBCore.Functions.CreateUseableItem(value.name, function(source, item)
         if item.name == value.name then
             local model = value.model
@@ -176,7 +176,7 @@ function initItem(source, item)
     -- inital variation
     local petVariation = ''
     local maxHealth = 200
-    for k, v in pairs(Config.Products.petShop) do
+    for k, v in pairs(Config.pets) do
         if v.name == item.name then
             petVariation = PetVariation:getRandomPedVariationsName(v.model, true)
             maxHealth = v.maxHealth
@@ -332,7 +332,7 @@ QBCore.Commands.Add('addpet', 'add a pet to player inventory (Admin Only)', {}, 
     -- inital variation
     local petVariation = ''
     local maxHealth = 200
-    for k, v in pairs(Config.Products.petShop) do
+    for k, v in pairs(Config.pets) do
         if v.name == PETname then
             petVariation = PetVariation:getRandomPedVariationsName(v.model, true)
             maxHealth = v.maxHealth
