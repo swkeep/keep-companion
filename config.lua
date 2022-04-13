@@ -75,20 +75,20 @@ Config.pets = {
     },
 
     [7] = {
-        name = 'keepcompanionmtLion2',
+        name = 'keepcompanionmtlion2',
         model = 'A_C_Panther',
         maxHealth = 350,
         distinct = 'yes cat',
         price = 50000
     },
     [8] = {
-        name = 'keepcompanionmtLion3',
+        name = 'keepcompanionmtlion3',
         model = 'A_C_Cat_01',
         maxHealth = 100,
         distinct = 'no cat'
     },
     [9] = {
-        name = 'keepcompanionmtLion',
+        name = 'keepcompanionmtlion',
         model = 'A_C_MtLion',
         maxHealth = 350,
         distinct = 'yes cat'
