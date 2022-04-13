@@ -14,7 +14,8 @@ ActivePed = {
         lastCoord = nil,
         variation = nil,
         time = nil,
-        health = nil
+        health = nil,
+        food = nil
     }
 }
 -- itemData.name is item's name
@@ -32,6 +33,8 @@ function ActivePed:new(model, hostile, item, ped)
     self.data.variation = item.info.variation
     self.data.time = 1
     self.data.health = item.info.health
+    self.data.food = item.info.food
+
     -- set modelString and canHunt
     for key, information in pairs(Config.pets) do
         if information.name == item.name then
@@ -61,6 +64,8 @@ end
 function ActivePed:update(options)
     if options.model ~= nil then
         self.data.model = options.model or self.data.model
+    elseif options.food ~= nil then
+        self.data.food = options.food or self.data.food
     elseif options.hostile ~= nil then
         self.data.hostile = options.hostile or self.data.hostile
     elseif options.itemData ~= nil then
@@ -91,7 +96,7 @@ function addXpForDistanceMoved()
         local currentCoord = GetEntityCoords(pedData.entity)
         local distance = #(currentCoord - pedData.lastCoord)
         distance = math.floor(distance)
-        ActivePed:update {
+        ActivePed:update{
             lastCoord = 1
         }
 
@@ -106,15 +111,15 @@ function addXpForDistanceMoved()
 
             Xp = Xp + calNextXp(level)
             if Xp >= currentMaxXP then
-                ActivePed:update {
+                ActivePed:update{
                     xp = Xp
                 }
-                ActivePed:update {
+                ActivePed:update{
                     level = level + 1
                 }
                 TriggerEvent('QBCore:Notify', activeped.itemData.info.name .. "level up to " .. activeped.level)
             else
-                ActivePed:update {
+                ActivePed:update{
                     xp = Xp
                 }
             end
@@ -183,8 +188,9 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                 creatActivePetThread(ped)
                 warpPedAroundPlayer(ped)
 
+                print(ActivePed:read().itemData.weight)
                 exports['qb-target']:AddTargetEntity(ped, {
-                    options = { {
+                    options = {{
                         icon = "fas fa-sack-dollar",
                         label = "pet",
                         -- canInteract = function(entity)
@@ -216,13 +222,12 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                             -- TriggerEvent('keep-hunting:client:slaughterAnimal', entity)
                             return true
                         end
-                    } },
+                    }},
                     distance = 1.5
                 })
             end)
         end)
 end)
-
 
 --- when the player is AFK for a certain time pet will wander around
 ---@param timeOut table
@@ -249,11 +254,11 @@ end
 ---@param ped any
 function creatActivePetThread(ped)
     local goWanderingAfter = Config.Balance.goWander
-    local count = 10
+    local count = Config.DataUpdateInterval -- this value is
     local tmpcount = 0
     CreateThread(function()
         -- it's table just to have passed by reference.
-        local timeOut = { 0 }
+        local timeOut = {0}
         while DoesEntityExist(ped) do
             addXpForDistanceMoved()
             afkWandering(timeOut, goWanderingAfter)
@@ -271,6 +276,12 @@ function creatActivePetThread(ped)
                     key = 'XP',
                     content = activeped.XP
                 })
+
+                -- full server side
+                TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
+                    key = 'food',
+                    content = 'decrease'
+                })
                 tmpcount = 0
             end
             tmpcount = tmpcount + 1
@@ -280,8 +291,8 @@ function creatActivePetThread(ped)
             if IsPedDeadOrDying(ActivePed:read().entity) == false and ActivePed:read().maxHealth ~= currentHealth and
                 ActivePed:read().health ~= currentHealth then
                 -- ped is still alive
-                local retval--[[ boolean ]] , outBone--[[ integer ]]  =
-                GetPedLastDamageBone(ActivePed:read().entity--[[ Ped ]] )
+                local retval --[[ boolean ]] , outBone --[[ integer ]] =
+                    GetPedLastDamageBone(ActivePed:read().entity --[[ Ped ]] )
                 print(outBone)
                 local activeped = ActivePed:read()
                 local currentItem = {
@@ -294,7 +305,7 @@ function creatActivePetThread(ped)
                     content = GetEntityHealth(ActivePed:read().entity)
                 })
                 -- update current health value inside client
-                ActivePed:update {
+                ActivePed:update{
                     health = GetEntityHealth(ActivePed:read().entity)
                 }
             end
@@ -373,6 +384,32 @@ end)
 --          Commands Client Events
 -- =========================================
 
+RegisterNetEvent('keep-companion:client:updateFood')
+AddEventHandler('keep-companion:client:updateFood', function(newValue)
+    -- process of updating pet's name
+    ActivePed:update{
+        food = newValue
+    }
+end)
+
+RegisterNetEvent('keep-companion:client:getPetdata')
+AddEventHandler('keep-companion:client:getPetdata', function()
+    TriggerServerEvent('keep-companion:server:increaseFood', ActivePed:read().itemData)
+end)
+
+RegisterNetEvent('keep-companion:client:increaseFood')
+AddEventHandler('keep-companion:client:increaseFood', function(item, amount)
+    TriggerServerEvent('keep-companion:server:updateAllowedInfo', {
+        hash = item.info.hash,
+        slot = item.slot
+    }, {
+        key = 'food',
+        content = 'increase',
+        amount = amount
+    })
+end)
+
+-- #TODO this event should be two events one get active pet and one for changing pet name
 RegisterNetEvent('keep-companion:client:getActivePet')
 AddEventHandler('keep-companion:client:getActivePet', function(name)
     -- process of updating pet's name
