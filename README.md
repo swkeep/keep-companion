@@ -257,21 +257,19 @@ Note that project still not ready yet. but you can still test it and help me in 
 
 ```lua
 -- add it at end of Config.Locations table
-    ["petShop"] = {
+    ["petshop"] = {
         ["label"] = "Pet Shop",
-        ["coords"] = {
-            [1] = vector4(-3225.63, 928.89, 13.9, 297.06),
-            -- [2] = vector4(-659.87, -936.46, 21.83, 130.04), -- umcomment if you are using https://www.gta5-mods.com/maps/mlo-pet-shop
-        },
-        ["ped"] = {
-            ["model"] = 'S_M_M_StrVend_01'
-        },
+        ["coords"] = vector4(-695.74, 5802.04, 17.33, 57.15), --or vector4(-659.87, -936.46, 21.83, 130.04), --  for mlo https://www.gta5-mods.com/maps/
+        ["ped"] = 'S_M_M_StrVend_01',
+        ["scenario"] = "WORLD_HUMAN_COP_IDLES",
         ["radius"] = 1.5,
-        ["products"] = Config.Products["petShop"],
+        ["targetIcon"] = "fas fa-gun",
+        ["targetLabel"] = "Open Pet Shop",
+        ["products"] = Config.Products["petshop"],
         ["showblip"] = true,
         ["blipsprite"] = 267,
-        ["colour"] = 5
-    }
+        ["blipcolor"] = 5
+    },
 ```
 
 # step 4: tooltip
