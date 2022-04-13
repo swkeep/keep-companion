@@ -154,10 +154,6 @@ end
 -- ================================================
 -- #TODO add a way to fix undefined level and xp
 
-RegisterNetEvent('keep-companion:server:updatePedData', function(item, model, entity)
-    Pet:setAsSpawned(source, item, model, entity)
-end)
-
 RegisterNetEvent('keep-companion:server:updateAllowedInfo', function(item, data)
     -- #TODO optimize to just use one updateInfoHelper()
     -- #TODO data validation
@@ -193,6 +189,10 @@ RegisterNetEvent('keep-companion:server:updateAllowedInfo', function(item, data)
 
         end
     end
+end)
+
+RegisterNetEvent('keep-companion:server:updatePedData', function(item, model, entity)
+    Pet:setAsSpawned(source, item, model, entity)
 end)
 
 RegisterNetEvent('keep-companion:server:onPlayerUnload', function(item)
@@ -249,13 +249,9 @@ QBCore.Commands.Add('addItem', 'add item to player inventory (Admin Only)', {}, 
     TriggerClientEvent("inventory:client:ItemBox", source, QBCore.Shared.Items[item[1]], "add")
 end, 'admin')
 
-QBCore.Commands.Add('changePetName', 'change pet name', {{"name", "new pet name"}}, false, function(source, args)
+QBCore.Commands.Add('renamePet', 'rename pet', {{"name", "new pet name"}}, false, function(source, args)
     TriggerClientEvent("keep-companion:client:getActivePet", source, args[1])
 end, 'admin')
-
-RegisterNetEvent('keep-companion:server:updatePedData', function(item, model, entity)
-    Pet:setAsSpawned(source, item, model, entity)
-end)
 
 -- ============================
 --           Cooldown
