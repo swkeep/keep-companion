@@ -280,9 +280,11 @@ Note that project still not ready yet. but you can still test it and help me in 
 
 ```javascript
 else if (
-            itemData.name == "keepcompanionhusky" ||
+       itemData.name == "keepcompanionhusky" ||
             itemData.name == "keepcompanionrottweiler" ||
-            itemData.name == "keepcompanionmtLion" ||
+            itemData.name == "keepcompanionmtlion" ||
+            itemData.name == "keepcompanionmtlion2" ||
+            itemData.name == "keepcompanionmtlion3" ||
             itemData.name == "keepcompanionpoodle" ||
             itemData.name == "keepcompanionpug" ||
             itemData.name == "keepcompanionretriever" ||
