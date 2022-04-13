@@ -57,12 +57,7 @@ function ActivePed:read()
 end
 
 --- update requested value inside pet class
----@param model 'model'
----@param hostile boolean
----@param item table
----@param ped 'ped'
----@param xp integer
----@param level integer
+---@param options table
 function ActivePed:update(options)
     if options.model ~= nil then
         self.data.model = options.model or self.data.model
@@ -127,21 +122,6 @@ function addXpForDistanceMoved()
     end
 end
 
-function calNextXp(level)
-    local maxExp = math.floor(math.floor((level + 300) * (2 ^ (level / 7))) / 4)
-    local minExp = math.floor(math.floor(((level - 1) + 300) * (2 ^ ((level - 1) / 7))) / 4)
-    local dif = maxExp - minExp
-    local pr = math.floor(maxExp / minExp)
-    local multi = 1
-    return math.floor(dif / (multi * (level + 1) * pr))
-end
-
---- return max xp for current level
----@param level integer
-function currentLvlExp(level)
-    return math.floor(math.floor((level + 300) * (2 ^ (level / 7))) / 4)
-end
-
 RegisterNetEvent('keep-companion:client:callCompanion')
 AddEventHandler('keep-companion:client:callCompanion', function(modelName, hostileTowardPlayer, item)
     -- add another layer when player spawn it inside Vehicle
@@ -201,6 +181,7 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
 
                 -- add pet to active thread
                 creatActivePetThread(ped)
+                warpPedAroundPlayer(ped)
 
                 exports['qb-target']:AddTargetEntity(ped, {
                     options = { {
@@ -242,16 +223,6 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
         end)
 end)
 
-function makeEntityFaceEntity(entity1, entity2)
-    local p1 = GetEntityCoords(entity1, true)
-    local p2 = GetEntityCoords(entity2, true)
-
-    local dx = p2.x - p1.x
-    local dy = p2.y - p1.y
-
-    local heading = GetHeadingFromVector_2d(dx, dy)
-    SetEntityHeading(entity1, heading)
-end
 
 --- when the player is AFK for a certain time pet will wander around
 ---@param timeOut table
@@ -351,10 +322,10 @@ AddEventHandler('keep-companion:client:despawn', function(ped)
     whistleAnimation(plyPed, 1500)
 
     CoreName.Functions.Progressbar("despawn", "despawning", Config.Settings.despawnDuration * 1000, false, false, {
-        disableMovement = true,
+        disableMovement = false,
         disableCarMovement = false,
         disableMouse = false,
-        disableCombat = true
+        disableCombat = false
     }, {}, {}, {}, function()
         ClearPedTasks(plyPed)
         Citizen.CreateThread(function()

@@ -1,3 +1,35 @@
+function warpPedAroundPlayer(ped)
+    local currentPlayerCoord = GetEntityCoords(PlayerPedId())
+    local x, y, z = table.unpack(currentPlayerCoord)
+    SetEntityCoords(ped, x + 0.5, y + 0.5, z, 0, 0, 0, 0)
+end
+
+function calNextXp(level)
+    local maxExp = math.floor(math.floor((level + 300) * (2 ^ (level / 7))) / 4)
+    local minExp = math.floor(math.floor(((level - 1) + 300) * (2 ^ ((level - 1) / 7))) / 4)
+    local dif = maxExp - minExp
+    local pr = math.floor(maxExp / minExp)
+    local multi = 1
+    return math.floor(dif / (multi * (level + 1) * pr))
+end
+
+--- return max xp for current level
+---@param level integer
+function currentLvlExp(level)
+    return math.floor(math.floor((level + 300) * (2 ^ (level / 7))) / 4)
+end
+
+function makeEntityFaceEntity(entity1, entity2)
+    local p1 = GetEntityCoords(entity1, true)
+    local p2 = GetEntityCoords(entity2, true)
+
+    local dx = p2.x - p1.x
+    local dy = p2.y - p1.y
+
+    local heading = GetHeadingFromVector_2d(dx, dy)
+    SetEntityHeading(entity1, heading)
+end
+
 function TaskFollowTargetedPlayer(follower, targetPlayer, distanceToStopAt)
     -- i'm not which one is better but TaskFollowToOffsetOfEntity looks more natural
     TaskFollowToOffsetOfEntity(follower, targetPlayer, 2.0, 2.0, 2.0, 5.0, 10.0, distanceToStopAt, 1)
