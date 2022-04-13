@@ -261,7 +261,7 @@ Note that project still not ready yet. but you can still test it and help me in 
         ["label"] = "Pet Shop",
         ["coords"] = {
             [1] = vector4(-3225.63, 928.89, 13.9, 297.06),
-            --[2] = vector4(-659.87, -936.46, 21.83, 130.04), -- umcomment if you are using https://www.gta5-mods.com/maps/mlo-pet-shop
+            -- [2] = vector4(-659.87, -936.46, 21.83, 130.04), -- umcomment if you are using https://www.gta5-mods.com/maps/mlo-pet-shop
         },
         ["ped"] = {
             ["model"] = 'S_M_M_StrVend_01'
