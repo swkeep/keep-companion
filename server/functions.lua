@@ -1,3 +1,5 @@
+local QBCore = exports['qb-core']:GetCoreObject()
+
 --- get random pet name
 ---@param type 'species'
 ---@param gender integer
