@@ -126,6 +126,47 @@ PetVariation = {
             drawableId = 0,
             textureId = 0
         }
+    },
+    ['A_C_MtLion'] = {
+        ['white'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 0
+        },
+        ['brown'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 1
+        },
+        ['darkBrown'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 2
+        }
+    },
+    ['A_C_Panther'] = {
+        ['dark'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 0
+        }
+    },
+    ['A_C_Cat_01'] = {
+        ['gray'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 0
+        },
+        ['dark'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 1
+        },
+        ['brown'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 2
+        }
     }
 }
 
@@ -141,7 +182,6 @@ function PetVariation:setPedVariation(pedHnadle, pedModel, variation)
         data2 = PetVariation[pedModel][variation]
         if data2 ~= nil and
             IsPedComponentVariationValid(pedHnadle, data2.componentId, data2.drawableId, data2.textureId) then
-            print('change')
             SetPedComponentVariation(pedHnadle, data2.componentId, data2.drawableId, data2.textureId)
             return true
         else
