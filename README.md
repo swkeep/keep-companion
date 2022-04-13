@@ -22,9 +22,10 @@ Note that project still not ready yet. but you can still test it and help me in 
 - pet animation ==> not implemented
 - ...
 
-## Hotkey
+## Usage
 
 - open the menu with "o"
+- to rename pets use this command => /renamePet newName
 
 ## Previews
 
