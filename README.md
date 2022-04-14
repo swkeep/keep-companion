@@ -276,7 +276,7 @@ Note that project still not ready yet. but you can still test it and help me in 
         ["ped"] = 'S_M_M_StrVend_01',
         ["scenario"] = "WORLD_HUMAN_COP_IDLES",
         ["radius"] = 1.5,
-        ["targetIcon"] = "fas fa-gun",
+        ["targetIcon"] = "fas fa-paw",
         ["targetLabel"] = "Open Pet Shop",
         ["products"] = Config.Products["petshop"],
         ["showblip"] = true,
