@@ -191,7 +191,7 @@ function goThere(ped)
         local plyped = PlayerPedId()
         local position = GetEntityCoords(plyped)
         local coords, entity = RayCastGamePlayCamera(1000.0)
-        Draw2DText('Press ~g~E~w~ To go there', 4, { 255, 255, 255 }, 0.4, 0.43, 0.888 + 0.025)
+        Draw2DText('Press ~g~E~w~ To go there', 4, {255, 255, 255}, 0.4, 0.43, 0.888 + 0.025)
         if IsControlJustReleased(0, 38) then
             TaskGoToCoordAnyMeans(ped, coords, 10.0, 0, 0, 0, 0)
             activeLaser = false
@@ -247,7 +247,7 @@ function attackLogic()
         local plyped = PlayerPedId()
         local position = GetEntityCoords(plyped)
         local coords, entity = RayCastGamePlayCamera(1000.0)
-        Draw2DText('PRESS ~g~E~w~ TO ATTACK TARGET', 4, { 255, 255, 255 }, 0.4, 0.43, 0.888 + 0.025)
+        Draw2DText('PRESS ~g~E~w~ TO ATTACK TARGET', 4, {255, 255, 255}, 0.4, 0.43, 0.888 + 0.025)
         if IsControlJustReleased(0, 38) then
             ClearPedTasks(ActivePed:read().entity)
             if IsEntityAPed(entity) then
@@ -281,7 +281,7 @@ function attackLogic()
                         end
 
                         local Xp = Xp + (calNextXp(level) * 3)
-                        ActivePed:update {
+                        ActivePed:update{
                             xp = Xp
                         }
                     end
@@ -314,75 +314,6 @@ function doSomethingIfPedIsInsideVehicle(ped)
     end
 end
 
---- plays requested animation
----@param ped 'ped'
----@param animation 'animation name'
-function playerAnimation(ped, animation)
-    -- sitting animation
-    if animation == 'sleep_medium' then
-        waitForAnimation('creatures@rottweiler@amb@sleep_in_kennel@')
-        TaskPlayAnim(ped, 'creatures@rottweiler@amb@sleep_in_kennel@', 'sleep_in_kennel', 8.0, -8, -1, 1, 0, false,
-            false, false)
-    elseif animation == 'sleep_small' then
-        waitForAnimation('creatures@coyote@amb@world_coyote_rest@idle_a')
-        TaskPlayAnim(ped, 'creatures@coyote@amb@world_coyote_rest@idle_a', 'idle_a', 8.0, -8, -1, 1, 0, false, false,
-            false)
-    elseif animation == 'idle_a' then
-        waitForAnimation('creatures@rottweiler@amb@world_dog_sitting@base')
-        TaskPlayAnim(ped, 'creatures@rottweiler@amb@world_dog_sitting@base', 'base', 8.0, -8, -1, 1, 0, false, false,
-            false)
-    elseif animation == 'idle_b' then
-        waitForAnimation('creatures@carlin@amb@world_dog_sitting@idle_a')
-        TaskPlayAnim(ped, 'creatures@carlin@amb@world_dog_sitting@idle_a', 'idle_b', 8.0, -8, -1, 1, 0, false, false,
-            false)
-    elseif animation == 'sitting' then
-        waitForAnimation('creatures@retriever@amb@world_dog_sitting@idle_a')
-        TaskPlayAnim(ped, 'creatures@retriever@amb@world_dog_sitting@idle_a', 'idle_c', 8.0, -8, -1, 1, 0, false, false,
-            false)
-    elseif animation == 'sitting_idle' then
-        waitForAnimation('creatures@rottweiler@amb@world_dog_sitting@idle_a')
-        TaskPlayAnim(ped, 'creatures@rottweiler@amb@world_dog_sitting@idle_a', 'idle_c', 8.0, -8, -1, 1, 0, false,
-            false, false)
-    elseif animation == 'none' then
-        ClearPedTasks(ped)
-    end
-
-    -- -- idle bark
-    -- waitForAnimation('creatures@retriever@amb@world_dog_barking@idle_a')
-    -- TaskPlayAnim(ped, 'creatures@retriever@amb@world_dog_barking@idle_a', 'idle_a', 8.0, -8, -1, 1, 0, false, false,
-    --     false)
-    -- -- idel bark base
-    -- waitForAnimation('creatures@retriever@amb@world_dog_barking@base')
-    -- TaskPlayAnim(ped, 'creatures@retriever@amb@world_dog_barking@base', 'base', 8.0, -8, -1, 1, 0, false, false, false)
-    -- -- idle but with high jumping bark
-    -- waitForAnimation('creatures@retriever@amb@world_dog_barking@idle_a')
-    -- TaskPlayAnim(ped, 'creatures@retriever@amb@world_dog_barking@idle_a', 'idle_b', 8.0, -8, -1, 1, 0, false, false,
-    --     false)
-
-    -- -- rotate around + bark
-    -- waitForAnimation('creatures@retriever@amb@world_dog_barking@idle_a')
-    -- TaskPlayAnim(ped, 'creatures@retriever@amb@world_dog_barking@idle_a', 'idle_c', 8.0, -8, -1, 1, 0, false, false,
-    --     false)
-    -- -- siting dog base
-    -- waitForAnimation('creatures@retriever@amb@world_dog_sitting@base')
-    -- TaskPlayAnim(ped, 'creatures@retriever@amb@world_dog_sitting@base', 'base', 8.0, -8, -1, 1, 0, false, false, false)
-
-    -- -- sitting idle self itch
-    -- waitForAnimation('creatures@retriever@amb@world_dog_sitting@idle_a')
-    -- TaskPlayAnim(ped, 'creatures@retriever@amb@world_dog_sitting@idle_a', 'idle_a', 8.0, -8, -1, 1, 0, false, false,
-    --     false)
-
-    -- -- sitting idle look around
-    -- waitForAnimation('creatures@retriever@amb@world_dog_sitting@idle_a')
-    -- TaskPlayAnim(ped, 'creatures@retriever@amb@world_dog_sitting@idle_a', 'idle_b', 8.0, -8, -1, 1, 0, false, false,
-    --     false)
-    -- -- sitting idle full sit and up
-    -- waitForAnimation('creatures@retriever@amb@world_dog_sitting@idle_a')
-    -- TaskPlayAnim(ped, 'creatures@retriever@amb@world_dog_sitting@idle_a', 'idle_c', 8.0, -8, -1, 1, 0, false, false,
-    --     false)
-
-end
-
 --- gives ped ability to follow and attack targeted ped
 ---@param AttackerPed 'ped'
 ---@param targetPed 'ped'
@@ -404,4 +335,186 @@ function AttackTargetedPed(AttackerPed, targetPed)
         end
         TaskFollowTargetedPlayer(AttackerPed, PlayerPedId(), 3.0)
     end)
+end
+
+function playAnimation(ped, name, timeout)
+    local animationList = {
+        ['retriever'] = {
+            ['standing'] = {
+                ['normal_bark'] = {
+                    animDictionary = 'creatures@retriever@amb@world_dog_barking@idle_a',
+                    animationName = 'idle_a'
+                },
+                ['standing_bark'] = {
+                    animDictionary = 'creatures@retriever@amb@world_dog_barking@idle_a',
+                    animationName = 'idle_b'
+                },
+                ['rotate_bark'] = {
+                    animDictionary = 'creatures@retriever@amb@world_dog_barking@idle_a',
+                    animationName = 'idle_c'
+                }
+            },
+            ['siting'] = {
+                ['self_itch'] = {
+                    animDictionary = 'creatures@retriever@amb@world_dog_sitting@idle_a',
+                    animationName = 'idle_a'
+                },
+                ['look_around'] = {
+                    animDictionary = 'creatures@retriever@amb@world_dog_sitting@idle_a',
+                    animationName = 'idle_b'
+                },
+                ['sit_Up'] = {
+                    animDictionary = 'creatures@retriever@amb@world_dog_sitting@idle_a',
+                    animationName = 'idle_c'
+                },
+                ['sit'] = {
+                    animDictionary = 'creatures@retriever@amb@world_dog_sitting@base',
+                    animationName = 'base'
+                }
+            },
+            ['misc'] = {
+                ['indicate_ahead'] = {
+                    animDictionary = 'creatures@rottweiler@indication@',
+                    animationName = 'indicate_ahead'
+                },
+                ['indicate_high'] = {
+                    animDictionary = 'creatures@rottweiler@indication@',
+                    animationName = 'indicate_high'
+                },
+                ['indicate_low'] = {
+                    animDictionary = 'creatures@rottweiler@indication@',
+                    animationName = 'indicate_low'
+                }
+            }
+        },
+        ['rottweiler'] = {
+            ['standing'] = {},
+            ['siting'] = {},
+            ['misc'] = {
+                ['indicate_ahead'] = {
+                    animDictionary = 'creatures@rottweiler@indication@',
+                    animationName = 'indicate_ahead'
+                },
+                ['indicate_high'] = {
+                    animDictionary = 'creatures@rottweiler@indication@',
+                    animationName = 'indicate_high'
+                },
+                ['indicate_low'] = {
+                    animDictionary = 'creatures@rottweiler@indication@',
+                    animationName = 'indicate_low'
+                }
+            },
+            ['tricks'] = {
+                ['beg_enter'] = {
+                    animDictionary = 'creatures@rottweiler@tricks@',
+                    animationName = 'beg_enter'
+                },
+                ['beg_exit'] = {
+                    animDictionary = 'creatures@rottweiler@tricks@',
+                    animationName = 'beg_exit'
+                },
+                ['beg_loop'] = {
+                    animDictionary = 'creatures@rottweiler@tricks@',
+                    animationName = 'beg_loop'
+                },
+                ['paw_right_enter'] = {
+                    animDictionary = 'creatures@rottweiler@tricks@',
+                    animationName = 'paw_right_enter'
+                },
+                ['paw_right_exit'] = {
+                    animDictionary = 'creatures@rottweiler@tricks@',
+                    animationName = 'paw_right_exit'
+                },
+                ['paw_right_loop'] = {
+                    animDictionary = 'creatures@rottweiler@tricks@',
+                    animationName = 'paw_right_loop'
+                },
+                ['petting_chop'] = {
+                    animDictionary = 'creatures@rottweiler@tricks@',
+                    animationName = 'petting_chop'
+                },
+                ['petting_franklin'] = { -- this is for human that is petting dog!
+                    animDictionary = 'creatures@rottweiler@tricks@',
+                    animationName = 'petting_franklin'
+                }
+            },
+            ['hump'] = {
+                ['hump_enter_chop'] = {
+                    animDictionary = 'creatures@rottweiler@amb@',
+                    animationName = 'hump_enter_chop'
+                },
+                ['hump_enter_ladydog'] = {
+                    animDictionary = 'creatures@rottweiler@amb@',
+                    animationName = 'hump_enter_ladydog'
+                },
+                ['hump_exit_chop'] = {
+                    animDictionary = 'creatures@rottweiler@amb@',
+                    animationName = 'hump_exit_chop'
+                },
+                ['hump_exit_ladydog'] = {
+                    animDictionary = 'creatures@rottweiler@amb@',
+                    animationName = 'hump_exit_ladydog'
+                },
+                ['hump_loop_chop'] = {
+                    animDictionary = 'creatures@rottweiler@amb@',
+                    animationName = 'hump_loop_chop'
+                },
+                ['hump_loop_ladydog'] = {
+                    animDictionary = 'creatures@rottweiler@amb@',
+                    animationName = 'hump_loop_chop'
+                }
+            },
+            ['sleep'] = {
+                ['exit_kennel'] = {
+                    animDictionary = 'creatures@rottweiler@amb@sleep_in_kennel@',
+                    animationName = 'exit_kennel'
+                },
+                ['sleep_in_kennel'] = {
+                    animDictionary = 'creatures@rottweiler@amb@sleep_in_kennel@',
+                    animationName = 'sleep_in_kennel'
+                }
+            },
+            ['pickup'] = {
+                ['fetch_drop'] = {
+                    animDictionary = 'CREATURES@ROTTWEILER@MOVE',
+                    animationName = 'fetch_drop'
+                },
+                ['fetch_pickup'] = {
+                    animDictionary = 'CREATURES@ROTTWEILER@MOVE',
+                    animationName = 'fetch_pickup'
+                }
+            },
+            ['dump'] = {
+                ['dump_enter'] = {
+                    animDictionary = 'CREATURES@ROTTWEILER@MOVE',
+                    animationName = 'dump_enter'
+                },
+                ['dump_exit'] = {
+                    animDictionary = 'CREATURES@ROTTWEILER@MOVE',
+                    animationName = 'dump_exit'
+                },
+                ['dump_loop'] = {
+                    animDictionary = 'CREATURES@ROTTWEILER@MOVE',
+                    animationName = 'dump_loop'
+                }
+            },
+            ['pee'] = {
+                ['pee_left_enter'] = {
+                    animDictionary = 'CREATURES@ROTTWEILER@MOVE',
+                    animationName = 'pee_left_enter'
+                },
+                ['pee_left_exit'] = {
+                    animDictionary = 'CREATURES@ROTTWEILER@MOVE',
+                    animationName = 'pee_left_exit'
+                },
+                ['pee_left_idle'] = {
+                    animDictionary = 'CREATURES@ROTTWEILER@MOVE',
+                    animationName = 'pee_left_idle'
+                }
+            }
+        }
+    }
+
+    waitForAnimation('creatures@coyote@amb@world_coyote_rest@idle_a')
+    TaskPlayAnim(ped, 'creatures@coyote@amb@world_coyote_rest@idle_a', 'idle_a', 8.0, -8, -1, 1, 0, false, false, false)
 end

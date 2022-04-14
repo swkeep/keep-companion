@@ -126,6 +126,18 @@ Note that project still not ready yet. but you can still test it and help me in 
         ["combinable"] = nil,
         ["description"] = "Panter is your royal companion!"
     },
+    ["keepcompanioncat"] = {
+        ["name"] = "keepcompanioncat",
+        ["label"] = "Cat",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "A_C_Cat_01.png",
+        ["unique"] = true,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = nil,
+        ["description"] = "Cat is your royal companion!"
+    },
     ["keepcompanionpug"] = {
         ["name"] = "keepcompanionpug",
         ["label"] = "Pug",
@@ -170,7 +182,7 @@ Note that project still not ready yet. but you can still test it and help me in 
 
 ```lua
 -- add it at end of Config.Products table
-    ["petShop"] = {
+    ["petshop"] = {
         [1] = {
             name = 'keepcompanionwesty',
             price = 50000,
@@ -196,7 +208,7 @@ Note that project still not ready yet. but you can still test it and help me in 
             slot = 3
         },
         [4] = {
-            name = 'keepcompanionretriever',
+            name = 'keepcompanionrottweiler',
             price = 75000,
             amount = 5,
             info = {},
@@ -221,7 +233,7 @@ Note that project still not ready yet. but you can still test it and help me in 
         },
 
         [7] = {
-            name = 'keepcompanionmtLion2',
+            name = 'keepcompanionmtlion2',
             price = 50000,
             amount = 5,
             info = {},
@@ -229,7 +241,7 @@ Note that project still not ready yet. but you can still test it and help me in 
             slot = 7
         },
         [8] = {
-            name = 'keepcompanionmtLion3',
+            name = 'keepcompanioncat',
             price = 50000,
             amount = 5,
             info = {},
@@ -237,7 +249,7 @@ Note that project still not ready yet. but you can still test it and help me in 
             slot = 8
         },
         [9] = {
-            name = 'keepcompanionmtLion',
+            name = 'keepcompanionmtlion',
             price = 50000,
             amount = 5,
             info = {},
@@ -281,11 +293,11 @@ Note that project still not ready yet. but you can still test it and help me in 
 
 ```javascript
 else if (
-       itemData.name == "keepcompanionhusky" ||
+            itemData.name == "keepcompanionhusky" ||
             itemData.name == "keepcompanionrottweiler" ||
             itemData.name == "keepcompanionmtlion" ||
             itemData.name == "keepcompanionmtlion2" ||
-            itemData.name == "keepcompanionmtlion3" ||
+            itemData.name == "keepcompanioncat" ||
             itemData.name == "keepcompanionpoodle" ||
             itemData.name == "keepcompanionpug" ||
             itemData.name == "keepcompanionretriever" ||

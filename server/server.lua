@@ -116,8 +116,9 @@ function Pet:despawnPet(source, item)
 end
 
 -- ============================
---          Item
+--          Items
 -- ============================
+-- food 
 QBCore.Functions.CreateUseableItem('petfood', function(source, item)
     TriggerClientEvent('keep-companion:client:getPetdata', source)
 end)
@@ -129,6 +130,7 @@ RegisterNetEvent('keep-companion:server:increaseFood', function(item)
     TriggerClientEvent('keep-companion:client:increaseFood', source, item, math.random(1500, 2000))
 end)
 
+-- all pets
 for key, value in pairs(Config.pets) do
     QBCore.Functions.CreateUseableItem(value.name, function(source, item)
         if item.name == value.name then
@@ -158,7 +160,7 @@ RegisterNetEvent('keep-companion:server:updateAllowedInfo', function(item, data)
     -- #TODO optimize to just use one updateInfoHelper()
     -- #TODO data validation
     local Player = QBCore.Functions.GetPlayer(source)
-    local requestedItem = Player.PlayerData.items[item.slot] -- ask item's data from sever
+    local requestedItem = Player.PlayerData.items[item.slot] -- ask sever to give item's data
     data = data or {}
     if requestedItem == nil or item.hash ~= requestedItem.info.hash then
         -- either item doesnt exist or player changed slot
