@@ -272,7 +272,7 @@ Note that project still not ready yet. but you can still test it and help me in 
 -- add it at end of Config.Locations table
     ["petshop"] = {
         ["label"] = "Pet Shop",
-        ["coords"] = vector4(-695.74, 5802.04, 17.33, 57.15), --or vector4(-659.87, -936.46, 21.83, 130.04), --  for mlo https://www.gta5-mods.com/maps/
+        ["coords"] = vector4(563.76, 2753.27, 42.88, 186.12), --or vector4(-659.87, -936.46, 21.83, 130.04), --  for mlo https://www.gta5-mods.com/maps/
         ["ped"] = 'S_M_M_StrVend_01',
         ["scenario"] = "WORLD_HUMAN_COP_IDLES",
         ["radius"] = 1.5,
