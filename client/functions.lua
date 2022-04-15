@@ -199,7 +199,7 @@ function getIntoCar()
             for i = 1, 5, 1 do
                 if IsVehicleSeatFree(vehicle, i - 2) then
                     SetPedIntoVehicle(ped, vehicle, i - 2)
-                    playerAnimation(ped, 'sitting')
+                    playAnimation(ped, 'retriever', 'siting', 'look_around', ActivePed:read().model, 'REPEAT')
                     seatEmpty = i - 2
                     goto here
                 end
@@ -388,7 +388,8 @@ function AttackTargetedPed(AttackerPed, targetPed)
     end)
 end
 
-function playAnimation(ped, petType, state, animation, currentPetType)
+function playAnimation(ped, petType, state, animation, currentPetType, c_timings)
+    -- c_timings = REPEAT , STOP_LAST_FRAME , UPPERBODY ,ENABLE_PLAYER_CONTRO , CANCELABLE
     local animationList = {
         ['retriever'] = {
             ['standing'] = {
@@ -412,7 +413,8 @@ function playAnimation(ped, petType, state, animation, currentPetType)
                 },
                 ['look_around'] = {
                     animDictionary = 'creatures@retriever@amb@world_dog_sitting@idle_a',
-                    animationName = 'idle_b'
+                    animationName = 'idle_b',
+                    skip = {'A_C_Westy', 'A_C_Pug', 'A_C_Poodle', 'A_C_Cat_01', 'A_C_MtLion', 'A_C_Panther'}
                 },
                 ['sit_Up'] = {
                     animDictionary = 'creatures@retriever@amb@world_dog_sitting@idle_a',
@@ -640,7 +642,7 @@ function playAnimation(ped, petType, state, animation, currentPetType)
     }
 
     -- if currentPetType is provided if we find it inside animation skip value we will skip this animation
-    if animationList[petType][state][animation].skip ~= nil then
+    if animationList[petType][state][animation].skip ~= nil and currentPetType ~= nil then
         for key, value in pairs(animationList[petType][state][animation].skip) do
             if currentPetType == value then
                 return
@@ -650,7 +652,23 @@ function playAnimation(ped, petType, state, animation, currentPetType)
 
     local c_animDictionary = animationList[petType][state][animation].animDictionary
     local c_animationName = animationList[petType][state][animation].animationName
-
     waitForAnimation(c_animDictionary)
-    TaskPlayAnim(ped, c_animDictionary, c_animationName, 8.0, -8, -1, 0, 0, false, false, false)
+    local flag = -1
+    local slow = -1
+    if c_timings ~= nil then
+        if c_timings == 'REPEAT' then
+            flag = 1
+        elseif c_timings == 'STOP_LAST_FRAME' then
+            flag = 2
+        elseif c_timings == 'UPPERBODY' then
+            flag = 16
+        elseif c_timings == 'ENABLE_PLAYER_CONTROL' then
+            flag = 32
+        elseif c_timings == 'CANCELABLE' then
+            flag = 120
+        else
+            flag = -1
+        end
+    end
+    TaskPlayAnim(ped, c_animDictionary, c_animationName, 8.0, -8, slow, flag, 0, false, false, false)
 end
