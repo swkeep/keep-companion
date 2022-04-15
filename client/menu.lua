@@ -64,7 +64,11 @@ local menu = {
     [7] = {
         lable = "Tricks",
         action = function(plyped, activePed)
+            QBCore.Functions.Notify('test tricks beg', 'error', 1500)
             Animator(activePed.entity, activePed.model, 'tricks', 'beg')
+            Wait(7000)
+            QBCore.Functions.Notify('test tricks paw', 'error', 1500)
+            Animator(activePed.entity, activePed.model, 'tricks', 'paw')
         end
     }
 }

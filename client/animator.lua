@@ -1,3 +1,5 @@
+-- sequential animations are only supported for up to 3 animations
+-- they need to be in the order of Start=>Loop=>Exit
 local animationList = {
     ['rottweiler'] = {
         ['standing'] = {
@@ -65,17 +67,22 @@ local animationList = {
                     }
                 }
             },
-            ['paw_right_enter'] = {
-                animDictionary = 'creatures@rottweiler@tricks@',
-                animationName = 'paw_right_enter'
-            },
-            ['paw_right_exit'] = {
-                animDictionary = 'creatures@rottweiler@tricks@',
-                animationName = 'paw_right_exit'
-            },
-            ['paw_right_loop'] = {
-                animDictionary = 'creatures@rottweiler@tricks@',
-                animationName = 'paw_right_loop'
+            ['paw'] = {
+                sequential = true,
+                list = {
+                    [1] = {
+                        animDictionary = 'creatures@rottweiler@tricks@',
+                        animationName = 'paw_right_enter'
+                    },
+                    [2] = {
+                        animDictionary = 'creatures@rottweiler@tricks@',
+                        animationName = 'paw_right_loop'
+                    },
+                    [3] = {
+                        animDictionary = 'creatures@rottweiler@tricks@',
+                        animationName = 'paw_right_exit'
+                    }
+                }
             },
             ['petting_chop'] = {
                 animDictionary = 'creatures@rottweiler@tricks@',
@@ -88,30 +95,41 @@ local animationList = {
             }
         },
         ['hump'] = {
-            ['hump_enter_chop'] = {
-                animDictionary = 'creatures@rottweiler@amb@',
-                animationName = 'hump_enter_chop'
+            ['hump_chop'] = {
+                sequential = true,
+                list = {
+                    [1] = {
+                        animDictionary = 'creatures@rottweiler@amb@',
+                        animationName = 'hump_enter_chop'
+                    },
+                    [2] = {
+                        animDictionary = 'creatures@rottweiler@amb@',
+                        animationName = 'hump_loop_chop'
+                    },
+                    [3] = {
+                        animDictionary = 'creatures@rottweiler@amb@',
+                        animationName = 'hump_exit_chop'
+                    }
+                }
             },
-            ['hump_enter_ladydog'] = {
-                animDictionary = 'creatures@rottweiler@amb@',
-                animationName = 'hump_enter_ladydog'
-            },
-            ['hump_exit_chop'] = {
-                animDictionary = 'creatures@rottweiler@amb@',
-                animationName = 'hump_exit_chop'
-            },
-            ['hump_exit_ladydog'] = {
-                animDictionary = 'creatures@rottweiler@amb@',
-                animationName = 'hump_exit_ladydog'
-            },
-            ['hump_loop_chop'] = {
-                animDictionary = 'creatures@rottweiler@amb@',
-                animationName = 'hump_loop_chop'
-            },
-            ['hump_loop_ladydog'] = {
-                animDictionary = 'creatures@rottweiler@amb@',
-                animationName = 'hump_loop_chop'
+            ['hump_ladydog'] = {
+                sequential = true,
+                list = {
+                    [1] = {
+                        animDictionary = 'creatures@rottweiler@amb@',
+                        animationName = 'hump_enter_ladydog'
+                    },
+                    [2] = {
+                        animDictionary = 'creatures@rottweiler@amb@',
+                        animationName = 'hump_loop_ladydog'
+                    },
+                    [3] = {
+                        animDictionary = 'creatures@rottweiler@amb@',
+                        animationName = 'hump_exit_ladydog'
+                    }
+                }
             }
+
         },
         ['sleep'] = {
             ['exit_kennel'] = {
@@ -153,17 +171,22 @@ local animationList = {
             }
         },
         ['pee'] = {
-            ['pee_left_enter'] = {
-                animDictionary = 'CREATURES@ROTTWEILER@MOVE',
-                animationName = 'pee_left_enter'
-            },
-            ['pee_left_exit'] = {
-                animDictionary = 'CREATURES@ROTTWEILER@MOVE',
-                animationName = 'pee_left_exit'
-            },
-            ['pee_left_idle'] = {
-                animDictionary = 'CREATURES@ROTTWEILER@MOVE',
-                animationName = 'pee_left_idle'
+            ['pee'] = {
+                sequential = true,
+                list = {
+                    [1] = {
+                        animDictionary = 'CREATURES@ROTTWEILER@MOVE',
+                        animationName = 'pee_left_enter'
+                    },
+                    [2] = {
+                        animDictionary = 'CREATURES@ROTTWEILER@MOVE',
+                        animationName = 'pee_left_idle'
+                    },
+                    [3] = {
+                        animDictionary = 'CREATURES@ROTTWEILER@MOVE',
+                        animationName = 'pee_left_exit'
+                    }
+                }
             }
         }
     },
