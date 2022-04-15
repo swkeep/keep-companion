@@ -64,8 +64,7 @@ local menu = {
     [7] = {
         lable = "Tricks",
         action = function(plyped, activePed)
-            playAnimation(activePed.entity, 'rottweiler', 'tricks', 'petting_chop')
-            playAnimation(PlayerPedId(), 'rottweiler', 'tricks', 'petting_franklin')
+            Animator(activePed.entity, activePed.model, 'tricks', 'beg')
         end
     }
 }
@@ -145,13 +144,19 @@ end)
 
 -- Command
 RegisterCommand('+showMenu', function()
-    local doesPlayerHavePet = ActivePed:read() or {}
+    -- local doesPlayerHavePet = ActivePed:read() or {}
+    -- if ((IsDowned() and IsPoliceOrEMS()) or not IsDowned()) and not PlayerData.metadata["ishandcuffed"] and
+    --     not IsPauseMenuActive() and not inRadialMenu and next(doesPlayerHavePet) ~= nil then
+    --     SetCursorLocation(0.5, 0.5)
+    --     setRadialState(true, true)
+    -- elseif next(doesPlayerHavePet) == nil then
+    --     TriggerEvent('QBCore:Notify', "you must have atleast one active pet to access to menu")
+    -- end
+
     if ((IsDowned() and IsPoliceOrEMS()) or not IsDowned()) and not PlayerData.metadata["ishandcuffed"] and
-        not IsPauseMenuActive() and not inRadialMenu and next(doesPlayerHavePet) ~= nil then
+        not IsPauseMenuActive() and not inRadialMenu then
         SetCursorLocation(0.5, 0.5)
         setRadialState(true, true)
-    elseif next(doesPlayerHavePet) == nil then
-        TriggerEvent('QBCore:Notify', "you must have atleast one active pet to access to menu")
     end
 end, false)
 
