@@ -213,9 +213,10 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                             SetEntityCoords(entity, x, y, z, 0, 0, 0, 0)
                             TaskPause(entity, 5000)
 
-                            playAnimation(entity, 'rottweiler', 'tricks', 'petting_chop')
+                            -- #TODO skip smal animal cus they don't have this animation
+                            playAnimation(entity, 'rottweiler', 'tricks', 'petting_chop', modelName)
                             playAnimation(PlayerPedId(), 'rottweiler', 'tricks', 'petting_franklin')
-                            TriggerServerEvent('hud:server:RelieveStress', Config.Balance.petRelieveStressValue)
+                            TriggerServerEvent('hud:server:RelieveStress', Config.Balance.petStressReliefValue)
                             return true
                         end
                     }},

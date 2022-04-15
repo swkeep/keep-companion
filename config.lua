@@ -23,7 +23,7 @@ Config.Settings = {
 Config.Balance = {
     maximumLevel = 50, -- xp callculation only work util level 99 don't set it to higher values
     goWander = 60, -- sec pet gonna go wandering around player after player is AFK for a certain time
-    petRelieveStressValue = math.random(12, 24)
+    petStressReliefValue = math.random(12, 24)
 }
 
 Config.DataUpdateInterval = 10 -- 10sec

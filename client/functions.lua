@@ -337,7 +337,7 @@ function AttackTargetedPed(AttackerPed, targetPed)
     end)
 end
 
-function playAnimation(ped, petType, state, animation)
+function playAnimation(ped, petType, state, animation, currentPetType)
     local animationList = {
         ['retriever'] = {
             ['standing'] = {
@@ -431,7 +431,8 @@ function playAnimation(ped, petType, state, animation)
                 },
                 ['petting_chop'] = {
                     animDictionary = 'creatures@rottweiler@tricks@',
-                    animationName = 'petting_chop'
+                    animationName = 'petting_chop',
+                    skip = {'A_C_Westy', 'A_C_Pug', 'A_C_Poodle', 'A_C_Cat_01'}
                 },
                 ['petting_franklin'] = { -- this is for human that is petting dog!
                     animDictionary = 'creatures@rottweiler@tricks@',
@@ -586,6 +587,15 @@ function playAnimation(ped, petType, state, animation)
             }
         }
     }
+
+    -- if currentPetType is provided if we find it inside animation skip value we will skip this animation
+    if animationList[petType][state][animation].skip ~= nil then
+        for key, value in pairs(animationList[petType][state][animation].skip) do
+            if currentPetType == value then
+                return
+            end
+        end
+    end
 
     local c_animDictionary = animationList[petType][state][animation].animDictionary
     local c_animationName = animationList[petType][state][animation].animationName
