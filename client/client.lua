@@ -214,8 +214,9 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                             TaskPause(entity, 5000)
 
                             -- #TODO skip smal animal cus they don't have this animation
-                            playAnimation(entity, 'rottweiler', 'tricks', 'petting_chop', modelName)
-                            playAnimation(PlayerPedId(), 'rottweiler', 'tricks', 'petting_franklin')
+                            Animator(entity, modelName, 'tricks', 'petting_chop')
+                            Animator(plyPed, modelName, 'tricks', 'petting_franklin')
+
                             TriggerServerEvent('hud:server:RelieveStress', Config.Balance.petStressReliefValue)
                             return true
                         end
@@ -239,8 +240,13 @@ local function afkWandering(timeOut, goWanderingAfter)
             timeOut[1] = timeOut[1] + 1
         end
         if timeOut[1] == goWanderingAfter then
-            -- player is stoped more than 10sec
-            TaskWanderInArea(ped, coord, 4.0, 2, 8.0)
+            if timeOut.lastAction == nil or timeOut.lastAction ~= 'wandering' then
+                TaskWanderInArea(ped, coord, 4.0, 2, 8.0)
+                timeOut.lastAction = 'wandering'
+            elseif timeOut.lastAction ~= nil and timeOut.lastAction == 'wandering' then
+                local rand = math.random(1, 10)
+                timeOut.lastAction = 'animation'
+            end
         end
     else
         timeOut[1] = 0
@@ -255,7 +261,10 @@ function creatActivePetThread(ped)
     local tmpcount = 0
     CreateThread(function()
         -- it's table just to have passed by reference.
-        local timeOut = {0}
+        local timeOut = {
+            0,
+            lastAction = nil
+        }
         while DoesEntityExist(ped) do
             addXpForDistanceMoved()
             afkWandering(timeOut, goWanderingAfter)
