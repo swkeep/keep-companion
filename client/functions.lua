@@ -512,6 +512,78 @@ function playAnimation(ped, name, timeout)
                     animationName = 'pee_left_idle'
                 }
             }
+        },
+        ['cat'] = {
+            ['standing'] = {
+                ['idle'] = {
+                    animDictionary = 'creatures@cat@move',
+                    animationName = 'idle'
+                },
+                ['idle_dwn'] = {
+                    animDictionary = 'creatures@cat@move',
+                    animationName = 'idle_dwn'
+                },
+                ['idle_upp'] = {
+                    animDictionary = 'creatures@cat@move',
+                    animationName = 'idle_upp'
+                }
+            },
+            ['siting'] = {
+                ['sitting'] = {
+                    animDictionary = 'creatures@cat@amb@world_cat_sleeping_ledge@idle_a',
+                    animationName = 'idle_a'
+                }
+            },
+            ['misc'] = {},
+            ['sleep'] = {
+                ['enter_sleep'] = {
+                    animDictionary = 'creatures@cat@amb@world_cat_sleeping_ground@enter',
+                    animationName = 'enter'
+                },
+                ['sleep'] = {
+                    animDictionary = 'creatures@cat@amb@world_cat_sleeping_ground@base',
+                    animationName = 'base'
+                },
+                ['idle_sleep'] = {
+                    animDictionary = 'creatures@cat@amb@world_cat_sleeping_ground@idle_a',
+                    animationName = 'idle_a'
+                },
+                ['exit_sleep'] = {
+                    animDictionary = 'creatures@cat@amb@world_cat_sleeping_ground@exit',
+                    animationName = 'base'
+                },
+                ['exit2_sleep'] = {
+                    animDictionary = 'creatures@cat@amb@peyote@enter',
+                    animationName = 'enter'
+                },
+                ['exit_panic_sleep'] = {
+                    animDictionary = 'creatures@cat@amb@world_cat_sleeping_ground@exit',
+                    animationName = 'idle_a'
+                }
+            }
+        },
+        ['cougar'] = {
+            ['standing'] = {
+                ['idle'] = {
+                    animDictionary = 'creatures@cat@move',
+                    animationName = 'idle'
+                }
+
+            },
+            ['siting'] = {
+                ['sitting'] = {
+                    animDictionary = 'creatures@cat@amb@world_cat_sleeping_ledge@idle_a',
+                    animationName = 'idle_a'
+                }
+            },
+            ['misc'] = {},
+            ['sleep'] = {
+                ['enter_sleep'] = {
+                    animDictionary = 'creatures@cat@amb@world_cat_sleeping_ground@enter',
+                    animationName = 'enter'
+                }
+
+            }
         }
     }
 
