@@ -328,7 +328,7 @@ local correctionList = {
 --- missfra1leadinoutfra_1_int_trevor _trevor_leadin_loop_chop <<<< sleep with feared face!
 --- misschop_vehicle@back_of_van chop_sit_loop chop_lean_back_loop chop_growl_to_sit chop_growl chop_bark
 -- fix_agy_int1-1 a_c_chop_02_dual-1 <<<< sleep
-function Animator(pedHandle, pedModel, state, animation, c_timings)
+function Animator(pedHandle, pedModel, state, animation, options)
 
     -- #TODO sequential animation
     if correctionList[pedModel] == nil or correctionList[pedModel][state] == nil or
@@ -352,24 +352,45 @@ function Animator(pedHandle, pedModel, state, animation, c_timings)
                 local c_animationName = currentAnimation.animationName
 
                 local timeout = 0
+                if options == nil then
+                    options = {}
+                end
+                if options.sequentialTimings == nil then
+                    options.sequentialTimings = {}
+                end
+                local tmpsequentialTimings = {
+                    [1] = options.sequentialTimings[1] or 0, -- start animation Timeout ==> 1sec(6s-5s) to loop 
+                    [2] = options.sequentialTimings[2] or 0, -- loop animation Timeout  ==> 6sec(6s-0s) to exit
+                    [3] = options.sequentialTimings[3] or 0, -- exit animation Timeout  ==> 4sec(6s-2s) to end
+                    step = options.sequentialTimings['step'] or 1,
+                    Timeout = options.sequentialTimings['Timeout'] or 5
+                }
                 if count == 1 then
-                    timeout = timeout + 5
+                    timeout = timeout + tmpsequentialTimings[1]
                     excuteAnimation(pedHandle, c_animDictionary, c_animationName, 'STOP_LAST_FRAME')
                 elseif count == 2 then
+                    timeout = timeout + tmpsequentialTimings[2]
                     excuteAnimation(pedHandle, c_animDictionary, c_animationName, 'REPEAT')
                 elseif count == 3 then
-                    timeout = timeout + 3
+                    timeout = timeout + tmpsequentialTimings[3]
                     excuteAnimation(pedHandle, c_animDictionary, c_animationName)
                 end
 
                 local skip = false
                 Wait(75)
                 while IsEntityPlayingAnim(pedHandle, c_animDictionary, c_animationName, 3) == 1 and skip == false do
-                    timeout = timeout + 1
-                    if timeout > 6 then
-                        skip = true
+                    if tmpsequentialTimings[4] ~= nil then
+                        timeout = timeout + tmpsequentialTimings['step']
+                        if timeout > tmpsequentialTimings['Timeout'] then
+                            skip = true
+                        end
+                    else
+                        timeout = timeout + 1
+                        if timeout > 6 then
+                            skip = true
+                        end
                     end
-                    Wait(500)
+                    Wait(1000)
                 end
                 count = count + 1
                 if count > size then
@@ -383,7 +404,11 @@ function Animator(pedHandle, pedModel, state, animation, c_timings)
 
     local c_animDictionary = correctionList[pedModel][state][animation].animDictionary
     local c_animationName = correctionList[pedModel][state][animation].animationName
-    excuteAnimation(pedHandle, c_animDictionary, c_animationName, c_timings)
+    if options.c_timings ~= nil then
+        excuteAnimation(pedHandle, c_animDictionary, c_animationName, options.c_timings)
+    else
+        excuteAnimation(pedHandle, c_animDictionary, c_animationName)
+    end
 end
 
 function excuteAnimation(pedHandle, c_animDictionary, c_animationName, c_timings)
