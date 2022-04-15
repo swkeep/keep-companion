@@ -188,16 +188,19 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                 creatActivePetThread(ped)
                 warpPedAroundPlayer(ped)
 
-                print(ActivePed:read().itemData.weight)
                 exports['qb-target']:AddTargetEntity(ped, {
                     options = {{
                         icon = "fas fa-sack-dollar",
                         label = "pet",
-                        -- canInteract = function(entity)
-                        --     if not IsPedAPlayer(entity) then
-                        --         return (entity and IsEntityDead(entity))
-                        --     end
-                        -- end,
+                        canInteract = function(entity)
+                            if not IsPedAPlayer(entity) then
+                                if IsEntityDead(entity) == false then
+                                    return true
+                                else
+                                    return false
+                                end
+                            end
+                        end,
                         action = function(entity)
                             makeEntityFaceEntity(PlayerPedId(), entity)
                             makeEntityFaceEntity(entity, PlayerPedId())
@@ -210,16 +213,9 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                             SetEntityCoords(entity, x, y, z, 0, 0, 0, 0)
                             TaskPause(entity, 5000)
 
-                            waitForAnimation('amb@medic@standing@kneel@base')
-                            waitForAnimation('anim@gangops@facility@servers@bodysearch@')
-                            TaskPlayAnim(PlayerPedId(), "amb@medic@standing@kneel@base", "base", 8.0, -8.0, -1, 1, 0,
-                                false, false, false)
-                            TaskPlayAnim(PlayerPedId(), "anim@gangops@facility@servers@bodysearch@", "player_search",
-                                8.0, -8.0, -1, 48, 0, false, false, false)
-                            -- if IsPedAPlayer(entity) and IsEntityDead(entity) then
-                            --     return false
-                            -- end
-                            -- TriggerEvent('keep-hunting:client:slaughterAnimal', entity)
+                            playAnimation(entity, 'rottweiler', 'tricks', 'petting_chop')
+                            playAnimation(PlayerPedId(), 'rottweiler', 'tricks', 'petting_franklin')
+                            TriggerServerEvent('hud:server:RelieveStress', Config.Balance.petRelieveStressValue)
                             return true
                         end
                     }},

@@ -337,7 +337,7 @@ function AttackTargetedPed(AttackerPed, targetPed)
     end)
 end
 
-function playAnimation(ped, name, timeout)
+function playAnimation(ped, petType, state, animation)
     local animationList = {
         ['retriever'] = {
             ['standing'] = {
@@ -587,6 +587,9 @@ function playAnimation(ped, name, timeout)
         }
     }
 
-    waitForAnimation('creatures@coyote@amb@world_coyote_rest@idle_a')
-    TaskPlayAnim(ped, 'creatures@coyote@amb@world_coyote_rest@idle_a', 'idle_a', 8.0, -8, -1, 1, 0, false, false, false)
+    local c_animDictionary = animationList[petType][state][animation].animDictionary
+    local c_animationName = animationList[petType][state][animation].animationName
+
+    waitForAnimation(c_animDictionary)
+    TaskPlayAnim(ped, c_animDictionary, c_animationName, 8.0, -8, -1, 0, 0, false, false, false)
 end
