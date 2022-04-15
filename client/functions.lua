@@ -31,25 +31,7 @@ function makeEntityFaceEntity(entity1, entity2)
 end
 
 function TaskFollowTargetedPlayer(follower, targetPlayer, distanceToStopAt)
-    -- i'm not which one is better but TaskFollowToOffsetOfEntity looks more natural
-    TaskFollowToOffsetOfEntity(follower, targetPlayer, 2.0, 2.0, 2.0, 5.0, 10.0, distanceToStopAt, 1)
-
-    -- TaskGotoEntityAiming(follower, targetPlayer, distanceToStopAt, 5.0)
-
-    -- CreateThread(function()
-    --     while DoesEntityExist(follower) do
-    --         Wait(1000)
-    --         local targetCoord = GetEntityCoords(targetPlayer)
-    --         local followerCoord = GetEntityCoords(follower)
-    --         local distance = #(targetCoord - followerCoord)
-    --         if distance > distanceToStopAt then
-    --             ClearPedTasks(follower)
-    --             TaskGoToCoordAnyMeans(follower, targetCoord, 5.0, 0, 786603, 0xbf800000)
-    --         else
-    --             -- put some idle animation here
-    --         end
-    --     end
-    -- end)
+    TaskFollowToOffsetOfEntity(follower, targetPlayer, 2.5, 2.5, 2.5, 5.0, 10.0, distanceToStopAt, 1)
 end
 
 function wanderAroundWithDuration(ped, coord, radius, minimalLength, timeBetweenWalks)
@@ -297,6 +279,75 @@ function attackLogic()
     end
 end
 
+function HuntandGrab(plyped, activePed)
+    local activeLaser = true
+    while activeLaser do
+        Wait(0)
+        local color = {
+            r = 2,
+            g = 241,
+            b = 181,
+            a = 200
+        }
+        local position = GetEntityCoords(plyped)
+        local coords, entity = RayCastGamePlayCamera(1000.0)
+        Draw2DText('Press ~g~E~w~ To go there', 4, {255, 255, 255}, 0.4, 0.43, 0.888 + 0.025)
+        if IsControlJustReleased(0, 38) then
+            local dragger = activePed.entity
+            if IsPedAPlayer(entity) == 1 or IsEntityAPed(entity) == false or entity == dragger then
+                QBCore.Functions.Notify('Could not do that', "error", 1500)
+                return
+            end
+            CreateThread(function()
+                local finished = false
+                TaskFollowToOffsetOfEntity(dragger, entity, 0.0, 0.0, 0.0, 5.0, 10.0, 1.0, 1)
+                while finished == false do
+                    local pedCoord = GetEntityCoords(entity)
+                    local petCoord = GetEntityCoords(dragger)
+                    local distance = GetDistanceBetweenCoords(pedCoord, petCoord)
+                    if distance < 5.0 then
+                        AttackTargetedPed(dragger, entity)
+                        -- wait until pet kill target
+                        while IsPedDeadOrDying(entity) == false do
+                            Wait(250)
+                        end
+                        -- drag dead body
+                        SetEntityCoords(entity, GetOffsetFromEntityInWorldCoords(dragger, 0.0, 0.25, 0.0))
+                        AttachEntityToEntity(entity, dragger, 11816, 0.05, 0.05, 0.5, 0.0, 0.0, 0.0, false, false,
+                            false, false, 2, true)
+                        finished = true
+                    elseif distance > 50.0 then
+                        -- skip when to much distance
+                        finished = true
+                    end
+                    Wait(1000)
+                end
+                -- Detach entity when it has to much distance or it's near player
+                CreateThread(function()
+                    local finished = false
+                    local playerPed = plyped
+                    TaskFollowToOffsetOfEntity(dragger, playerPed, 2.0, 2.0, 2.0, 1.0, 10.0, 3.0, 1)
+                    while finished == false do
+                        local pedCoord = GetEntityCoords(playerPed)
+                        local petCoord = GetEntityCoords(dragger)
+                        local distance = GetDistanceBetweenCoords(pedCoord, petCoord)
+                        if distance < 3.0 or distance > 50.0 then
+                            DetachEntity(entity, true, false)
+                            ClearPedSecondaryTask(dragger)
+                            finished = true
+                        end
+                        Wait(1000)
+                    end
+                end)
+            end)
+            activeLaser = false
+        end
+        DrawLine(position.x, position.y, position.z, coords.x, coords.y, coords.z, color.r, color.g, color.b, color.a)
+        DrawMarker(28, coords.x, coords.y, coords.z, 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, 0.1, 0.1, 0.1, color.r, color.g,
+            color.b, color.a, false, true, 2, nil, nil, false)
+    end
+end
+
 --- if player is inside a vehicle we need to relocate ped location so they won't sucide
 ---@param ped 'ped'
 function doSomethingIfPedIsInsideVehicle(ped)
@@ -432,7 +483,7 @@ function playAnimation(ped, petType, state, animation, currentPetType)
                 ['petting_chop'] = {
                     animDictionary = 'creatures@rottweiler@tricks@',
                     animationName = 'petting_chop',
-                    skip = {'A_C_Westy', 'A_C_Pug', 'A_C_Poodle', 'A_C_Cat_01'}
+                    skip = {'A_C_Westy', 'A_C_Pug', 'A_C_Poodle', 'A_C_Cat_01', 'A_C_MtLion', 'A_C_Panther'}
                 },
                 ['petting_franklin'] = { -- this is for human that is petting dog!
                     animDictionary = 'creatures@rottweiler@tricks@',
