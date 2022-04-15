@@ -50,7 +50,7 @@ Config.pets = {
         distinct = 'yes dog'
     },
     [3] = {
-        name = 'keepcompanionretriever',
+        name = 'keepcompanionrottweiler',
         model = 'A_C_Rottweiler',
         maxHealth = 300,
         distinct = 'yes dog'
