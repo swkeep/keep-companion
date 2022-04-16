@@ -64,8 +64,9 @@ local menu = {
     [7] = {
         lable = "Tricks",
         action = function(plyped, activePed)
-            QBCore.Functions.Notify('test tricks beg', 'error', 1500)
-            Animator(activePed.entity, activePed.model, 'tricks', 'beg', {
+
+            if Animator(activePed.entity, activePed.model, 'tricks', {
+                animation = 'beg',
                 sequentialTimings = {
                     -- How close the value is to the Timeout value determines how fast the script moves to the next animation.
                     [1] = 5, -- start animation Timeout ==> 1sec(6s-5s) to loop 
@@ -74,10 +75,19 @@ local menu = {
                     step = 1,
                     Timeout = 6
                 }
-            })
+            }) == false then
+                QBCore.Functions.Notify('this pet can not do that', 'error', 1500)
+            else
+                QBCore.Functions.Notify('test tricks beg', 'error', 1500)
+            end
             Wait(10000)
-            QBCore.Functions.Notify('test tricks paw', 'error', 1500)
-            Animator(activePed.entity, activePed.model, 'tricks', 'paw')
+            if Animator(activePed.entity, activePed.model, 'tricks', {
+                animation = 'paw'
+            }) == false then
+                QBCore.Functions.Notify('this pet can not do that', 'error', 1500)
+            else
+                QBCore.Functions.Notify('test tricks paw', 'error', 1500)
+            end
         end
     }
 }

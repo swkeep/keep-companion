@@ -199,7 +199,7 @@ function getIntoCar()
             for i = 1, 5, 1 do
                 if IsVehicleSeatFree(vehicle, i - 2) then
                     SetPedIntoVehicle(ped, vehicle, i - 2)
-                    Animator(ped, ActivePed.read().model, 'siting', 'look_around', {
+                    Animator(ped, ActivePed.read().model, 'siting', {
                         c_timings = 'REPEAT'
                     })
                     seatEmpty = i - 2

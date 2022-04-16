@@ -86,8 +86,7 @@ local animationList = {
             },
             ['petting_chop'] = {
                 animDictionary = 'creatures@rottweiler@tricks@',
-                animationName = 'petting_chop',
-                skip = {'A_C_Westy', 'A_C_Pug', 'A_C_Poodle', 'A_C_Cat_01', 'A_C_MtLion', 'A_C_Panther'}
+                animationName = 'petting_chop'
             },
             ['petting_franklin'] = { -- this is for human that is petting dog!
                 animDictionary = 'creatures@rottweiler@tricks@',
@@ -245,19 +244,18 @@ local animationList = {
                 animDictionary = 'creatures@cat@move',
                 animationName = 'idle'
             }
-
         },
         ['siting'] = {
             ['sitting'] = {
-                animDictionary = 'creatures@cat@amb@world_cat_sleeping_ledge@idle_a',
-                animationName = 'idle_a'
+                animDictionary = 'creatures@cougar@amb@world_cougar_rest@idle_a',
+                animationName = 'idle_c'
             }
         },
         ['misc'] = {},
         ['sleep'] = {
             ['enter_sleep'] = {
-                animDictionary = 'creatures@cat@amb@world_cat_sleeping_ground@enter',
-                animationName = 'enter'
+                animDictionary = 'creatures@cougar@amb@world_cougar_rest@idle_a',
+                animationName = 'idle_a'
             }
 
         }
@@ -278,23 +276,28 @@ local animationList = {
             }
         },
         ['siting'] = {
-            ['sitting_base'] = {
-                animDictionary = 'creatures@pug@amb@world_dog_sitting@base',
-                animationName = 'base'
-            },
-            ['sitting_enter'] = {
-                animDictionary = 'creatures@pug@amb@world_dog_sitting@enter',
-                animationName = 'enter'
-            },
-            ['sitting_exit'] = {
-                animDictionary = 'creatures@pug@amb@world_dog_sitting@exit',
-                animationName = 'exit'
+            ['siting_1'] = {
+                sequential = true,
+                list = {
+                    [1] = {
+                        animDictionary = 'creatures@pug@amb@world_dog_sitting@enter',
+                        animationName = 'enter'
+                    },
+                    [2] = {
+                        animDictionary = 'creatures@pug@amb@world_dog_sitting@base',
+                        animationName = 'base'
+                    },
+                    [3] = {
+                        animDictionary = 'creatures@pug@amb@world_dog_sitting@exit',
+                        animationName = 'exit'
+                    }
+                }
             },
             ['sitting_idle_a'] = {
                 animDictionary = 'creatures@pug@amb@world_dog_sitting@idle_a',
                 animationName = 'idle_a'
             },
-            ['sitting_idle_b'] = {
+            ['look_around'] = {
                 animDictionary = 'creatures@pug@amb@world_dog_sitting@idle_a',
                 animationName = 'idle_b'
             },
@@ -328,25 +331,40 @@ local correctionList = {
 --- missfra1leadinoutfra_1_int_trevor _trevor_leadin_loop_chop <<<< sleep with feared face!
 --- misschop_vehicle@back_of_van chop_sit_loop chop_lean_back_loop chop_growl_to_sit chop_growl chop_bark
 -- fix_agy_int1-1 a_c_chop_02_dual-1 <<<< sleep
-function Animator(pedHandle, pedModel, state, animation, options)
-
+function Animator(pedHandle, pedModel, state, options)
     -- #TODO sequential animation
+    print(pedHandle, pedModel, state)
+    print_table(options)
+    -- choose random animation if it's not included
+    if options.animation == nil then
+        local tmp = {}
+        if options == nil then
+            options = {}
+        end
+        for key, value in pairs(correctionList[pedModel][state]) do
+            table.insert(tmp, key)
+        end
+        options.animation = tmp[math.random(1, #tmp)]
+        while correctionList[pedModel][state][options.animation].sequential ~= nil do
+            options.animation = tmp[math.random(1, #tmp)]
+        end
+    end
     if correctionList[pedModel] == nil or correctionList[pedModel][state] == nil or
-        correctionList[pedModel][state][animation] == nil then
-        return
+        correctionList[pedModel][state][options.animation] == nil then
+        return false
     end
     -- sequential animation logic
-    if correctionList[pedModel][state][animation].sequential ~= nil and
-        correctionList[pedModel][state][animation].sequential == true then
+    if correctionList[pedModel][state][options.animation].sequential ~= nil and
+        correctionList[pedModel][state][options.animation].sequential == true then
         CreateThread(function()
             local finish = false
             local count = 1
-            local size = #correctionList[pedModel][state][animation].list
+            local size = #correctionList[pedModel][state][options.animation].list
             while finish == false do
-                local currentAnimation = animation
+                local currentAnimation = options.animation
 
                 if count <= size then
-                    currentAnimation = correctionList[pedModel][state][animation].list[count]
+                    currentAnimation = correctionList[pedModel][state][options.animation].list[count]
                 end
                 local c_animDictionary = currentAnimation.animDictionary
                 local c_animationName = currentAnimation.animationName
@@ -358,6 +376,7 @@ function Animator(pedHandle, pedModel, state, animation, options)
                 if options.sequentialTimings == nil then
                     options.sequentialTimings = {}
                 end
+
                 local tmpsequentialTimings = {
                     [1] = options.sequentialTimings[1] or 0, -- start animation Timeout ==> 1sec(6s-5s) to loop 
                     [2] = options.sequentialTimings[2] or 0, -- loop animation Timeout  ==> 6sec(6s-0s) to exit
@@ -401,13 +420,17 @@ function Animator(pedHandle, pedModel, state, animation, options)
         -- skip rest of functions when we have to play sequential
         return
     end
+    local c_animDictionary = correctionList[pedModel][state][options.animation].animDictionary
+    local c_animationName = correctionList[pedModel][state][options.animation].animationName
 
-    local c_animDictionary = correctionList[pedModel][state][animation].animDictionary
-    local c_animationName = correctionList[pedModel][state][animation].animationName
-    if options.c_timings ~= nil then
-        excuteAnimation(pedHandle, c_animDictionary, c_animationName, options.c_timings)
+    if options ~= nil then
+        if options.c_timings ~= nil then
+            excuteAnimation(pedHandle, c_animDictionary, c_animationName, options.c_timings)
+        else
+            excuteAnimation(pedHandle, c_animDictionary, c_animationName)
+        end
     else
-        excuteAnimation(pedHandle, c_animDictionary, c_animationName)
+        return
     end
 end
 

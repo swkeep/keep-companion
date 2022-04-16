@@ -214,8 +214,12 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                             TaskPause(entity, 5000)
 
                             -- #TODO skip smal animal cus they don't have this animation
-                            Animator(entity, modelName, 'tricks', 'petting_chop')
-                            Animator(plyPed, modelName, 'tricks', 'petting_franklin')
+                            Animator(entity, modelName, 'tricks', {
+                                animation = 'petting_chop'
+                            })
+                            Animator(plyPed, 'A_C_Rottweiler', 'tricks', {
+                                animation = 'petting_franklin'
+                            })
 
                             TriggerServerEvent('hud:server:RelieveStress', Config.Balance.petStressReliefValue)
                             return true
