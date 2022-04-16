@@ -117,7 +117,7 @@ function addXpForDistanceMoved()
                 ActivePed:update{
                     level = level + 1
                 }
-                TriggerEvent('QBCore:Notify', activeped.itemData.info.name .. "level up to " .. activeped.level)
+                TriggerEvent('QBCore:Notify', activeped.itemData.info.name .. " level up to " .. activeped.level)
             else
                 ActivePed:update{
                     xp = Xp
