@@ -213,7 +213,6 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                             SetEntityCoords(entity, x, y, z, 0, 0, 0, 0)
                             TaskPause(entity, 5000)
 
-                            -- #TODO skip smal animal cus they don't have this animation
                             Animator(entity, modelName, 'tricks', {
                                 animation = 'petting_chop'
                             })
@@ -233,24 +232,29 @@ end)
 
 --- when the player is AFK for a certain time pet will wander around
 ---@param timeOut table
----@param goWanderingAfter number
-local function afkWandering(timeOut, goWanderingAfter)
+---@param afk number
+local function afkWandering(timeOut, afk)
     -- #TODO follow player when not afk
     local ped = ActivePed:read().entity
     local plyPed = PlayerPedId()
     local coord = GetEntityCoords(plyPed)
     if IsPedStopped(plyPed) then
-        if timeOut[1] ~= (goWanderingAfter + 1) then
+        if timeOut[1] < afk.afkTimerRestAfter then
             timeOut[1] = timeOut[1] + 1
-        end
-        if timeOut[1] == goWanderingAfter then
-            if timeOut.lastAction == nil or timeOut.lastAction ~= 'wandering' then
-                TaskWanderInArea(ped, coord, 4.0, 2, 8.0)
-                timeOut.lastAction = 'wandering'
-            elseif timeOut.lastAction ~= nil and timeOut.lastAction == 'wandering' then
-                local rand = math.random(1, 10)
+            -- code here
+            if timeOut[1] == afk.wanderingInterval then
+                if timeOut.lastAction == nil or (timeOut.lastAction ~= nil and timeOut.lastAction == 'animation') then
+                    ClearPedTasks(ped) -- clear last animation
+                    TaskWanderInArea(ped, coord, 4.0, 2, 8.0)
+                    timeOut.lastAction = 'wandering'
+                end
+            elseif timeOut[1] == afk.animationInterval then
+                ClearPedTasks(ped) -- clear TaskWanderInArea
+                Animator(ped, ActivePed:read().model, 'siting')
                 timeOut.lastAction = 'animation'
             end
+        else
+            timeOut[1] = 0 --
         end
     else
         timeOut[1] = 0
@@ -260,7 +264,7 @@ end
 --- this set of Functions will executed evetry sec to tracker pet's behaviour.
 ---@param ped any
 function creatActivePetThread(ped)
-    local goWanderingAfter = Config.Balance.goWander
+    local afk = Config.Balance.afk
     local count = Config.DataUpdateInterval -- this value is
     local tmpcount = 0
     CreateThread(function()
@@ -271,7 +275,7 @@ function creatActivePetThread(ped)
         }
         while DoesEntityExist(ped) do
             addXpForDistanceMoved()
-            afkWandering(timeOut, goWanderingAfter)
+            afkWandering(timeOut, afk)
             increasePetAge()
 
             -- update every 10 sec

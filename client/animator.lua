@@ -331,16 +331,18 @@ local correctionList = {
 --- missfra1leadinoutfra_1_int_trevor _trevor_leadin_loop_chop <<<< sleep with feared face!
 --- misschop_vehicle@back_of_van chop_sit_loop chop_lean_back_loop chop_growl_to_sit chop_growl chop_bark
 -- fix_agy_int1-1 a_c_chop_02_dual-1 <<<< sleep
+-- options = {
+--     animation = ?, -- if not icluded sciprt will pick one random animation inside list
+--     c_timings = ?,
+-- }
 function Animator(pedHandle, pedModel, state, options)
     -- #TODO sequential animation
-    print(pedHandle, pedModel, state)
-    print_table(options)
     -- choose random animation if it's not included
+    if options == nil then
+        options = {}
+    end
     if options.animation == nil then
         local tmp = {}
-        if options == nil then
-            options = {}
-        end
         for key, value in pairs(correctionList[pedModel][state]) do
             table.insert(tmp, key)
         end
