@@ -102,8 +102,8 @@ Note that project still not ready yet. but you can still test it and help me in 
         ["combinable"] = nil,
         ["description"] = "Westy is your royal companion!"
     },
-    ["keepcompanionmtLion"] = {
-        ["name"] = "keepcompanionmtLion",
+    ["keepcompanionmtlion"] = {
+        ["name"] = "keepcompanionmtlion",
         ["label"] = "MtLion",
         ["weight"] = 500,
         ["type"] = "item",
@@ -114,8 +114,8 @@ Note that project still not ready yet. but you can still test it and help me in 
         ["combinable"] = nil,
         ["description"] = "MtLion is your royal companion!"
     },
-    ["keepcompanionmtLion2"] = {
-        ["name"] = "keepcompanionmtLion2",
+    ["keepcompanionmtlion2"] = {
+        ["name"] = "keepcompanionmtlion2",
         ["label"] = "Panter",
         ["weight"] = 500,
         ["type"] = "item",
