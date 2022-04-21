@@ -29,13 +29,13 @@ Note that project still not ready yet. but you can still test it and help me in 
 
 ## Previews
 
-![shop](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/shop.jpg)
-![petshop](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/shop2.jpg)
-![tooltip](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/tooltip.jpg)
-![spawn](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/call.jpg)
-![menu](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/menu.jpg)
-![commands](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/levelup.jpg)
-![pets](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/pets.jpg)
+![shop](https://raw.githubusercontent.com/swkeep/keep-companion/test/.github/images/shop.jpg)
+![petshop](https://raw.githubusercontent.com/swkeep/keep-companion/test/.github/images/shop2.jpg)
+![tooltip](https://raw.githubusercontent.com/swkeep/keep-companion/test/.github/images/tooltip.jpg)
+![spawn](https://raw.githubusercontent.com/swkeep/keep-companion/test/.github/images/call.jpg)
+![menu](https://raw.githubusercontent.com/swkeep/keep-companion/test/.github/images/menu.jpg)
+![commands](https://raw.githubusercontent.com/swkeep/keep-companion/test/.github/images/levelup.jpg)
+![pets](https://raw.githubusercontent.com/swkeep/keep-companion/test/.github/images/pets.jpg)
 
 ## installation
 
