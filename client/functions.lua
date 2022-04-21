@@ -271,7 +271,9 @@ function attackLogic()
                     end
 
                 end)
-
+                return true
+            else
+                return false
             end
             activeLaser = false
         end

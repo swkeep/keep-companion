@@ -6,23 +6,34 @@ local isMenuOpen = false
 local menu = {
     ['Follow'] = {
         lable = 'Follow',
+        -- triggerNotification = {'onSuccess', 'onFailed'},
+        -- and action should retrun a bool value true == onSuccess ,false == onFailed
+        triggerNotification = {'PETNAME is now following you!', 'PETNAME failed to follow you!'},
         action = function(plyped, activePed)
             doSomethingIfPedIsInsideVehicle(activePed.entity)
             TaskFollowTargetedPlayer(activePed.entity, plyped, 3.0)
+            return true
         end
     },
     ['Hunt'] = {
         lable = 'Hunt',
+        triggerNotification = {'PETNAME is now hunting!', 'PETNAME can not do that!'},
         action = function(plyped, activePed)
             if activePed.canHunt == true then
                 if activePed.level >= Config.Settings.minHuntingAbilityLevel then
-                    attackLogic()
+                    if attackLogic() == true then
+                        return true
+                    else
+                        return false
+                    end
                 else
                     TriggerEvent('QBCore:Notify',
                         "Not enough levels to hunt (min " .. Config.Settings.minHuntingAbilityLevel .. ')')
+                    return false
                 end
             else
                 TriggerEvent('QBCore:Notify', "Your pet can't hunt!")
+                return false
             end
         end
     },
@@ -91,18 +102,60 @@ local menu = {
     }
 }
 
+local function replaceString(s)
+    local x
+    x = s:gsub("PETNAME", ActivePed.read().itemData.info.name)
+    return x
+end
+
 -- Command
-AddEventHandler('keep-companion:client:menuActionDispatcher', function(option)
+AddEventHandler('keep-companion:client:actionMenuDispatcher', function(option)
     local plyped = PlayerPedId()
     local activePed = ActivePed.read()
-    for key, func in pairs(menu) do
+    for key, values in pairs(menu) do
         if option.type == key then
-            func.action(plyped, activePed)
+            if values.action(plyped, activePed) == true then
+                if values.triggerNotification ~= nil then
+                    QBCore.Functions.Notify(replaceString(values.triggerNotification[1]), 'success', 1500)
+                end
+            else
+                if values.triggerNotification ~= nil then
+                    QBCore.Functions.Notify(replaceString(values.triggerNotification[2]))
+                end
+            end
         end
     end
 end)
 
-AddEventHandler('keep-companion:client:MainMenu', function()
+AddEventHandler('keep-companion:client:PetMenu', function()
+    local header = "name: " .. ActivePed.read().itemData.info.name
+    local leave = "leave"
+
+    -- header
+    local openMenu = {{
+        header = header,
+        isMenuHeader = true
+    }, {
+        header = 'Actions',
+        params = {
+            event = "keep-companion:client:petMenuActions"
+        }
+    }, {
+        header = leave,
+        txt = "",
+        params = {
+            event = "qb-menu:closeMenu"
+        }
+    }}
+
+    exports['qb-menu']:openMenu(openMenu)
+end)
+
+local function ClearMenu()
+    TriggerEvent("qb-menu:closeMenu")
+end
+
+AddEventHandler('keep-companion:client:petMenuActions', function(option)
     local header = "name: " .. ActivePed.read().itemData.info.name
     local leave = "leave"
 
@@ -112,13 +165,12 @@ AddEventHandler('keep-companion:client:MainMenu', function()
         isMenuHeader = true
     }}
 
-    -- actions
     for key, value in pairs(menu) do
         openMenu[#openMenu + 1] = {
             header = value.lable,
-            txt = value.desc or nil,
+            txt = value.desc or "",
             params = {
-                event = "keep-companion:client:EventDispatcher",
+                event = "keep-companion:client:actionMenuDispatcher",
                 args = {
                     type = key
                 }
@@ -138,6 +190,10 @@ AddEventHandler('keep-companion:client:MainMenu', function()
     exports['qb-menu']:openMenu(openMenu)
 end)
 
+AddEventHandler('keep-companion:client:switchControl', function(option)
+
+end)
+
 local function IsPoliceOrEMS()
     return (PlayerData.job.name == "police" or PlayerData.job.name == "ambulance")
 end
@@ -151,7 +207,7 @@ RegisterCommand('+showMenu', function()
     local doesPlayerHavePet = ActivePed:read() or {}
     if ((IsDowned() and IsPoliceOrEMS()) or not IsDowned()) and not PlayerData.metadata["ishandcuffed"] and
         not IsPauseMenuActive() and not isMenuOpen and next(doesPlayerHavePet) ~= nil then
-        TriggerEvent('keep-companion:client:MainMenu')
+        TriggerEvent('keep-companion:client:PetMenu')
     elseif next(doesPlayerHavePet) == nil then
         TriggerEvent('QBCore:Notify', "you must have atleast one active pet to access to menu")
     end
