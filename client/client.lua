@@ -224,7 +224,7 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                             return true
                         end
                     }},
-                    distance = 1.5
+                    distance = 2.5
                 })
             end)
         end)
@@ -234,7 +234,6 @@ end)
 ---@param timeOut table
 ---@param afk number
 local function afkWandering(timeOut, afk)
-    -- #TODO follow player when not afk
     local ped = ActivePed:read().entity
     local plyPed = PlayerPedId()
     local coord = GetEntityCoords(plyPed)

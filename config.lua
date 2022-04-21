@@ -17,7 +17,8 @@ Config.Settings = {
         colour = 2,
         shortRange = false
     },
-    chaseDistance = 50.0
+    chaseDistance = 50.0,
+    petMenuKeybind = 'o' -- defalut keybind (players can change bind)
 }
 
 Config.Balance = {
