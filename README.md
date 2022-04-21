@@ -29,12 +29,13 @@ Note that project still not ready yet. but you can still test it and help me in 
 
 ## Previews
 
-![shop](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/shop.png)
-![petshop](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/petshop.png)
-![tooltip](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/tooltip.png)
-![spawn](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/spawn.png)
-![menu](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/menu.png)
-![commands](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/commands.png)
+![shop](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/shop.jpg)
+![petshop](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/shop2.jpg)
+![tooltip](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/tooltip.jpg)
+![spawn](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/call.jpg)
+![menu](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/menu.jpg)
+![commands](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/levelup.jpg)
+![pets](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/pets.jpg)
 
 ## installation
 
@@ -44,6 +45,7 @@ Note that project still not ready yet. but you can still test it and help me in 
 
 - [qb-target](https://github.com/BerkieBb/qb-target)
 - [qbcore framework](https://github.com/qbcore-framework)
+- [qb-menu](https://github.com/qbcore-framework/qb-menu)
 - [qbcore inventory](https://github.com/qbcore-framework/qb-inventory)
 - [lj-inventory](https://github.com/loljoshie/lj-inventory) -- in screenshot
 - [qb-shops](https://github.com/qbcore-framework/qb-shops)
