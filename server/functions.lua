@@ -93,7 +93,8 @@ function updateInfoHelper(Player, slot, data)
     if Player.PlayerData.items[slot] then
         Player.PlayerData.items[slot].info[data.key] = data.content
     end
-    -- print('updating: ' .. Player.PlayerData.citizenid, "whichPart: " .. data.key)
+    -- print('how much: ', data.content, 'itemHash: ' .. Player.PlayerData.items[slot].info['hash'],
+    --     "whichPart: " .. data.key)
     Player.Functions.SetInventory(Player.PlayerData.items, true)
 end
 
@@ -225,7 +226,10 @@ function Update_food(Player, data, item, source, requestedItem)
         end
     end
     updateInfoHelper(Player, item.slot, mData)
-    TriggerClientEvent('keep-companion:client:updateFood', source, mData.content)
+    TriggerClientEvent('keep-companion:client:updateFood', source, {
+        content = mData.content,
+        hash = Player.PlayerData.items[item.slot].info['hash']
+    })
 end
 
 function Update_age(Player, data, item, source, requestedItem)

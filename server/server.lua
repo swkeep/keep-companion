@@ -111,7 +111,7 @@ end
 function Pet:despawnPet(source, item)
     -- despawn pet
     -- save all data after despawning pet
-    TriggerClientEvent('keep-companion:client:despawn', source, self.players[source][item.info.hash].entity)
+    TriggerClientEvent('keep-companion:client:despawn', source, self.players[source][item.info.hash].entity, item)
     Pet:setAsDespawned(source, item)
 end
 
@@ -197,9 +197,11 @@ RegisterNetEvent('keep-companion:server:updatePedData', function(item, model, en
     Pet:setAsSpawned(source, item, model, entity)
 end)
 
-RegisterNetEvent('keep-companion:server:onPlayerUnload', function(item)
+RegisterNetEvent('keep-companion:server:onPlayerUnload', function(items)
     -- save pet's Information when player logout
-    Pet:setAsDespawned(source, item)
+    for key, value in pairs(items) do
+        Pet:setAsDespawned(source, value)
+    end
 end)
 
 -- ============================

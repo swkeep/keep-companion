@@ -30,7 +30,7 @@ Config.Balance = {
         -- after 120-sec passes timer will start over from 0
         afkTimerRestAfter = 120, -- sec
         wanderingInterval = 60,
-        animationInterval = 100
+        animationInterval = 90
     }, -- sec pet gonna go wandering around player after player is AFK for a certain time
 
     petStressReliefValue = math.random(12, 24)

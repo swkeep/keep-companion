@@ -244,7 +244,7 @@ end
 
 RegisterKeyMapping('+showMenu', 'show pet menu', 'keyboard', Config.Settings.petMenuKeybind)
 RegisterCommand('+showMenu', function()
-    local doesPlayerHavePet = ActivePed:read() or {}
+    local doesPlayerHavePet = ActivePed:read()
     if ((IsDowned() and IsPoliceOrEMS()) or not IsDowned()) and not PlayerData.metadata["ishandcuffed"] and
         not IsPauseMenuActive() and not isMenuOpen and next(doesPlayerHavePet) ~= nil then
         TriggerEvent('keep-companion:client:PetMenu')
