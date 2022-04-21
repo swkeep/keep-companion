@@ -2,12 +2,10 @@ Config = Config or {}
 
 Config.DEBUG = false -- make sure it's false
 
-Config.callingCompanionDuration = 1000
-
 Config.Settings = {
     callCompanionDuration = 2, -- sec
     despawnDuration = 3, -- sec
-    itemUsageCooldown = 5, -- sec
+    itemUsageCooldown = 1, -- sec
     minHuntingAbilityLevel = 1, -- level
     changePetNameDuration = 5, -- sec
     carFlipingDuration = 5, -- sec
@@ -20,6 +18,9 @@ Config.Settings = {
     chaseDistance = 50.0,
     petMenuKeybind = 'o' -- defalut keybind (players can change bind)
 }
+
+-- server and client
+Config.MaxActivePetsPetPlayer = 3
 
 Config.Balance = {
     maximumLevel = 50, -- xp callculation only work util level 99 don't set it to higher values

@@ -128,17 +128,24 @@ AddEventHandler('keep-companion:client:actionMenuDispatcher', function(option)
 end)
 
 AddEventHandler('keep-companion:client:PetMenu', function()
-    local header = "name: " .. ActivePed.read().itemData.info.name
+    local header = "Name: " .. ActivePed.read().itemData.info.name
     local leave = "leave"
 
     -- header
     local openMenu = {{
         header = header,
+        txt = "pet under control",
         isMenuHeader = true
     }, {
         header = 'Actions',
         params = {
             event = "keep-companion:client:petMenuActions"
+        }
+    }, {
+        header = 'switchControl',
+        txt = "",
+        params = {
+            event = "keep-companion:client:switchControl"
         }
     }, {
         header = leave,
@@ -150,10 +157,6 @@ AddEventHandler('keep-companion:client:PetMenu', function()
 
     exports['qb-menu']:openMenu(openMenu)
 end)
-
-local function ClearMenu()
-    TriggerEvent("qb-menu:closeMenu")
-end
 
 AddEventHandler('keep-companion:client:petMenuActions', function(option)
     local header = "name: " .. ActivePed.read().itemData.info.name
@@ -191,7 +194,44 @@ AddEventHandler('keep-companion:client:petMenuActions', function(option)
 end)
 
 AddEventHandler('keep-companion:client:switchControl', function(option)
+    local header = "Switch pet on Control"
+    local leave = "leave"
 
+    -- header
+    local openMenu = {{
+        header = header,
+        isMenuHeader = true
+    }}
+
+    for key, value in pairs(ActivePed:petsList()) do
+        openMenu[#openMenu + 1] = {
+            header = value.name,
+            params = {
+                event = "keep-companion:client:switchControlOfPet",
+                args = {
+                    index = value.key
+                }
+            }
+        }
+    end
+
+    -- leave menu
+    openMenu[#openMenu + 1] = {
+        header = leave,
+        txt = "",
+        params = {
+            event = "qb-menu:closeMenu"
+        }
+    }
+
+    exports['qb-menu']:openMenu(openMenu)
+end)
+
+AddEventHandler('keep-companion:client:switchControlOfPet', function(option)
+    if option.index > 0 then
+        ActivePed:switchControl(option.index)
+        TriggerEvent('keep-companion:client:petMenuActions')
+    end
 end)
 
 local function IsPoliceOrEMS()

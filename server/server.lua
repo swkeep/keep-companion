@@ -1,6 +1,6 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 -- pet system
-local maxLimit = 1 -- don't change this it will break script
+local maxLimit = Config.MaxActivePetsPetPlayer
 
 -- ============================
 --          Class
