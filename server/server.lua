@@ -123,6 +123,17 @@ QBCore.Functions.CreateUseableItem('petfood', function(source, item)
     TriggerClientEvent('keep-companion:client:getPetdata', source)
 end)
 
+QBCore.Functions.CreateUseableItem('collarpet', function(source, item)
+    TriggerClientEvent('keep-companion:client:renameCollar', source, item)
+end)
+
+RegisterNetEvent('keep-companion:server:renameCollar', function(name)
+    local Player = QBCore.Functions.GetPlayer(source)
+    if Player.Functions.RemoveItem("collarpet", 1) then
+        TriggerClientEvent("keep-companion:client:getActivePet", source, name)
+    end
+end)
+
 RegisterNetEvent('keep-companion:server:increaseFood', function(item)
     if item == nil then
         return

@@ -187,6 +187,18 @@ Note that project still not ready yet. but you can still test it and help me in 
         ["shouldClose"] = true,
         ["combinable"] = nil,
         ["description"] = "food for your companion!"
+    },
+    ["collarpet"] = {
+        ["name"] = "collarpet",
+        ["label"] = "Pet collar",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "collarpet.png",
+        ["unique"] = false,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = true,
+        ["description"] = "Rename your pets!"
     }
 ```
 
@@ -277,6 +289,22 @@ Note that project still not ready yet. but you can still test it and help me in 
             info = {},
             type = 'item',
             slot = 10
+        },
+        [11] = {
+            name = 'petfood',
+            price = 500,
+            amount = 1000,
+            info = {},
+            type = 'item',
+            slot = 11
+        },
+        [12] = {
+            name = 'collarpet',
+            price = 50000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 12
         }
     }
 
