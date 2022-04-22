@@ -492,22 +492,27 @@ AddEventHandler('keep-companion:client:increaseFood', function(item, amount)
 end)
 
 RegisterNetEvent('keep-companion:client:renameCollar', function(item)
-    local name = exports['qb-input']:ShowInput({
-        header = "rename: " .. ActivePed:read().itemData.info.name,
-        submitText = "rename",
-        inputs = {{
-            type = 'text',
-            isRequired = true,
-            name = 'PETNAME',
-            text = "enter pet name"
-        }}
-    })
-    if name then
-        if not name.PETNAME then
-            return
+    if ActivePed:read() ~= nil then
+        local name = exports['qb-input']:ShowInput({
+            header = "rename: " .. ActivePed:read().itemData.info.name,
+            submitText = "rename",
+            inputs = {{
+                type = 'text',
+                isRequired = true,
+                name = 'PETNAME',
+                text = "enter pet name"
+            }}
+        })
+        if name then
+            if not name.PETNAME then
+                return
+            end
+            TriggerServerEvent('keep-companion:server:renameCollar', name.PETNAME)
         end
-        TriggerServerEvent('keep-companion:server:renameCollar', name.PETNAME)
+    else
+        QBCore.Functions.Notify('Aleast one pet should be on your control!', 'error', 7500)
     end
+
 end)
 
 -- #TODO this event should be two events one get active pet and one for changing pet name
