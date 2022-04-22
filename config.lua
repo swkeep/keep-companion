@@ -7,6 +7,7 @@ Config.Settings = {
     despawnDuration = 3, -- sec
     itemUsageCooldown = 1, -- sec
     minHuntingAbilityLevel = 1, -- level
+    feedingSpeed = 5,
     changePetNameDuration = 5, -- sec
     carFlipingDuration = 5, -- sec
     PetMiniMap = {
@@ -16,6 +17,7 @@ Config.Settings = {
         shortRange = false
     },
     chaseDistance = 50.0,
+    fleeFromNotOwenerDistance = 60.0,
     petMenuKeybind = 'o' -- defalut keybind (players can change bind)
 }
 

@@ -469,7 +469,7 @@ end)
 
 RegisterNetEvent('keep-companion:client:getPetdata')
 AddEventHandler('keep-companion:client:getPetdata', function()
-    CoreName.Functions.Progressbar("feeding", "Feeding", Config.Settings.despawnDuration * 1000, false, false, {
+    CoreName.Functions.Progressbar("feeding", "Feeding", Config.Settings.feedingSpeed * 1000, false, false, {
         disableMovement = false,
         disableCarMovement = false,
         disableMouse = false,

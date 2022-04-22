@@ -175,6 +175,18 @@ Note that project still not ready yet. but you can still test it and help me in 
         ["shouldClose"] = true,
         ["combinable"] = nil,
         ["description"] = "Shepherd is your royal companion!"
+    },
+    ["petfood"] = {
+        ["name"] = "petfood",
+        ["label"] = "pet food",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "petfood.png",
+        ["unique"] = false,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = nil,
+        ["description"] = "food for your companion!"
     }
 ```
 

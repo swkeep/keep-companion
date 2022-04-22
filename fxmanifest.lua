@@ -9,7 +9,3 @@ client_scripts {'client/animator.lua', 'client/functions.lua', 'client/client.lu
                 'client/c_util.lua'}
 
 server_script {'server/functions.lua', 'server/server.lua'}
-
-ui_page 'html/index.html'
-
-files {'html/*', 'html/index.html', 'html/styles.css', 'html/script.js', 'html/img/*', 'html/main.js'}
