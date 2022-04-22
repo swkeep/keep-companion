@@ -4,28 +4,31 @@
 
 ## Features
 
-- xp and level system
-- food and health system
-- auto naming & renaming system
-- random pet variation
-- command pet by menu
-- pet shop
-- pet animation
+- XP and leveling system
+- Food system
+- Health system (heal and revive)
+- Auto naming (At first usage) & Renaming
+- Random pet variation
+- Control pet's actions
+- Pet shop
+- Pet animation
 - ...
 
 # WIP status:
 
-Note that project still not ready yet. but you can still test it and help me in development.
+- Pls, note this project is a work in progress.
 
-- xp and level system ==> basic implementation
-- food ==> not implemented
-- pet animation ==> not implemented
-- ...
+- WIP features:
+
+1. XP calculation
+2. Food calculation
+3. Transfer ownership (not available right now)
+4. Combat XP calculation
 
 ## Usage
 
 - open the menu with "o"
-- to rename pets use this command => /renamePet newName
+- menu keybind can be customized inside settings and Fivem keybinds
 
 ## Previews
 
