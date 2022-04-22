@@ -307,6 +307,27 @@ local animationList = {
             }
         },
         ['sleep'] = {}
+    },
+    ['PLAYER'] = {
+        ['revive'] = {
+            ['tendtodead'] = {
+                sequential = true,
+                list = {
+                    [1] = {
+                        animDictionary = 'amb@medic@standing@tendtodead@enter',
+                        animationName = 'enter'
+                    },
+                    [2] = {
+                        animDictionary = 'amb@medic@standing@tendtodead@idle_a',
+                        animationName = 'idle_c'
+                    },
+                    [3] = {
+                        animDictionary = 'amb@medic@standing@tendtodead@exit',
+                        animationName = 'exit'
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -321,12 +342,18 @@ local correctionList = {
     ['A_C_Poodle'] = animationList.small,
     ['A_C_Panther'] = animationList.cougar,
     ['A_C_MtLion'] = animationList.cougar,
-    ['A_C_Cat_01'] = animationList.cat
+    ['A_C_Cat_01'] = animationList.cat,
+    ['PLAYER'] = animationList.PLAYER
 }
 -- missexile2 fra0_ig_14_chop_sniff_fwds
 -- missexile2 taunt_01 taunt_02
 -- missfra0_chop_find chop_bark_at_ballas
 -- missfra0_chop_find fra0_ig_14_chop_sniff_fwds
+
+-- 014704 random@nigel@1c take_collar_cam 3966
+-- 014705 random@nigel@1c take_collar_dog 3966
+-- 014706 random@nigel@1c take_collar_dogfacial 3966
+-- 014707 random@nigel@1c take_collar_trevor 3966
 
 --- missfra1leadinoutfra_1_int_trevor _trevor_leadin_loop_chop <<<< sleep with feared face!
 --- misschop_vehicle@back_of_van chop_sit_loop chop_lean_back_loop chop_growl_to_sit chop_growl chop_bark
@@ -335,6 +362,7 @@ local correctionList = {
 --     animation = ?, -- if not icluded sciprt will pick one random animation inside list
 --     c_timings = ?,
 -- }
+
 function Animator(pedHandle, pedModel, state, options)
     -- #TODO sequential animation
     -- choose random animation if it's not included
@@ -400,7 +428,7 @@ function Animator(pedHandle, pedModel, state, options)
                 local skip = false
                 Wait(75)
                 while IsEntityPlayingAnim(pedHandle, c_animDictionary, c_animationName, 3) == 1 and skip == false do
-                    if tmpsequentialTimings[4] ~= nil then
+                    if tmpsequentialTimings['Timeout'] ~= 5 then
                         timeout = timeout + tmpsequentialTimings['step']
                         if timeout > tmpsequentialTimings['Timeout'] then
                             skip = true
