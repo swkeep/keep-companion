@@ -199,6 +199,18 @@ Note that project still not ready yet. but you can still test it and help me in 
         ["shouldClose"] = true,
         ["combinable"] = true,
         ["description"] = "Rename your pets!"
+    },
+    ["firstaidforpet"] = {
+        ["name"] = "firstaidforpet",
+        ["label"] = "First aid for pet",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "firstaidforpet.png",
+        ["unique"] = false,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = nil,
+        ["description"] = "Revive your pet!"
     }
 ```
 
@@ -305,6 +317,14 @@ Note that project still not ready yet. but you can still test it and help me in 
             info = {},
             type = 'item',
             slot = 12
+        },
+        [13] = {
+            name = 'firstaidforpet',
+            price = 5000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 13
         }
     }
 
@@ -346,7 +366,6 @@ else if (
             itemData.name == "keepcompanionshepherd" ||
             itemData.name == "keepcompanionwesty"
         ) {
-            // TODO changing heere
             let gender = itemData.info.gender;
             gender ? (gender = "male") : (gender = "female");
             $(".item-info-title").html("<p>" + itemData.info.name + "</p>");
