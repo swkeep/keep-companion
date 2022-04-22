@@ -10,12 +10,9 @@ Config.Settings = {
     feedingSpeed = 5,
     changePetNameDuration = 5, -- sec
     carFlipingDuration = 5, -- sec
-    PetMiniMap = {
-        showblip = true,
-        sprite = 442,
-        colour = 2,
-        shortRange = false
-    },
+    firstAidDuration = 5,
+    firstAidHealthRecoverAmount = 50, -- 50% of their life
+    PetMiniMap = { showblip = true, sprite = 442, colour = 2, shortRange = false },
     chaseDistance = 50.0,
     fleeFromNotOwenerDistance = 60.0,
     petMenuKeybind = 'o' -- defalut keybind (players can change bind)

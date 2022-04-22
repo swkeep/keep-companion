@@ -161,7 +161,7 @@ function addXpForDistanceMoved(savedData)
     local index = ActivePed:findByHash(savedData.itemData.info.hash)
     distance = math.floor(distance)
 
-    ActivePed:update{
+    ActivePed:update {
         index = index,
         lastCoord = 1
     }
@@ -177,17 +177,17 @@ function addXpForDistanceMoved(savedData)
 
         Xp = Xp + calNextXp(level)
         if Xp >= currentMaxXP then
-            ActivePed:update{
+            ActivePed:update {
                 index = index,
                 xp = Xp
             }
-            ActivePed:update{
+            ActivePed:update {
                 index = index,
                 level = level + 1
             }
             TriggerEvent('QBCore:Notify', savedData.itemData.info.name .. " level up to " .. savedData.level)
         else
-            ActivePed:update{
+            ActivePed:update {
                 index = index,
                 xp = Xp
             }
@@ -250,48 +250,116 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                 end
                 SetEntityMaxHealth(ped, currentPetData.maxHealth)
                 SetEntityHealth(ped, currentPetData.itemData.info.health)
-
-                -- add pet to active thread
-                creatActivePetThread(ped)
-
-                exports['qb-target']:AddTargetEntity(ped, {
-                    options = {{
-                        icon = "fas fa-sack-dollar",
-                        label = "pet",
-                        canInteract = function(entity)
-                            if IsEntityDead(entity) == false then
+                local currentHealth = GetEntityHealth(ped)
+                if currentHealth == 0 then
+                    exports['qb-target']:AddTargetEntity(ped, {
+                        options = { {
+                            icon = "fas fa-sack-dollar",
+                            label = "revive pet",
+                            canInteract = function(entity)
+                                if IsEntityDead(entity) == 1 and ActivePed.read() ~= nil then
+                                    return true
+                                else
+                                    return false
+                                end
+                            end,
+                            action = function(entity)
+                                if DoesEntityExist(entity) then
+                                    TriggerEvent('keep-companion:client:increaseHealth', ped, item, 'revive')
+                                end
                                 return true
-                            else
-                                return false
                             end
-                        end,
-                        action = function(entity)
-                            makeEntityFaceEntity(PlayerPedId(), entity)
-                            makeEntityFaceEntity(entity, PlayerPedId())
+                        } },
+                        distance = 1.5
+                    })
+                else
+                    creatActivePetThread(ped)
+                    exports['qb-target']:AddTargetEntity(ped, {
+                        options = { {
+                            icon = "fas fa-sack-dollar",
+                            label = "pet",
+                            canInteract = function(entity)
+                                if IsEntityDead(entity) == false then
+                                    return true
+                                else
+                                    return false
+                                end
+                            end,
+                            action = function(entity)
+                                makeEntityFaceEntity(PlayerPedId(), entity)
+                                makeEntityFaceEntity(entity, PlayerPedId())
 
-                            local playerPed = PlayerPedId()
-                            local coords = GetEntityCoords(playerPed)
-                            local forward = GetEntityForwardVector(playerPed)
-                            local x, y, z = table.unpack(coords + forward * 1.0)
+                                local playerPed = PlayerPedId()
+                                local coords = GetEntityCoords(playerPed)
+                                local forward = GetEntityForwardVector(playerPed)
+                                local x, y, z = table.unpack(coords + forward * 1.0)
 
-                            SetEntityCoords(entity, x, y, z, 0, 0, 0, 0)
-                            TaskPause(entity, 5000)
+                                SetEntityCoords(entity, x, y, z, 0, 0, 0, 0)
+                                TaskPause(entity, 5000)
 
-                            Animator(entity, modelName, 'tricks', {
-                                animation = 'petting_chop'
-                            })
-                            Animator(plyPed, 'A_C_Rottweiler', 'tricks', {
-                                animation = 'petting_franklin'
-                            })
+                                Animator(entity, modelName, 'tricks', {
+                                    animation = 'petting_chop'
+                                })
+                                Animator(plyPed, 'A_C_Rottweiler', 'tricks', {
+                                    animation = 'petting_franklin'
+                                })
 
-                            TriggerServerEvent('hud:server:RelieveStress', Config.Balance.petStressReliefValue)
-                            return true
-                        end
-                    }},
-                    distance = 2.5
-                })
+                                TriggerServerEvent('hud:server:RelieveStress', Config.Balance.petStressReliefValue)
+                                return true
+                            end
+                        }, {
+                            icon = "fas fa-sack-dollar",
+                            label = "patch up pet",
+                            canInteract = function(entity)
+                                if IsEntityDead(entity) == false then
+                                    return true
+                                else
+                                    return false
+                                end
+                            end,
+                            action = function(entity)
+                                TriggerEvent('keep-companion:client:increaseHealth', ped, item, 'Heal')
+                                return true
+                            end
+                        } },
+                        distance = 1.5
+                    })
+                end
             end)
         end)
+end)
+
+AddEventHandler('keep-companion:client:increaseHealth', function(ped, item, TYPE)
+    QBCore.Functions.TriggerCallback("QBCore:HasItem", function(hasitem)
+        if hasitem then
+            local plyID = PlayerPedId()
+            makeEntityFaceEntity(plyID, ped)
+            local timeout = Config.Settings.firstAidDuration
+            Animator(plyID, "PLAYER", 'revive', {
+                animation = 'tendtodead',
+                sequentialTimings = {
+                    [1] = timeout - 1,
+                    [2] = 0,
+                    [3] = 0,
+                    step = 1,
+                    Timeout = timeout
+                }
+            })
+            -- firstaidforpet
+            CoreName.Functions.Progressbar("reviveing", "Reviveing",
+                Config.Settings.firstAidDuration * 1000, false, false, {
+                    disableMovement = true,
+                    disableCarMovement = true,
+                    disableMouse = false,
+                    disableCombat = true
+                }, {}, {}, {}, function()
+                    local currectPet = ActivePed.data[ActivePed:findByHash(item.info.hash)]
+                    TriggerServerEvent('keep-companion:server:revivePet', currectPet, TYPE)
+                end)
+        else
+            QBCore.Functions.Notify('You need first aid to revive your pet!', "error", 1500)
+        end
+    end, 'firstaidforpet')
 end)
 
 --- when the player is AFK for a certain time pet will wander around
@@ -335,12 +403,13 @@ function creatActivePetThread(ped)
     CreateThread(function()
         local tmpcount = 0
         local savedData = ActivePed:read()
+        local fninished = false
         -- it's table just to have passed by reference.
         local timeOut = {
             0,
             lastAction = nil
         }
-        while DoesEntityExist(ped) do
+        while DoesEntityExist(ped) and fninished == false do
             petAgeCounter(savedData)
             afkWandering(timeOut, afk, plyPed, ped)
             addXpForDistanceMoved(savedData)
@@ -384,10 +453,29 @@ function creatActivePetThread(ped)
                     content = GetEntityHealth(savedData.entity)
                 })
                 -- update current health value inside client
-                ActivePed:update{
+                ActivePed:update {
                     index = ActivePed:findByHash(activeped.itemData.info.hash),
                     health = GetEntityHealth(savedData.entity)
                 }
+            end
+            if IsPedDeadOrDying(savedData.entity) == 1 then
+                -- #TODO report pet state and health to serve
+                local c_health = GetEntityHealth(savedData.entity)
+                local currentItem = {
+                    hash = savedData.itemData.info.hash,
+                    slot = savedData.itemData.slot
+                }
+                if c_health == 0 or c_health == 100 then
+                    TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
+                        key = 'state',
+                        content = IsPedDeadOrDying(savedData.entity, 1)
+                    })
+                    TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
+                        key = 'health',
+                        content = c_health
+                    })
+                    fninished = true
+                end
             end
             Wait(1000)
         end
@@ -395,19 +483,25 @@ function creatActivePetThread(ped)
 end
 
 function petAgeCounter(savedData)
-    ActivePed:update{
+    ActivePed:update {
         index = ActivePed:findByHash(savedData.itemData.info.hash),
         time = savedData.time + 1
     }
 end
 
 RegisterNetEvent('keep-companion:client:despawn')
-AddEventHandler('keep-companion:client:despawn', function(ped, item)
+AddEventHandler('keep-companion:client:despawn', function(ped, item, revive)
+    if revive ~= nil and revive == true then
+        -- revive skip animation
+        ActivePed:remove(ActivePed:findByHash(item.info.hash))
+        return
+    end
     local plyPed = PlayerPedId()
     local currentItem = {
         hash = item.info.hash,
         slot = item.slot
     }
+
     SetCurrentPedWeapon(plyPed, 0xA2719263, true)
     ClearPedTasks(plyPed)
     whistleAnimation(plyPed, 1500)
@@ -461,7 +555,7 @@ end)
 RegisterNetEvent('keep-companion:client:updateFood')
 AddEventHandler('keep-companion:client:updateFood', function(petData)
     -- process of updating pet's name
-    ActivePed:update{
+    ActivePed:update {
         index = ActivePed:findByHash(petData.hash),
         food = petData.content
     }
@@ -496,12 +590,12 @@ RegisterNetEvent('keep-companion:client:renameCollar', function(item)
         local name = exports['qb-input']:ShowInput({
             header = "rename: " .. ActivePed:read().itemData.info.name,
             submitText = "rename",
-            inputs = {{
+            inputs = { {
                 type = 'text',
                 isRequired = true,
                 name = 'PETNAME',
                 text = "enter pet name"
-            }}
+            } }
         })
         if name then
             if not name.PETNAME then
@@ -513,6 +607,14 @@ RegisterNetEvent('keep-companion:client:renameCollar', function(item)
         QBCore.Functions.Notify('Aleast one pet should be on your control!', 'error', 7500)
     end
 
+end)
+
+RegisterNetEvent('keep-companion:client:getPetDataForRevive', function(item)
+    if ActivePed:read() ~= nil then
+
+    else
+        QBCore.Functions.Notify('Aleast one pet should be on your control!', 'error', 7500)
+    end
 end)
 
 -- #TODO this event should be two events one get active pet and one for changing pet name

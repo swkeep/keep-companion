@@ -108,21 +108,29 @@ end
 --- depsawn helper
 ---@param source integer
 ---@param item table
-function Pet:despawnPet(source, item)
+function Pet:despawnPet(source, item, revive)
     -- despawn pet
     -- save all data after despawning pet
-    TriggerClientEvent('keep-companion:client:despawn', source, self.players[source][item.info.hash].entity, item)
+    TriggerClientEvent('keep-companion:client:despawn', source, self.players[source][item.info.hash].entity, item, revive)
     Pet:setAsDespawned(source, item)
 end
 
 -- ============================
 --          Items
 -- ============================
--- food 
+-- food
 QBCore.Functions.CreateUseableItem('petfood', function(source, item)
     TriggerClientEvent('keep-companion:client:getPetdata', source)
 end)
 
+RegisterNetEvent('keep-companion:server:increaseFood', function(item)
+    if item == nil then
+        return
+    end
+    TriggerClientEvent('keep-companion:client:increaseFood', source, item, math.random(1500, 2000))
+end)
+
+-- rename - collar
 QBCore.Functions.CreateUseableItem('collarpet', function(source, item)
     TriggerClientEvent('keep-companion:client:renameCollar', source, item)
 end)
@@ -134,12 +142,49 @@ RegisterNetEvent('keep-companion:server:renameCollar', function(name)
     end
 end)
 
-RegisterNetEvent('keep-companion:server:increaseFood', function(item)
-    if item == nil then
-        return
-    end
-    TriggerClientEvent('keep-companion:client:increaseFood', source, item, math.random(1500, 2000))
+-- first aid - revive
+QBCore.Functions.CreateUseableItem('firstaidforpet', function(source, item)
+    TriggerClientEvent('QBCore:Notify', source, "Use your 3th eye on pet!", 'error', 2500)
 end)
+
+local function revivePet(Player, item)
+    local percentage = Config.Settings.firstAidHealthRecoverAmount
+    local maxHealth = getMaxHealth(item.model)
+    local res = math.floor(maxHealth * (percentage / 100))
+
+    for key, items in pairs(Player.PlayerData.items) do
+        if items.info.hash ~= nil and (items.info.hash == item.itemData.info.hash) then
+            local amount = items.info.health + res
+            Player.PlayerData.items[items.slot].info.health = amount
+            Player.Functions.SetInventory(Player.PlayerData.items, true)
+            return true, items, amount
+        end
+    end
+end
+
+RegisterNetEvent('keep-companion:server:revivePet', function(item, TYPE)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    local state, updatedItem, amount = revivePet(Player, item)
+    if state == true then
+        if Player.Functions.RemoveItem("firstaidforpet", 1) then
+            if TYPE == 'Heal' then
+                TriggerClientEvent('QBCore:Notify', src, "You pet healed for: " .. amount, 'success', 2500)
+            elseif TYPE == 'revive' then
+                Pet:despawnPet(src, updatedItem, true)
+                TriggerClientEvent('QBCore:Notify', src, "Your per revived!", 'success', 2500)
+            end
+        end
+    end
+end)
+
+function getMaxHealth(model)
+    for key, value in pairs(Config.pets) do
+        if value.model == model then
+            return value.maxHealth
+        end
+    end
+end
 
 -- all pets
 for key, value in pairs(Config.pets) do
@@ -227,11 +272,11 @@ QBCore.Commands.Add('addpet', 'add a pet to player inventory (Admin Only)', {}, 
         info = {}
     }
     local random = math.random(1, 2)
-    local gender = {true, false}
+    local gender = { true, false }
     local gen = gender[random]
     itemData.info.hash = tostring(
         QBCore.Shared.RandomInt(2) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(1) ..
-            QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
+        QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
     itemData.info.name = NameGenerator('dog', random)
     itemData.info.gender = gen
     itemData.info.age = 0
@@ -264,7 +309,7 @@ QBCore.Commands.Add('addItem', 'add item to player inventory (Admin Only)', {}, 
     TriggerClientEvent("inventory:client:ItemBox", source, QBCore.Shared.Items[item[1]], "add")
 end, 'admin')
 
-QBCore.Commands.Add('renamePet', 'rename pet', {{"name", "new pet name"}}, false, function(source, args)
+QBCore.Commands.Add('renamePet', 'rename pet', { { "name", "new pet name" } }, false, function(source, args)
     TriggerClientEvent("keep-companion:client:getActivePet", source, args[1])
 end, 'admin')
 
