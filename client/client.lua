@@ -254,7 +254,7 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                 if currentHealth == 0 then
                     exports['qb-target']:AddTargetEntity(ped, {
                         options = { {
-                            icon = "fas fa-sack-dollar",
+                            icon = "fas fa-first-aid",
                             label = "revive pet",
                             canInteract = function(entity)
                                 if IsEntityDead(entity) == 1 and ActivePed.read() ~= nil then
@@ -308,8 +308,8 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                                 return true
                             end
                         }, {
-                            icon = "fas fa-sack-dollar",
-                            label = "patch up pet",
+                            icon = "fas fa-first-aid",
+                            label = "Heal",
                             canInteract = function(entity)
                                 if IsEntityDead(entity) == false then
                                     return true
@@ -334,6 +334,10 @@ AddEventHandler('keep-companion:client:increaseHealth', function(ped, item, TYPE
         if hasitem then
             local plyID = PlayerPedId()
             makeEntityFaceEntity(plyID, ped)
+            if TYPE == 'Heal' then
+                makeEntityFaceEntity(ped, plyID)
+                TaskPause(ped, 5000)
+            end
             local timeout = Config.Settings.firstAidDuration
             Animator(plyID, "PLAYER", 'revive', {
                 animation = 'tendtodead',
@@ -355,6 +359,7 @@ AddEventHandler('keep-companion:client:increaseHealth', function(ped, item, TYPE
                 }, {}, {}, {}, function()
                     local currectPet = ActivePed.data[ActivePed:findByHash(item.info.hash)]
                     TriggerServerEvent('keep-companion:server:revivePet', currectPet, TYPE)
+                    TaskFollowTargetedPlayer(ped, plyID)
                 end)
         else
             QBCore.Functions.Notify('You need first aid to revive your pet!', "error", 1500)

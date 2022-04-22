@@ -154,10 +154,21 @@ local function revivePet(Player, item)
 
     for key, items in pairs(Player.PlayerData.items) do
         if items.info.hash ~= nil and (items.info.hash == item.itemData.info.hash) then
-            local amount = items.info.health + res
+            local amount
+            local wasMaxHealth = false
+            if items.info.health >= maxHealth then
+                amount = maxHealth
+                wasMaxHealth = true
+            else
+                amount = items.info.health + res
+                if amount >= maxHealth then
+                    amount = maxHealth
+                end
+                wasMaxHealth = false
+            end
             Player.PlayerData.items[items.slot].info.health = amount
             Player.Functions.SetInventory(Player.PlayerData.items, true)
-            return true, items, amount
+            return true, items, amount, wasMaxHealth
         end
     end
 end
@@ -165,15 +176,19 @@ end
 RegisterNetEvent('keep-companion:server:revivePet', function(item, TYPE)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    local state, updatedItem, amount = revivePet(Player, item)
+    local state, updatedItem, amount, wasMaxHealth = revivePet(Player, item)
     if state == true then
-        if Player.Functions.RemoveItem("firstaidforpet", 1) then
-            if TYPE == 'Heal' then
-                TriggerClientEvent('QBCore:Notify', src, "You pet healed for: " .. amount, 'success', 2500)
-            elseif TYPE == 'revive' then
-                Pet:despawnPet(src, updatedItem, true)
-                TriggerClientEvent('QBCore:Notify', src, "Your per revived!", 'success', 2500)
+        if wasMaxHealth == false then
+            if Player.Functions.RemoveItem("firstaidforpet", 1) then
+                if TYPE == 'Heal' then
+                    TriggerClientEvent('QBCore:Notify', src, "You pet healed for: " .. amount, 'success', 2500)
+                elseif TYPE == 'revive' then
+                    Pet:despawnPet(src, updatedItem, true)
+                    TriggerClientEvent('QBCore:Notify', src, "Your per revived!", 'success', 2500)
+                end
             end
+        else
+            TriggerClientEvent('QBCore:Notify', src, "Pet is on full health!", 'error', 2500)
         end
     end
 end)
