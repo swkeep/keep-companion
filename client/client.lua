@@ -224,7 +224,7 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                 warpPedAroundPlayer(ped)
                 if hostileTowardPlayer == true then
                     -- if player is not owner of pet it will attack player
-                    taskAttackTarget(ped, plyPed, 10000)
+                    taskAttackTarget(ped, plyPed, 10000, item)
                 else
                     TaskFollowTargetedPlayer(ped, plyPed, 3.0)
                     -- add blip to entity
@@ -259,12 +259,10 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                         icon = "fas fa-sack-dollar",
                         label = "pet",
                         canInteract = function(entity)
-                            if not IsPedAPlayer(entity) then
-                                if IsEntityDead(entity) == false then
-                                    return true
-                                else
-                                    return false
-                                end
+                            if IsEntityDead(entity) == false then
+                                return true
+                            else
+                                return false
                             end
                         end,
                         action = function(entity)
@@ -437,21 +435,21 @@ end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     -- #TODO fix update on player unload!
-    local currentItem = {
-        hash = activeped.itemData.info.hash,
-        slot = activeped.itemData.slot
-    }
-    TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
-        key = 'state',
-        content = IsPedDeadOrDying(activeped.entity, 1)
-    })
-    if activeped.time ~= nil then
-        TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
-            key = 'age',
-            content = activeped.time
-        })
-    end
-    TriggerServerEvent('keep-companion:server:onPlayerUnload', activeped.itemData)
+    -- local currentItem = {
+    --     hash = activeped.itemData.info.hash,
+    --     slot = activeped.itemData.slot
+    -- }
+    -- TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
+    --     key = 'state',
+    --     content = IsPedDeadOrDying(activeped.entity, 1)
+    -- })
+    -- if activeped.time ~= nil then
+    --     TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
+    --         key = 'age',
+    --         content = activeped.time
+    --     })
+    -- end
+    -- TriggerServerEvent('keep-companion:server:onPlayerUnload', activeped.itemData)
     ActivePed:removeAll()
     PlayerData = {} -- empty playerData
 end)
@@ -471,7 +469,14 @@ end)
 
 RegisterNetEvent('keep-companion:client:getPetdata')
 AddEventHandler('keep-companion:client:getPetdata', function()
-    TriggerServerEvent('keep-companion:server:increaseFood', ActivePed:read().itemData)
+    CoreName.Functions.Progressbar("feeding", "Feeding", Config.Settings.despawnDuration * 1000, false, false, {
+        disableMovement = false,
+        disableCarMovement = false,
+        disableMouse = false,
+        disableCombat = false
+    }, {}, {}, {}, function()
+        TriggerServerEvent('keep-companion:server:increaseFood', ActivePed:read().itemData)
+    end)
 end)
 
 RegisterNetEvent('keep-companion:client:increaseFood')

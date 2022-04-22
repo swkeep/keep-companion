@@ -224,12 +224,14 @@ function Update_food(Player, data, item, source, requestedItem)
                 content = 500
             }
         end
+        TriggerClientEvent('QBCore:Notify', source, "Pet food value increased too: " .. mData.content)
     end
     updateInfoHelper(Player, item.slot, mData)
     TriggerClientEvent('keep-companion:client:updateFood', source, {
         content = mData.content,
         hash = Player.PlayerData.items[item.slot].info['hash']
     })
+
 end
 
 function Update_age(Player, data, item, source, requestedItem)
