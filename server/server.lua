@@ -105,9 +105,10 @@ function Pet:isMaxLimitPedReached(source)
     end
 end
 
---- depsawn helper
+--- despawn pet and remove it's data from server
 ---@param source integer
 ---@param item table
+---@param revive boolean
 function Pet:despawnPet(source, item, revive)
     -- despawn pet
     -- save all data after despawning pet
@@ -147,6 +148,13 @@ QBCore.Functions.CreateUseableItem('firstaidforpet', function(source, item)
     TriggerClientEvent('QBCore:Notify', source, "Use your 3th eye on pet!", 'error', 2500)
 end)
 
+--- revive or heal pet by it's item's hash
+---@param Player any
+---@param item any
+---@return boolean
+---@return table
+---@return number
+---@return boolean
 local function revivePet(Player, item)
     local percentage = Config.Settings.firstAidHealthRecoverAmount
     local maxHealth = getMaxHealth(item.model)
@@ -193,6 +201,9 @@ RegisterNetEvent('keep-companion:server:revivePet', function(item, TYPE)
     end
 end)
 
+--- get pet max health from confing file by it's model
+---@param model string
+---@return integer
 function getMaxHealth(model)
     for key, value in pairs(Config.pets) do
         if value.model == model then
@@ -225,11 +236,9 @@ end
 -- ================================================
 --          Item - Updating Information
 -- ================================================
--- #TODO add a way to fix undefined level and xp
 
 RegisterNetEvent('keep-companion:server:updateAllowedInfo', function(item, data)
     -- #TODO optimize to just use one updateInfoHelper()
-    -- #TODO data validation
     local Player = QBCore.Functions.GetPlayer(source)
     local requestedItem = Player.PlayerData.items[item.slot] -- ask sever to give item's data
     data = data or {}
@@ -249,9 +258,6 @@ RegisterNetEvent('keep-companion:server:updateAllowedInfo', function(item, data)
                 -- need to get maxHealth
                 updateInfoHelper(Player, item.slot, data)
             end
-        elseif data.key == 'state' then
-            -- update pet state
-            updateInfoHelper(Player, item.slot, data)
         elseif data.key == 'age' then
             Update_age(Player, data, item, source, requestedItem)
         elseif data.key == 'name' then
@@ -296,8 +302,6 @@ QBCore.Commands.Add('addpet', 'add a pet to player inventory (Admin Only)', {}, 
     itemData.info.gender = gen
     itemData.info.age = 0
     itemData.info.food = 100
-    -- state = alive or dead
-    itemData.info.state = true
     -- owener data
     itemData.info.owner = Player.PlayerData.charinfo
     -- inital level and xp
