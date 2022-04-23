@@ -21,6 +21,8 @@ local menu = {
         TYPE = 'Hunt',
         triggerNotification = { 'PETNAME is now hunting!', 'PETNAME can not do that!' },
         action = function(plyped, activePed)
+            local isInVehicle = IsPedInAnyVehicle(activePed, true)
+            print(isInVehicle)
             if activePed.canHunt == true then
                 if activePed.level >= Config.Settings.minHuntingAbilityLevel then
                     if attackLogic() == true then
@@ -76,17 +78,19 @@ local menu = {
         action = function(plyped, activePed)
             getIntoCar()
         end
-    },
-    [7] = {
-        lable = 'Tricks',
-        TYPE = 'Tricks',
-        action = function(plyped, activePed)
+    }
+}
 
+local menu2 = {
+    [1] = {
+        lable = 'Beg',
+        TYPE = 'Beg',
+        action = function(plyped, activePed)
             if Animator(activePed.entity, activePed.model, 'tricks', {
                 animation = 'beg',
                 sequentialTimings = {
                     -- How close the value is to the Timeout value determines how fast the script moves to the next animation.
-                    [1] = 5, -- start animation Timeout ==> 1sec(6s-5s) to loop
+                    [1] = 6, -- start animation Timeout ==> 1sec(6s-5s) to loop
                     [2] = 0, -- loop animation Timeout  ==> 6sec(6s-0s) to exit
                     [3] = 2, -- exit animation Timeout  ==> 4sec(6s-2s) to end
                     step = 1,
@@ -95,28 +99,33 @@ local menu = {
             }) == false then
                 QBCore.Functions.Notify('this pet can not do that', 'error', 1500)
             else
-                QBCore.Functions.Notify('test tricks beg', 'error', 1500)
+                QBCore.Functions.Notify('Start', 'success', 1500)
             end
-            Wait(10000)
+        end
+    },
+    [2] = {
+        lable = 'TEST',
+        TYPE = 'TEST',
+        action = function(plyped, activePed)
+            local isInVehicle = IsPedInAnyVehicle(activePed.entity, true)
+            print(isInVehicle)
+            variationTester(activePed.entity, 0)
+        end
+    },
+    [3] = {
+        lable = 'Paw',
+        TYPE = 'Paw',
+        action = function(plyped, activePed)
             if Animator(activePed.entity, activePed.model, 'tricks', {
                 animation = 'paw'
             }) == false then
                 QBCore.Functions.Notify('this pet can not do that', 'error', 1500)
             else
-                QBCore.Functions.Notify('test tricks paw', 'error', 1500)
+                QBCore.Functions.Notify('Start', 'success', 1500)
             end
-        end
-    },
-    [8] = {
-        lable = 'TEST',
-        TYPE = 'TEST',
-        action = function(plyped, activePed)
-            variationTester(activePed.entity, 0)
         end
     }
 }
-
-
 
 local function replaceString(s)
     local x
@@ -128,7 +137,7 @@ end
 AddEventHandler('keep-companion:client:actionMenuDispatcher', function(option)
     local plyped = PlayerPedId()
     local activePed = ActivePed.read()
-    for key, values in pairs(menu) do
+    for key, values in pairs(option.menu) do
         if option.type == values.TYPE then
             if values.action(plyped, activePed) == true then
                 if values.triggerNotification ~= nil then
@@ -191,7 +200,52 @@ AddEventHandler('keep-companion:client:petMenuActions', function(option)
             params = {
                 event = "keep-companion:client:actionMenuDispatcher",
                 args = {
-                    type = value.TYPE
+                    type = value.TYPE,
+                    menu = menu
+                }
+            }
+        }
+    end
+
+    openMenu[#openMenu + 1] = {
+        header = 'Tricks',
+        txt = "",
+        params = {
+            event = "keep-companion:client:Tricks"
+        }
+    }
+
+    -- leave menu
+    openMenu[#openMenu + 1] = {
+        header = leave,
+        txt = "",
+        params = {
+            event = "qb-menu:closeMenu"
+        }
+    }
+
+    exports['qb-menu']:openMenu(openMenu)
+end)
+
+AddEventHandler('keep-companion:client:Tricks', function(option)
+    local header = "name: " .. ActivePed.read().itemData.info.name
+    local leave = "leave"
+
+    -- header
+    local openMenu = { {
+        header = header,
+        isMenuHeader = true
+    } }
+
+    for key, value in pairs(menu2) do
+        openMenu[#openMenu + 1] = {
+            header = value.lable,
+            txt = value.desc or "",
+            params = {
+                event = "keep-companion:client:actionMenuDispatcher",
+                args = {
+                    type = value.TYPE,
+                    menu = menu2
                 }
             }
         }
