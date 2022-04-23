@@ -113,9 +113,14 @@ function Pet:despawnPet(source, item, revive)
     -- despawn pet
     -- save all data after despawning pet
     TriggerClientEvent('keep-companion:client:despawn', source, self.players[source][item.info.hash].entity, item, revive)
-    Pet:setAsDespawned(source, item)
 end
 
+RegisterNetEvent('keep-companion:server:setAsDespawned', function(item)
+    if item == nil then
+        return
+    end
+    Pet:setAsDespawned(source, item)
+end)
 -- ============================
 --          Items
 -- ============================

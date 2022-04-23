@@ -511,6 +511,7 @@ AddEventHandler('keep-companion:client:despawn', function(ped, item, revive)
     if revive ~= nil and revive == true then
         -- revive skip animation
         ActivePed:remove(ActivePed:findByHash(item.info.hash))
+        TriggerServerEvent('keep-companion:server:setAsDespawned', item)
         return
     end
     local plyPed = PlayerPedId()
@@ -536,6 +537,7 @@ AddEventHandler('keep-companion:client:despawn', function(ped, item, revive)
                 content = ActivePed.data[ActivePed:findByHash(item.info.hash)].time
             })
             ActivePed:remove(ActivePed:findByHash(item.info.hash))
+            TriggerServerEvent('keep-companion:server:setAsDespawned', item)
         end)
     end)
 end)
