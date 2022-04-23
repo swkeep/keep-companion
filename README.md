@@ -4,37 +4,41 @@
 
 ## Features
 
-- xp and level system
-- food and health system
-- auto naming & renaming system
-- random pet variation
-- command pet by menu
-- pet shop
-- pet animation
+- XP and leveling system
+- Food system
+- Health system (heal and revive)
+- Auto naming (At first usage) & Renaming
+- Random pet variation
+- Control pet's actions
+- Pet shop
+- Pet animation
 - ...
 
 # WIP status:
 
-Note that project still not ready yet. but you can still test it and help me in development.
+- Pls, note this project is a work in progress.
 
-- xp and level system ==> basic implementation
-- food ==> not implemented
-- pet animation ==> not implemented
-- ...
+- WIP features:
+
+1. XP calculation
+2. Food calculation
+3. Transfer ownership (not available right now)
+4. Combat XP calculation
 
 ## Usage
 
 - open the menu with "o"
-- to rename pets use this command => /renamePet newName
+- menu keybind can be customized inside settings and Fivem keybinds
 
 ## Previews
 
-![shop](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/shop.png)
-![petshop](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/petshop.png)
-![tooltip](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/tooltip.png)
-![spawn](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/spawn.png)
-![menu](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/menu.png)
-![commands](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/commands.png)
+![shop](https://raw.githubusercontent.com/swkeep/keep-companion/test/.github/images/shop.jpg)
+![petshop](https://raw.githubusercontent.com/swkeep/keep-companion/test/.github/images/shop2.jpg)
+![tooltip](https://raw.githubusercontent.com/swkeep/keep-companion/test/.github/images/tooltip.jpg)
+![spawn](https://raw.githubusercontent.com/swkeep/keep-companion/test/.github/images/call.jpg)
+![menu](https://raw.githubusercontent.com/swkeep/keep-companion/test/.github/images/menu.jpg)
+![commands](https://raw.githubusercontent.com/swkeep/keep-companion/test/.github/images/levelup.jpg)
+![pets](https://raw.githubusercontent.com/swkeep/keep-companion/test/.github/images/pets.jpg)
 
 ## installation
 
@@ -44,6 +48,7 @@ Note that project still not ready yet. but you can still test it and help me in 
 
 - [qb-target](https://github.com/BerkieBb/qb-target)
 - [qbcore framework](https://github.com/qbcore-framework)
+- [qb-menu](https://github.com/qbcore-framework/qb-menu)
 - [qbcore inventory](https://github.com/qbcore-framework/qb-inventory)
 - [lj-inventory](https://github.com/loljoshie/lj-inventory) -- in screenshot
 - [qb-shops](https://github.com/qbcore-framework/qb-shops)
@@ -173,6 +178,42 @@ Note that project still not ready yet. but you can still test it and help me in 
         ["shouldClose"] = true,
         ["combinable"] = nil,
         ["description"] = "Shepherd is your royal companion!"
+    },
+    ["petfood"] = {
+        ["name"] = "petfood",
+        ["label"] = "pet food",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "petfood.png",
+        ["unique"] = false,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = nil,
+        ["description"] = "food for your companion!"
+    },
+    ["collarpet"] = {
+        ["name"] = "collarpet",
+        ["label"] = "Pet collar",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "collarpet.png",
+        ["unique"] = false,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = true,
+        ["description"] = "Rename your pets!"
+    },
+    ["firstaidforpet"] = {
+        ["name"] = "firstaidforpet",
+        ["label"] = "First aid for pet",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "firstaidforpet.png",
+        ["unique"] = false,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = nil,
+        ["description"] = "Revive your pet!"
     }
 ```
 
@@ -263,6 +304,30 @@ Note that project still not ready yet. but you can still test it and help me in 
             info = {},
             type = 'item',
             slot = 10
+        },
+        [11] = {
+            name = 'petfood',
+            price = 500,
+            amount = 1000,
+            info = {},
+            type = 'item',
+            slot = 11
+        },
+        [12] = {
+            name = 'collarpet',
+            price = 50000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 12
+        },
+        [13] = {
+            name = 'firstaidforpet',
+            price = 5000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 13
         }
     }
 
@@ -272,7 +337,7 @@ Note that project still not ready yet. but you can still test it and help me in 
 -- add it at end of Config.Locations table
     ["petshop"] = {
         ["label"] = "Pet Shop",
-        ["coords"] = vector4(563.76, 2753.27, 42.88, 186.12), --or vector4(-659.87, -936.46, 21.83, 130.04), --  for mlo https://www.gta5-mods.com/maps/
+        ["coords"] = vector4(561.18, 2741.51, 42.87, 199.08), --or vector4(-659.87, -936.46, 21.83, 130.04), --  for mlo https://www.gta5-mods.com/maps/
         ["ped"] = 'S_M_M_StrVend_01',
         ["scenario"] = "WORLD_HUMAN_COP_IDLES",
         ["radius"] = 1.5,
@@ -304,7 +369,6 @@ else if (
             itemData.name == "keepcompanionshepherd" ||
             itemData.name == "keepcompanionwesty"
         ) {
-            // TODO changing heere
             let gender = itemData.info.gender;
             gender ? (gender = "male") : (gender = "female");
             $(".item-info-title").html("<p>" + itemData.info.name + "</p>");

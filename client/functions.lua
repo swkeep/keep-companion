@@ -57,11 +57,26 @@ end
 ---@param ped 'ped'
 ---@param targetPed 'ped'
 ---@param fleeTimeout integer
-function taskAttackTarget(ped, targetPed, fleeTimeout)
+function taskAttackTarget(ped, targetPed, fleeTimeout, item)
     TaskCombatPed(ped, targetPed, 0, 16)
     CreateThread(function()
         Wait(fleeTimeout)
         TaskSmartFleePed(ped, targetPed, 100.0, 10.0, 0, 0)
+        if item ~= nil then
+            local maxDistance = Config.Settings.fleeFromNotOwenerDistance
+            local finished = false
+            while DoesEntityExist(ped) and finished == false do
+                local plyCoord = GetEntityCoords(targetPed)
+                local pedCoord = GetEntityCoords(ped)
+                local distance = GetDistanceBetweenCoords(plyCoord, pedCoord)
+                if distance > maxDistance then
+                    -- #TODO this should remove pet from server too 
+                    ActivePed:remove(ActivePed:findByHash(item.info.hash))
+                    finished = true
+                end
+                Wait(1000)
+            end
+        end
     end)
 end
 
@@ -271,7 +286,9 @@ function attackLogic()
                     end
 
                 end)
-
+                return true
+            else
+                return false
             end
             activeLaser = false
         end

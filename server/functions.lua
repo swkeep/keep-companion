@@ -5,24 +5,24 @@ local QBCore = exports['qb-core']:GetCoreObject()
 ---@param gender integer
 function NameGenerator(type, gender)
     local names = {
-        dog = {{"Max", "Buddy", "Charlie", "Jack", "Cooper", "Rocky", "Toby", "Tucker", "Jake", "Bear", "Duke", "Teddy",
-                "Oliver", "Riley", "Bailey", "Bentley", "Milo", "Buster", "Cody", "Dexter", "Winston", "Murphy", "Leo",
-                "Lucky", "Oscar", "Louie", "Zeus", "Henry", "Sam", "Harley", "Baxter", "Gus", "Sammy", "Jackson",
-                "Bruno", "Diesel", "Jax", "Gizmo", "Bandit", "Rusty", "Marley", "Jasper", "Brody", "Roscoe", "Hank",
-                "Otis", "Bo", "Joey", "Beau", "Ollie", "Tank", "Shadow", "Peanut", "Hunter", "Scout", "Blue", "Rocco",
-                "Simba", "Tyson", "Ziggy", "Boomer", "Romeo", "Apollo", "Ace", "Luke", "Rex", "Finn", "Chance", "Rudy",
-                "Loki", "Moose", "George", "Samson", "Coco", "Benny", "Thor", "Rufus", "Prince", "Chester", "Brutus",
-                "Scooter", "Chico", "Spike", "Gunner", "Sparky", "Mickey", "Kobe", "Chase", "Oreo", "Frankie", "Mac",
-                "Benji", "Bubba", "Champ", "Brady", "Elvis", "Copper", "Cash", "Archie", "Walter"},
-               {"Bella", "Lucy", "Daisy", "Molly", "Lola", "Sophie", "Sadie", "Maggie", "Chloe", "Bailey", "Roxy",
-                "Zoey", "Lily", "Luna", "Coco", "Stella", "Gracie", "Abby", "Penny", "Zoe", "Ginger", "Ruby", "Rosie",
-                "Lilly", "Ellie", "Mia", "Sasha", "Lulu", "Pepper", "Nala", "Lexi", "Lady", "Emma", "Riley", "Dixie",
-                "Annie", "Maddie", "Piper", "Princess", "Izzy", "Maya", "Olive", "Cookie", "Roxie", "Angel", "Belle",
-                "Layla", "Missy", "Cali", "Honey", "Millie", "Harley", "Marley", "Holly", "Kona", "Shelby", "Jasmine",
-                "Ella", "Charlie", "Minnie", "Willow", "Phoebe", "Callie", "Scout", "Katie", "Dakota", "Sugar", "Sandy",
-                "Josie", "Macy", "Trixie", "Winnie", "Peanut", "Mimi", "Hazel", "Mocha", "Cleo", "Hannah", "Athena",
-                "Lacey", "Sassy", "Lucky", "Bonnie", "Allie", "Brandy", "Sydney", "Casey", "Gigi", "Baby", "Madison",
-                "Heidi", "Sally", "Shadow", "Cocoa", "Pebbles", "Misty", "Nikki", "Lexie", "Grace", "Sierra"}}
+        dog = { { "Max", "Buddy", "Charlie", "Jack", "Cooper", "Rocky", "Toby", "Tucker", "Jake", "Bear", "Duke", "Teddy",
+            "Oliver", "Riley", "Bailey", "Bentley", "Milo", "Buster", "Cody", "Dexter", "Winston", "Murphy", "Leo",
+            "Lucky", "Oscar", "Louie", "Zeus", "Henry", "Sam", "Harley", "Baxter", "Gus", "Sammy", "Jackson",
+            "Bruno", "Diesel", "Jax", "Gizmo", "Bandit", "Rusty", "Marley", "Jasper", "Brody", "Roscoe", "Hank",
+            "Otis", "Bo", "Joey", "Beau", "Ollie", "Tank", "Shadow", "Peanut", "Hunter", "Scout", "Blue", "Rocco",
+            "Simba", "Tyson", "Ziggy", "Boomer", "Romeo", "Apollo", "Ace", "Luke", "Rex", "Finn", "Chance", "Rudy",
+            "Loki", "Moose", "George", "Samson", "Coco", "Benny", "Thor", "Rufus", "Prince", "Chester", "Brutus",
+            "Scooter", "Chico", "Spike", "Gunner", "Sparky", "Mickey", "Kobe", "Chase", "Oreo", "Frankie", "Mac",
+            "Benji", "Bubba", "Champ", "Brady", "Elvis", "Copper", "Cash", "Archie", "Walter" },
+        { "Bella", "Lucy", "Daisy", "Molly", "Lola", "Sophie", "Sadie", "Maggie", "Chloe", "Bailey", "Roxy",
+            "Zoey", "Lily", "Luna", "Coco", "Stella", "Gracie", "Abby", "Penny", "Zoe", "Ginger", "Ruby", "Rosie",
+            "Lilly", "Ellie", "Mia", "Sasha", "Lulu", "Pepper", "Nala", "Lexi", "Lady", "Emma", "Riley", "Dixie",
+            "Annie", "Maddie", "Piper", "Princess", "Izzy", "Maya", "Olive", "Cookie", "Roxie", "Angel", "Belle",
+            "Layla", "Missy", "Cali", "Honey", "Millie", "Harley", "Marley", "Holly", "Kona", "Shelby", "Jasmine",
+            "Ella", "Charlie", "Minnie", "Willow", "Phoebe", "Callie", "Scout", "Katie", "Dakota", "Sugar", "Sandy",
+            "Josie", "Macy", "Trixie", "Winnie", "Peanut", "Mimi", "Hazel", "Mocha", "Cleo", "Hannah", "Athena",
+            "Lacey", "Sassy", "Lucky", "Bonnie", "Allie", "Brandy", "Sydney", "Casey", "Gigi", "Baby", "Madison",
+            "Heidi", "Sally", "Shadow", "Cocoa", "Pebbles", "Misty", "Nikki", "Lexie", "Grace", "Sierra" } }
     }
     local size = #names[type][gender]
     return names[type][gender][math.random(1, size)]
@@ -42,16 +42,14 @@ function initItem(source, item)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     local random = math.random(1, 2)
-    local gender = {true, false}
+    local gender = { true, false }
     local gen = gender[random]
     item.info.hash = tostring(QBCore.Shared.RandomInt(2) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(1) ..
-                                  QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
+    QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
     item.info.name = NameGenerator('dog', random)
     item.info.gender = gen
     item.info.age = 0
     item.info.food = 100
-    -- state = alive or dead
-    item.info.state = true
     -- owener data
     item.info.owner = Player.PlayerData.charinfo
     -- inital level and xp
@@ -93,7 +91,8 @@ function updateInfoHelper(Player, slot, data)
     if Player.PlayerData.items[slot] then
         Player.PlayerData.items[slot].info[data.key] = data.content
     end
-    -- print('updating: ' .. Player.PlayerData.citizenid, "whichPart: " .. data.key)
+    -- print('how much: ', data.content, 'itemHash: ' .. Player.PlayerData.items[slot].info['hash'],
+    --     "whichPart: " .. data.key)
     Player.Functions.SetInventory(Player.PlayerData.items, true)
 end
 
@@ -131,7 +130,7 @@ function CalorieCalData:convertWeightToLbs(weight)
     return (weight * 10) / 500
 end
 
---- update logic 
+--- update logic
 function FindWhereIsItem(Player, item, source)
     if Player.PlayerData.items ~= nil and next(Player.PlayerData.items) ~= nil then
         for k, v in pairs(Player.PlayerData.items) do
@@ -209,7 +208,7 @@ function Update_food(Player, data, item, source, requestedItem)
             overEat = RER - (RER * (Config.foodOverEat / 100))
             if Player.PlayerData.items[item.slot] then
                 Player.PlayerData.items[item.slot].weight = Player.PlayerData.items[item.slot].weight +
-                                                                (overEat * (Config.weightIncreaseByOverEat / 100))
+                    (overEat * (Config.weightIncreaseByOverEat / 100))
             end
             Player.Functions.SetInventory(Player.PlayerData.items, true)
         elseif currentEstimatedFoodValue < RER and currentEstimatedFoodValue >= 0 then
@@ -223,9 +222,14 @@ function Update_food(Player, data, item, source, requestedItem)
                 content = 500
             }
         end
+        TriggerClientEvent('QBCore:Notify', source, "Pet food value increased too: " .. mData.content)
     end
     updateInfoHelper(Player, item.slot, mData)
-    TriggerClientEvent('keep-companion:client:updateFood', source, mData.content)
+    TriggerClientEvent('keep-companion:client:updateFood', source, {
+        content = mData.content,
+        hash = Player.PlayerData.items[item.slot].info['hash']
+    })
+
 end
 
 function Update_age(Player, data, item, source, requestedItem)

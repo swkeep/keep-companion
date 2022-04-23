@@ -2,23 +2,24 @@ Config = Config or {}
 
 Config.DEBUG = false -- make sure it's false
 
-Config.callingCompanionDuration = 1000
-
 Config.Settings = {
     callCompanionDuration = 2, -- sec
     despawnDuration = 3, -- sec
-    itemUsageCooldown = 5, -- sec
+    itemUsageCooldown = 1, -- sec
     minHuntingAbilityLevel = 1, -- level
+    feedingSpeed = 5,
     changePetNameDuration = 5, -- sec
     carFlipingDuration = 5, -- sec
-    PetMiniMap = {
-        showblip = true,
-        sprite = 442,
-        colour = 2,
-        shortRange = false
-    },
-    chaseDistance = 50.0
+    firstAidDuration = 6, -- sec note: don't use 5 it's will cus animations to snap
+    firstAidHealthRecoverAmount = 50, -- 50% of their life
+    PetMiniMap = { showblip = true, sprite = 442, colour = 2, shortRange = false },
+    chaseDistance = 50.0,
+    fleeFromNotOwenerDistance = 60.0,
+    petMenuKeybind = 'o' -- defalut keybind (players can change bind)
 }
+
+-- server and client
+Config.MaxActivePetsPetPlayer = 3
 
 Config.Balance = {
     maximumLevel = 50, -- xp callculation only work util level 99 don't set it to higher values
@@ -28,7 +29,7 @@ Config.Balance = {
         -- after 120-sec passes timer will start over from 0
         afkTimerRestAfter = 120, -- sec
         wanderingInterval = 60,
-        animationInterval = 100
+        animationInterval = 90
     }, -- sec pet gonna go wandering around player after player is AFK for a certain time
 
     petStressReliefValue = math.random(12, 24)

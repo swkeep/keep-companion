@@ -1,6 +1,6 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 -- pet system
-local maxLimit = 1 -- don't change this it will break script
+local maxLimit = Config.MaxActivePetsPetPlayer
 
 -- ============================
 --          Class
@@ -105,20 +105,26 @@ function Pet:isMaxLimitPedReached(source)
     end
 end
 
---- depsawn helper
+--- despawn pet and remove it's data from server
 ---@param source integer
 ---@param item table
-function Pet:despawnPet(source, item)
+---@param revive boolean
+function Pet:despawnPet(source, item, revive)
     -- despawn pet
     -- save all data after despawning pet
-    TriggerClientEvent('keep-companion:client:despawn', source, self.players[source][item.info.hash].entity)
-    Pet:setAsDespawned(source, item)
+    TriggerClientEvent('keep-companion:client:despawn', source, self.players[source][item.info.hash].entity, item, revive)
 end
 
+RegisterNetEvent('keep-companion:server:setAsDespawned', function(item)
+    if item == nil then
+        return
+    end
+    Pet:setAsDespawned(source, item)
+end)
 -- ============================
 --          Items
 -- ============================
--- food 
+-- food
 QBCore.Functions.CreateUseableItem('petfood', function(source, item)
     TriggerClientEvent('keep-companion:client:getPetdata', source)
 end)
@@ -129,6 +135,87 @@ RegisterNetEvent('keep-companion:server:increaseFood', function(item)
     end
     TriggerClientEvent('keep-companion:client:increaseFood', source, item, math.random(1500, 2000))
 end)
+
+-- rename - collar
+QBCore.Functions.CreateUseableItem('collarpet', function(source, item)
+    TriggerClientEvent('keep-companion:client:renameCollar', source, item)
+end)
+
+RegisterNetEvent('keep-companion:server:renameCollar', function(name)
+    local Player = QBCore.Functions.GetPlayer(source)
+    if Player.Functions.RemoveItem("collarpet", 1) then
+        TriggerClientEvent("keep-companion:client:renameCollarAction", source, name)
+    end
+end)
+
+-- first aid - revive
+QBCore.Functions.CreateUseableItem('firstaidforpet', function(source, item)
+    TriggerClientEvent('QBCore:Notify', source, "Use your 3th eye on pet!", 'error', 2500)
+end)
+
+--- revive or heal pet by it's item's hash
+---@param Player any
+---@param item any
+---@return boolean
+---@return table
+---@return number
+---@return boolean
+local function revivePet(Player, item)
+    local percentage = Config.Settings.firstAidHealthRecoverAmount
+    local maxHealth = getMaxHealth(item.model)
+    local res = math.floor(maxHealth * (percentage / 100))
+
+    for key, items in pairs(Player.PlayerData.items) do
+        if items.info.hash ~= nil and (items.info.hash == item.itemData.info.hash) then
+            local amount
+            local wasMaxHealth = false
+            if items.info.health >= maxHealth then
+                amount = maxHealth
+                wasMaxHealth = true
+            else
+                amount = items.info.health + res
+                if amount >= maxHealth then
+                    amount = maxHealth
+                end
+                wasMaxHealth = false
+            end
+            Player.PlayerData.items[items.slot].info.health = amount
+            Player.Functions.SetInventory(Player.PlayerData.items, true)
+            return true, items, amount, wasMaxHealth
+        end
+    end
+end
+
+RegisterNetEvent('keep-companion:server:revivePet', function(item, TYPE)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    local state, updatedItem, amount, wasMaxHealth = revivePet(Player, item)
+    if state == true then
+        if wasMaxHealth == false then
+            if Player.Functions.RemoveItem("firstaidforpet", 1) then
+                if TYPE == 'Heal' then
+                    TriggerClientEvent('QBCore:Notify', src, "You pet healed for: " .. amount, 'success', 2500)
+                elseif TYPE == 'revive' then
+                    Pet:despawnPet(src, updatedItem, true)
+                    TriggerClientEvent('QBCore:Notify', src, "Your per revived!", 'success', 2500)
+                end
+            end
+        else
+            TriggerClientEvent('QBCore:Notify', src, "Pet is on full health!", 'error', 2500)
+        end
+    end
+end)
+
+--- get pet max health from confing file by it's model
+---@param model string
+---@return integer
+function getMaxHealth(model)
+    for key, value in pairs(Config.pets) do
+        if value.model == model then
+            return value.maxHealth
+        end
+    end
+end
 
 -- all pets
 for key, value in pairs(Config.pets) do
@@ -154,11 +241,9 @@ end
 -- ================================================
 --          Item - Updating Information
 -- ================================================
--- #TODO add a way to fix undefined level and xp
 
 RegisterNetEvent('keep-companion:server:updateAllowedInfo', function(item, data)
     -- #TODO optimize to just use one updateInfoHelper()
-    -- #TODO data validation
     local Player = QBCore.Functions.GetPlayer(source)
     local requestedItem = Player.PlayerData.items[item.slot] -- ask sever to give item's data
     data = data or {}
@@ -178,9 +263,6 @@ RegisterNetEvent('keep-companion:server:updateAllowedInfo', function(item, data)
                 -- need to get maxHealth
                 updateInfoHelper(Player, item.slot, data)
             end
-        elseif data.key == 'state' then
-            -- update pet state
-            updateInfoHelper(Player, item.slot, data)
         elseif data.key == 'age' then
             Update_age(Player, data, item, source, requestedItem)
         elseif data.key == 'name' then
@@ -197,9 +279,11 @@ RegisterNetEvent('keep-companion:server:updatePedData', function(item, model, en
     Pet:setAsSpawned(source, item, model, entity)
 end)
 
-RegisterNetEvent('keep-companion:server:onPlayerUnload', function(item)
+RegisterNetEvent('keep-companion:server:onPlayerUnload', function(items)
     -- save pet's Information when player logout
-    Pet:setAsDespawned(source, item)
+    for key, value in pairs(items) do
+        Pet:setAsDespawned(source, value)
+    end
 end)
 
 -- ============================
@@ -214,17 +298,15 @@ QBCore.Commands.Add('addpet', 'add a pet to player inventory (Admin Only)', {}, 
         info = {}
     }
     local random = math.random(1, 2)
-    local gender = {true, false}
+    local gender = { true, false }
     local gen = gender[random]
     itemData.info.hash = tostring(
         QBCore.Shared.RandomInt(2) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(1) ..
-            QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
+        QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
     itemData.info.name = NameGenerator('dog', random)
     itemData.info.gender = gen
     itemData.info.age = 0
     itemData.info.food = 100
-    -- state = alive or dead
-    itemData.info.state = true
     -- owener data
     itemData.info.owner = Player.PlayerData.charinfo
     -- inital level and xp
@@ -251,8 +333,8 @@ QBCore.Commands.Add('addItem', 'add item to player inventory (Admin Only)', {}, 
     TriggerClientEvent("inventory:client:ItemBox", source, QBCore.Shared.Items[item[1]], "add")
 end, 'admin')
 
-QBCore.Commands.Add('renamePet', 'rename pet', {{"name", "new pet name"}}, false, function(source, args)
-    TriggerClientEvent("keep-companion:client:getActivePet", source, args[1])
+QBCore.Commands.Add('renamePet', 'rename pet', { { "name", "new pet name" } }, false, function(source, args)
+    TriggerClientEvent("keep-companion:client:renameCollar", source, args[1])
 end, 'admin')
 
 -- ============================
