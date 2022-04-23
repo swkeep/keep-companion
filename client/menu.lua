@@ -4,20 +4,22 @@ PlayerData = QBCore.Functions.GetPlayerData()
 local isMenuOpen = false
 
 local menu = {
-    ['Follow'] = {
+    [1] = {
         lable = 'Follow',
+        TYPE = 'Follow',
         -- triggerNotification = {'onSuccess', 'onFailed'},
         -- and action should retrun a bool value true == onSuccess ,false == onFailed
-        triggerNotification = {'PETNAME is now following you!', 'PETNAME failed to follow you!'},
+        triggerNotification = { 'PETNAME is now following you!', 'PETNAME failed to follow you!' },
         action = function(plyped, activePed)
             doSomethingIfPedIsInsideVehicle(activePed.entity)
             TaskFollowTargetedPlayer(activePed.entity, plyped, 3.0)
             return true
         end
     },
-    ['Hunt'] = {
+    [2] = {
         lable = 'Hunt',
-        triggerNotification = {'PETNAME is now hunting!', 'PETNAME can not do that!'},
+        TYPE = 'Hunt',
+        triggerNotification = { 'PETNAME is now hunting!', 'PETNAME can not do that!' },
         action = function(plyped, activePed)
             if activePed.canHunt == true then
                 if activePed.level >= Config.Settings.minHuntingAbilityLevel then
@@ -37,8 +39,9 @@ local menu = {
             end
         end
     },
-    ['HuntandGrab'] = {
+    [3] = {
         lable = 'Hunt and Grab',
+        TYPE = 'HuntandGrab',
         action = function(plyped, activePed)
             if activePed.canHunt == true then
                 if activePed.level >= Config.Settings.minHuntingAbilityLevel then
@@ -52,34 +55,38 @@ local menu = {
             end
         end
     },
-    ['There'] = {
+    [4] = {
         lable = 'Go there',
+        TYPE = 'There',
         action = function(plyped, activePed)
             doSomethingIfPedIsInsideVehicle(activePed.entity)
             goThere(activePed.entity)
         end
     },
-    ['Wait'] = {
+    [5] = {
         lable = 'Wait',
+        TYPE = 'Wait',
         action = function(plyped, activePed)
             ClearPedTasks(activePed.entity)
         end
     },
-    ['GetinCar'] = {
+    [6] = {
         lable = 'Get in Car',
+        TYPE = 'GetinCar',
         action = function(plyped, activePed)
             getIntoCar()
         end
     },
-    ['Tricks'] = {
+    [7] = {
         lable = 'Tricks',
+        TYPE = 'Tricks',
         action = function(plyped, activePed)
 
             if Animator(activePed.entity, activePed.model, 'tricks', {
                 animation = 'beg',
                 sequentialTimings = {
                     -- How close the value is to the Timeout value determines how fast the script moves to the next animation.
-                    [1] = 5, -- start animation Timeout ==> 1sec(6s-5s) to loop 
+                    [1] = 5, -- start animation Timeout ==> 1sec(6s-5s) to loop
                     [2] = 0, -- loop animation Timeout  ==> 6sec(6s-0s) to exit
                     [3] = 2, -- exit animation Timeout  ==> 4sec(6s-2s) to end
                     step = 1,
@@ -113,7 +120,7 @@ AddEventHandler('keep-companion:client:actionMenuDispatcher', function(option)
     local plyped = PlayerPedId()
     local activePed = ActivePed.read()
     for key, values in pairs(menu) do
-        if option.type == key then
+        if option.type == values.TYPE then
             if values.action(plyped, activePed) == true then
                 if values.triggerNotification ~= nil then
                     QBCore.Functions.Notify(replaceString(values.triggerNotification[1]), 'success', 1500)
@@ -132,7 +139,7 @@ AddEventHandler('keep-companion:client:PetMenu', function()
     local leave = "leave"
 
     -- header
-    local openMenu = {{
+    local openMenu = { {
         header = header,
         txt = "pet under control",
         isMenuHeader = true
@@ -153,7 +160,7 @@ AddEventHandler('keep-companion:client:PetMenu', function()
         params = {
             event = "qb-menu:closeMenu"
         }
-    }}
+    } }
 
     exports['qb-menu']:openMenu(openMenu)
 end)
@@ -163,10 +170,10 @@ AddEventHandler('keep-companion:client:petMenuActions', function(option)
     local leave = "leave"
 
     -- header
-    local openMenu = {{
+    local openMenu = { {
         header = header,
         isMenuHeader = true
-    }}
+    } }
 
     for key, value in pairs(menu) do
         openMenu[#openMenu + 1] = {
@@ -175,7 +182,7 @@ AddEventHandler('keep-companion:client:petMenuActions', function(option)
             params = {
                 event = "keep-companion:client:actionMenuDispatcher",
                 args = {
-                    type = key
+                    type = value.TYPE
                 }
             }
         }
@@ -198,10 +205,10 @@ AddEventHandler('keep-companion:client:switchControl', function(option)
     local leave = "leave"
 
     -- header
-    local openMenu = {{
+    local openMenu = { {
         header = header,
         isMenuHeader = true
-    }}
+    } }
 
     for key, value in pairs(ActivePed:petsList()) do
         openMenu[#openMenu + 1] = {
@@ -263,4 +270,3 @@ end, false)
 RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
     PlayerData = val
 end)
-
