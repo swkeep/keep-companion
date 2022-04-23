@@ -116,6 +116,22 @@ function ActivePed:removeAll()
     for key, value in pairs(ActivePed:petsList()) do
         DeletePed(value.pedHandle)
         table.insert(tmpHash, value.itemData)
+        local currentItem = {
+            hash = value.itemData.info.hash or nil,
+            slot = value.itemData.slot or nil
+        }
+        TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
+            key = 'age',
+            content = value.time
+        })
+        TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
+            key = 'food',
+            content = value.food
+        })
+        TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
+            key = 'XP',
+            content = value.XP
+        })
     end
     TriggerServerEvent('keep-companion:server:onPlayerUnload', tmpHash)
     self.data = {}
@@ -273,7 +289,7 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                         distance = 1.5
                     })
                 else
-                    creatActivePetThread(ped)
+                    creatActivePetThread(ped, item)
                     exports['qb-target']:AddTargetEntity(ped, {
                         options = { {
                             icon = "fas fa-sack-dollar",
@@ -401,13 +417,13 @@ end
 
 --- this set of Functions will executed evetry sec to tracker pet's behaviour.
 ---@param ped any
-function creatActivePetThread(ped)
+function creatActivePetThread(ped, item)
     local afk = Config.Balance.afk
     local count = Config.DataUpdateInterval -- this value is
     local plyPed = PlayerPedId()
     CreateThread(function()
         local tmpcount = 0
-        local savedData = ActivePed:read()
+        local savedData = ActivePed.data[ActivePed:findByHash(item.info.hash)]
         local fninished = false
         -- it's table just to have passed by reference.
         local timeOut = {
@@ -472,10 +488,6 @@ function creatActivePetThread(ped)
                 }
                 if c_health == 0 or c_health == 100 then
                     TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
-                        key = 'state',
-                        content = IsPedDeadOrDying(savedData.entity, 1)
-                    })
-                    TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
                         key = 'health',
                         content = c_health
                     })
@@ -520,10 +532,6 @@ AddEventHandler('keep-companion:client:despawn', function(ped, item, revive)
         ClearPedTasks(plyPed)
         Citizen.CreateThread(function()
             TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
-                key = 'state',
-                content = IsPedDeadOrDying(ped, 1)
-            })
-            TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
                 key = 'age',
                 content = ActivePed.data[ActivePed:findByHash(item.info.hash)].time
             })
@@ -533,22 +541,6 @@ AddEventHandler('keep-companion:client:despawn', function(ped, item, revive)
 end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
-    -- #TODO fix update on player unload!
-    -- local currentItem = {
-    --     hash = activeped.itemData.info.hash,
-    --     slot = activeped.itemData.slot
-    -- }
-    -- TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
-    --     key = 'state',
-    --     content = IsPedDeadOrDying(activeped.entity, 1)
-    -- })
-    -- if activeped.time ~= nil then
-    --     TriggerServerEvent('keep-companion:server:updateAllowedInfo', currentItem, {
-    --         key = 'age',
-    --         content = activeped.time
-    --     })
-    -- end
-    -- TriggerServerEvent('keep-companion:server:onPlayerUnload', activeped.itemData)
     ActivePed:removeAll()
     PlayerData = {} -- empty playerData
 end)
