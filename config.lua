@@ -10,7 +10,7 @@ Config.Settings = {
     feedingSpeed = 5,
     changePetNameDuration = 5, -- sec
     carFlipingDuration = 5, -- sec
-    firstAidDuration = 5,
+    firstAidDuration = 6, -- sec note: don't use 5 it's will cus animations to snap
     firstAidHealthRecoverAmount = 50, -- 50% of their life
     PetMiniMap = { showblip = true, sprite = 442, colour = 2, shortRange = false },
     chaseDistance = 50.0,

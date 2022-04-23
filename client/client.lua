@@ -358,7 +358,7 @@ AddEventHandler('keep-companion:client:increaseHealth', function(ped, item, TYPE
             Animator(plyID, "PLAYER", 'revive', {
                 animation = 'tendtodead',
                 sequentialTimings = {
-                    [1] = timeout - 1,
+                    [1] = timeout,
                     [2] = 0,
                     [3] = 0,
                     step = 1,
@@ -606,22 +606,12 @@ RegisterNetEvent('keep-companion:client:renameCollar', function(item)
 
 end)
 
-RegisterNetEvent('keep-companion:client:getPetDataForRevive', function(item)
-    if ActivePed:read() ~= nil then
-
-    else
-        QBCore.Functions.Notify('Aleast one pet should be on your control!', 'error', 7500)
-    end
-end)
-
 -- #TODO this event should be two events one get active pet and one for changing pet name
-RegisterNetEvent('keep-companion:client:getActivePet')
-AddEventHandler('keep-companion:client:getActivePet', function(name)
+RegisterNetEvent('keep-companion:client:renameCollarAction', function(name)
     -- process of updating pet's name
     local activePed = ActivePed:read() or nil
-
     if activePed ~= nil then
-        local validation = ValidatePetName(name, 12) -- #TODO this sould be inside server/if needed
+        local validation = ValidatePetName(name, 12)
         local currentItem = {
             hash = activePed.itemData.info.hash or nil,
             slot = activePed.itemData.slot or nil
@@ -643,10 +633,10 @@ AddEventHandler('keep-companion:client:getActivePet', function(name)
                     end)
                 end)
         elseif validation.reason == 'badword' then
-            TriggerEvent('QBCore:Notify', "you can't name you pet like that!")
+            TriggerEvent('QBCore:Notify', "Don't name your pet like that!")
             print_table(validation.words)
         elseif validation.reason == 'maxCharacter' then
-            TriggerEvent('QBCore:Notify', "you reached maximum allowed Characters!")
+            TriggerEvent('QBCore:Notify', "You can not use that many words!")
         elseif validation.reason == 'moreThanOneWord' then
             -- won't trigger
             TriggerEvent('QBCore:Notify', "we can't save names that contain more than one word!")

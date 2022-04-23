@@ -139,7 +139,7 @@ end)
 RegisterNetEvent('keep-companion:server:renameCollar', function(name)
     local Player = QBCore.Functions.GetPlayer(source)
     if Player.Functions.RemoveItem("collarpet", 1) then
-        TriggerClientEvent("keep-companion:client:getActivePet", source, name)
+        TriggerClientEvent("keep-companion:client:renameCollarAction", source, name)
     end
 end)
 
@@ -329,7 +329,7 @@ QBCore.Commands.Add('addItem', 'add item to player inventory (Admin Only)', {}, 
 end, 'admin')
 
 QBCore.Commands.Add('renamePet', 'rename pet', { { "name", "new pet name" } }, false, function(source, args)
-    TriggerClientEvent("keep-companion:client:getActivePet", source, args[1])
+    TriggerClientEvent("keep-companion:client:renameCollar", source, args[1])
 end, 'admin')
 
 -- ============================

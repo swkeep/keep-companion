@@ -24,7 +24,7 @@ local animationList = {
             ['look_around'] = {
                 animDictionary = 'creatures@retriever@amb@world_dog_sitting@idle_a',
                 animationName = 'idle_b',
-                skip = {'A_C_Westy', 'A_C_Pug', 'A_C_Poodle', 'A_C_Cat_01', 'A_C_MtLion', 'A_C_Panther'}
+                skip = { 'A_C_Westy', 'A_C_Pug', 'A_C_Poodle', 'A_C_Cat_01', 'A_C_MtLion', 'A_C_Panther' }
             },
             ['sit_Up'] = {
                 animDictionary = 'creatures@retriever@amb@world_dog_sitting@idle_a',
@@ -408,7 +408,7 @@ function Animator(pedHandle, pedModel, state, options)
                 end
 
                 local tmpsequentialTimings = {
-                    [1] = options.sequentialTimings[1] or 0, -- start animation Timeout ==> 1sec(6s-5s) to loop 
+                    [1] = options.sequentialTimings[1] or 0, -- start animation Timeout ==> 1sec(6s-5s) to loop
                     [2] = options.sequentialTimings[2] or 0, -- loop animation Timeout  ==> 6sec(6s-0s) to exit
                     [3] = options.sequentialTimings[3] or 0, -- exit animation Timeout  ==> 4sec(6s-2s) to end
                     step = options.sequentialTimings['step'] or 1,
