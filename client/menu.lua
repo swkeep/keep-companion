@@ -106,8 +106,17 @@ local menu = {
                 QBCore.Functions.Notify('test tricks paw', 'error', 1500)
             end
         end
+    },
+    [8] = {
+        lable = 'TEST',
+        TYPE = 'TEST',
+        action = function(plyped, activePed)
+            variationTester(activePed.entity, 0)
+        end
     }
 }
+
+
 
 local function replaceString(s)
     local x
@@ -253,17 +262,11 @@ RegisterKeyMapping('+showMenu', 'show pet menu', 'keyboard', Config.Settings.pet
 RegisterCommand('+showMenu', function()
     local doesPlayerHavePet = ActivePed:read()
     if ((IsDowned() and IsPoliceOrEMS()) or not IsDowned()) and not PlayerData.metadata["ishandcuffed"] and
-        not IsPauseMenuActive() and not isMenuOpen and next(doesPlayerHavePet) ~= nil then
+        not IsPauseMenuActive() and not isMenuOpen and doesPlayerHavePet ~= nil then
         TriggerEvent('keep-companion:client:PetMenu')
-    elseif next(doesPlayerHavePet) == nil then
+    elseif doesPlayerHavePet == nil then
         TriggerEvent('QBCore:Notify', "you must have atleast one active pet to access to menu")
     end
-
-    -- if ((IsDowned() and IsPoliceOrEMS()) or not IsDowned()) and not PlayerData.metadata["ishandcuffed"] and
-    --     not IsPauseMenuActive() and not isMenuOpen then
-    --     SetCursorLocation(0.5, 0.5)
-    --     setRadialState(true, true)
-    -- end
 end, false)
 
 -- This will update all the PlayerData that doesn't get updated with a specific event other than this like the metadata
