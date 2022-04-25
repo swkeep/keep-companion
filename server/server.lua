@@ -154,13 +154,14 @@ QBCore.Functions.CreateUseableItem('firstaidforpet', function(source, item)
 end)
 
 --- revive or heal pet by it's item's hash
----@param Player any
----@param item any
+---@param Player table
+---@param item table
+---@param TYPE string
 ---@return boolean
 ---@return table
 ---@return number
 ---@return boolean
-local function revivePet(Player, item)
+local function revivePet(Player, item, TYPE)
     local percentage = Config.Settings.firstAidHealthRecoverAmount
     local maxHealth = getMaxHealth(item.model)
     local res = math.floor(maxHealth * (percentage / 100))
@@ -173,9 +174,13 @@ local function revivePet(Player, item)
                 amount = maxHealth
                 wasMaxHealth = true
             else
-                amount = items.info.health + res
-                if amount >= maxHealth then
-                    amount = maxHealth
+                if TYPE == 'revive' then
+                    amount = 100
+                else
+                    amount = items.info.health + res
+                    if amount >= maxHealth then
+                        amount = maxHealth
+                    end
                 end
                 wasMaxHealth = false
             end
@@ -189,7 +194,7 @@ end
 RegisterNetEvent('keep-companion:server:revivePet', function(item, TYPE)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    local state, updatedItem, amount, wasMaxHealth = revivePet(Player, item)
+    local state, updatedItem, amount, wasMaxHealth = revivePet(Player, item, TYPE)
     if state == true then
         if wasMaxHealth == false then
             if Player.Functions.RemoveItem("firstaidforpet", 1) then

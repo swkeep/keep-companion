@@ -50,7 +50,7 @@ Config.pets = {
     [1] = {
         name = 'keepcompanionwesty',
         model = 'A_C_Westy',
-        maxHealth = 100,
+        maxHealth = 150,
         distinct = 'no dog'
     },
     [2] = {
@@ -100,7 +100,7 @@ Config.pets = {
     [9] = {
         name = 'keepcompanioncat',
         model = 'A_C_Cat_01',
-        maxHealth = 100,
+        maxHealth = 150,
         distinct = 'no cat'
     },
     [10] = {
