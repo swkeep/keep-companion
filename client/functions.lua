@@ -1,9 +1,3 @@
-function warpPedAroundPlayer(ped)
-    local currentPlayerCoord = GetEntityCoords(PlayerPedId())
-    local x, y, z = table.unpack(currentPlayerCoord)
-    SetEntityCoords(ped, x + 0.5, y + 0.5, z, 0, 0, 0, 0)
-end
-
 function calNextXp(level)
     local maxExp = math.floor(math.floor((level + 300) * (2 ^ (level / 7))) / 4)
     local minExp = math.floor(math.floor(((level - 1) + 300) * (2 ^ ((level - 1) / 7))) / 4)
@@ -70,7 +64,7 @@ function taskAttackTarget(ped, targetPed, fleeTimeout, item)
                 local pedCoord = GetEntityCoords(ped)
                 local distance = GetDistanceBetweenCoords(plyCoord, pedCoord)
                 if distance > maxDistance then
-                    -- #TODO this should remove pet from server too 
+                    -- #TODO this should remove pet from server too
                     ActivePed:remove(ActivePed:findByHash(item.info.hash))
                     finished = true
                 end
@@ -188,7 +182,7 @@ function goThere(ped)
         local plyped = PlayerPedId()
         local position = GetEntityCoords(plyped)
         local coords, entity = RayCastGamePlayCamera(1000.0)
-        Draw2DText('Press ~g~E~w~ To go there', 4, {255, 255, 255}, 0.4, 0.43, 0.888 + 0.025)
+        Draw2DText('Press ~g~E~w~ To go there', 4, { 255, 255, 255 }, 0.4, 0.43, 0.888 + 0.025)
         if IsControlJustReleased(0, 38) then
             TaskGoToCoordAnyMeans(ped, coords, 10.0, 0, 0, 0, 0)
             activeLaser = false
@@ -246,7 +240,7 @@ function attackLogic()
         local plyped = PlayerPedId()
         local position = GetEntityCoords(plyped)
         local coords, entity = RayCastGamePlayCamera(1000.0)
-        Draw2DText('PRESS ~g~E~w~ TO ATTACK TARGET', 4, {255, 255, 255}, 0.4, 0.43, 0.888 + 0.025)
+        Draw2DText('PRESS ~g~E~w~ TO ATTACK TARGET', 4, { 255, 255, 255 }, 0.4, 0.43, 0.888 + 0.025)
         if IsControlJustReleased(0, 38) then
             ClearPedTasks(ActivePed:read().entity)
             if IsEntityAPed(entity) then
@@ -280,7 +274,7 @@ function attackLogic()
                         end
 
                         local Xp = Xp + (calNextXp(level) * 3)
-                        ActivePed:update{
+                        ActivePed:update {
                             xp = Xp
                         }
                     end
@@ -310,7 +304,7 @@ function HuntandGrab(plyped, activePed)
         }
         local position = GetEntityCoords(plyped)
         local coords, entity = RayCastGamePlayCamera(1000.0)
-        Draw2DText('Press ~g~E~w~ To go there', 4, {255, 255, 255}, 0.4, 0.43, 0.888 + 0.025)
+        Draw2DText('Press ~g~E~w~ To go there', 4, { 255, 255, 255 }, 0.4, 0.43, 0.888 + 0.025)
         if IsControlJustReleased(0, 38) then
             local dragger = activePed.entity
             if IsPedAPlayer(entity) == 1 or IsEntityAPed(entity) == false or entity == dragger then
@@ -370,17 +364,19 @@ end
 --- if player is inside a vehicle we need to relocate ped location so they won't sucide
 ---@param ped 'ped'
 function doSomethingIfPedIsInsideVehicle(ped)
-    if IsPedInAnyVehicle(ped, true) == 1 then
-        local plyped = PlayerPedId()
-        if IsPedInAnyVehicle(plyped, true) then
-            local vehicle = GetVehiclePedIsIn(plyped, false)
-            local forward = GetEntityForwardVector(plyped)
-            local trunkpos = GetWorldPositionOfEntityBone(vehicle, GetEntityBoneIndexByName(vehicle, "door_pside_f"))
-            local x, y, z = table.unpack(trunkpos + forward * 2.5)
-            SetEntityCoords(ped, x, y, z, 1, 0, 0, 1)
-        else
-            SetEntityCoords(ped, GetEntityCoords(plyped), 1, 0, 0, 1)
-        end
+    local playerped = PlayerPedId()
+    local coord = getSpawnLocation(playerped)
+    if IsPedInAnyVehicle(ped, true) then
+        SetEntityCoords(ped, coord, 1, 0, 0, 1)
+    end
+    Wait(75)
+end
+
+function getSpawnLocation(plyped)
+    if IsPedInAnyVehicle(plyped, true) then
+        return GetOffsetFromEntityInWorldCoords(plyped, -2.0, 1.0, 0.5)
+    else
+        return GetOffsetFromEntityInWorldCoords(plyped, 1.0, -1.0, 0.5)
     end
 end
 

@@ -21,9 +21,9 @@ local menu = {
         TYPE = 'Hunt',
         triggerNotification = { 'PETNAME is now hunting!', 'PETNAME can not do that!' },
         action = function(plyped, activePed)
-            local isInVehicle = IsPedInAnyVehicle(activePed.entity, true)
             if activePed.canHunt == true then
                 if activePed.level >= Config.Settings.minHuntingAbilityLevel then
+                    doSomethingIfPedIsInsideVehicle(activePed.entity)
                     if attackLogic() == true then
                         return true
                     else
@@ -46,6 +46,7 @@ local menu = {
         action = function(plyped, activePed)
             if activePed.canHunt == true then
                 if activePed.level >= Config.Settings.minHuntingAbilityLevel then
+                    doSomethingIfPedIsInsideVehicle(activePed.entity)
                     HuntandGrab(plyped, activePed)
                 else
                     TriggerEvent('QBCore:Notify',
