@@ -45,7 +45,7 @@ function initItem(source, item)
     local gender = { true, false }
     local gen = gender[random]
     item.info.hash = tostring(QBCore.Shared.RandomInt(2) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(1) ..
-    QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
+        QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
     item.info.name = NameGenerator('dog', random)
     item.info.gender = gen
     item.info.age = 0
@@ -250,6 +250,9 @@ function Update_name(Player, data, item, source, requestedItem)
     else
         TriggerClientEvent('QBCore:Notify', source, "your pet already named like that: " .. data.content)
     end
+    Pet:despawnPet(source, { info = {
+        hash = item.hash
+    } }, true)
 end
 
 -- ============================

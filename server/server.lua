@@ -6,7 +6,7 @@ local maxLimit = Config.MaxActivePetsPetPlayer
 --          Class
 -- ============================
 
-local Pet = {
+Pet = {
     players = {}
 }
 
