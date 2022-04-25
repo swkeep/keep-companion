@@ -21,8 +21,7 @@ local menu = {
         TYPE = 'Hunt',
         triggerNotification = { 'PETNAME is now hunting!', 'PETNAME can not do that!' },
         action = function(plyped, activePed)
-            local isInVehicle = IsPedInAnyVehicle(activePed, true)
-            print(isInVehicle)
+            local isInVehicle = IsPedInAnyVehicle(activePed.entity, true)
             if activePed.canHunt == true then
                 if activePed.level >= Config.Settings.minHuntingAbilityLevel then
                     if attackLogic() == true then
