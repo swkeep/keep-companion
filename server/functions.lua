@@ -198,8 +198,7 @@ function Update_food(Player, data, item, source, requestedItem)
         local overEat = 0
 
         overEat = Config.weightIncreaseByOverEat
-        local currentEstimatedFoodValue = requestedItem.info.food + data.amount
-
+        local currentEstimatedFoodValue = requestedItem.info.food + CalorieCalData:convertWeightToLbs(data.amount)
         if currentEstimatedFoodValue > RER then
             mData = {
                 key = data.key,
