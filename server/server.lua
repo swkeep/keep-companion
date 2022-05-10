@@ -126,6 +126,8 @@ end)
 -- ============================
 -- food
 QBCore.Functions.CreateUseableItem('petfood', function(source, item)
+    local Player = QBCore.Functions.GetPlayer(source)
+    Player.Functions.RemoveItem('petfood', 1)
     TriggerClientEvent('keep-companion:client:getPetdata', source)
 end)
 
