@@ -1,7 +1,5 @@
 Config = Config or {}
 
-Config.DEBUG = false -- make sure it's false
-
 Config.Settings = {
     callCompanionDuration = 2, -- sec
     despawnDuration = 3, -- sec
@@ -19,7 +17,7 @@ Config.Settings = {
 }
 
 -- server and client
-Config.MaxActivePetsPetPlayer = 3
+Config.MaxActivePetsPetPlayer = 2
 
 Config.Balance = {
     maximumLevel = 50, -- xp callculation only work util level 99 don't set it to higher values

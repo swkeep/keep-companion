@@ -120,3 +120,17 @@ function keyOf(tbl, value)
     end
     return nil
 end
+
+function Round(num, dp)
+    --[[
+    round a number to so-many decimal of places, which can be negative, 
+    e.g. -1 places rounds to 10's,  
+    
+    examples
+        173.2562 rounded to 0 dps is 173.0
+        173.2562 rounded to 2 dps is 173.26
+        173.2562 rounded to -1 dps is 170.0
+    ]] --
+    local mult = 10 ^ (dp or 0)
+    return math.floor(num * mult + 0.5) / mult
+end

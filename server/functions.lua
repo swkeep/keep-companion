@@ -1,4 +1,5 @@
 local QBCore = exports['qb-core']:GetCoreObject()
+Update = {}
 
 --- get random pet name
 ---@param type 'species'
@@ -69,33 +70,6 @@ function initItem(source, item)
     initInfoHelper(Player, item.slot, item.info)
 end
 
-function convertXpToLevel(xp)
-    -- hardcoded level 0
-    if xp >= 0 and xp <= 75 then
-        return 0
-    end
-
-    local maxExp = 0
-    local minExp = 0
-
-    for i = 1, 51, 1 do
-        maxExp = math.floor(math.floor((i + 300) * (2 ^ (i / 7))) / 4)
-        minExp = math.floor(math.floor(((i - 1) + 300) * (2 ^ ((i - 1) / 7))) / 4)
-        if xp >= minExp and xp <= maxExp then
-            return i
-        end
-    end
-end
-
-function updateInfoHelper(Player, slot, data)
-    if Player.PlayerData.items[slot] then
-        Player.PlayerData.items[slot].info[data.key] = data.content
-    end
-    -- print('how much: ', data.content, 'itemHash: ' .. Player.PlayerData.items[slot].info['hash'],
-    --     "whichPart: " .. data.key)
-    Player.Functions.SetInventory(Player.PlayerData.items, true)
-end
-
 -- 1 --> 7 year old
 CalorieCalData = {
     dog = {
@@ -130,128 +104,139 @@ function CalorieCalData:convertWeightToLbs(weight)
     return (weight * 10) / 500
 end
 
---- update logic
-function FindWhereIsItem(Player, item, source)
-    if Player.PlayerData.items ~= nil and next(Player.PlayerData.items) ~= nil then
-        for k, v in pairs(Player.PlayerData.items) do
-            if Player.PlayerData.items[k] ~= nil then
-                if Player.PlayerData.items[k].info.hash == item.hash then
-                    local slot = Player.PlayerData.items[k].slot
-                    return Player.PlayerData.items[slot]
-                end
-            end
+local function convert_xp_to_level(xp)
+    -- hardcoded level 0
+    if xp >= 0 and xp <= 75 then
+        return 0
+    end
+
+    local maxExp = 0
+    local minExp = 0
+
+    for i = 1, 51, 1 do
+        maxExp = math.floor(math.floor((i + 300) * (2 ^ (i / 7))) / 4)
+        minExp = math.floor(math.floor(((i - 1) + 300) * (2 ^ ((i - 1) / 7))) / 4)
+        if xp >= minExp and xp <= maxExp then
+            return i
         end
-    else
-        TriggerClientEvent('QBCore:Notify', source, "no items in inventory!")
-        return false
     end
 end
 
-function Update_XP(Player, data, item, source, requestedItem)
-    -- normalize xp value
-    local mData = {}
-    mData = {
-        key = data.key,
-        content = math.floor(data.content)
-    }
-    -- #TODO xp and level validation
-    local level = convertXpToLevel(mData.content)
-    local xp = mData.content
-    local server_cXP = requestedItem.info.XP
-    local server_Level = requestedItem.info.level
-
-    updateInfoHelper(Player, item.slot, mData)
-    if server_Level ~= level and (level >= 0 and level <= Config.Balance.maximumLevel) then
-        updateInfoHelper(Player, item.slot, {
-            key = 'level',
-            content = level
-        })
-    end
+local function calculate_next_xp_value(level)
+    local maxExp = math.floor(math.floor((level + 300) * (2 ^ (level / 7))) / 4)
+    local minExp = math.floor(math.floor(((level - 1) + 300) * (2 ^ ((level - 1) / 7))) / 4)
+    local dif = maxExp - minExp
+    local pr = math.floor(maxExp / minExp)
+    local multi = 1
+    return math.floor(dif / (multi * (level + 1) * pr))
 end
 
-function Update_food(Player, data, item, source, requestedItem)
-    -- update food value
-    local mData = {}
-    if data.content == nil then
+local function current_level_max_xp(level)
+    return math.floor(math.floor((level + 300) * (2 ^ (level / 7))) / 4)
+end
+
+function Update:xp(source, current_pet_data)
+    local level = convert_xp_to_level(math.floor(current_pet_data.info.XP))
+    local pet_name = current_pet_data.info.name
+
+    if level > Config.Balance.maximumLevel then
+        -- pet reached maximumLevel
         return
-    elseif data.content == 'decrease' then
-        if requestedItem.info.food > 0 then
-            -- value reached zore or negetive value
-            local weight = CalorieCalData:convertWeightToLbs(requestedItem.weight)
-            local RER = CalorieCalData:calRER(weight, 'dog') -- maxCalories
-            -- step calculation ==> (1min / timeIterval) * foodCycle
-            local step = math.floor(RER / ((60 / Config.DataUpdateInterval) * Config.foodCycleEnd))
-
-            mData = {
-                key = data.key,
-                content = math.floor(requestedItem.info.food - step)
-            }
-        elseif requestedItem.info.food <= 0 then
-            mData = {
-                key = data.key,
-                content = 0
-            }
-        end
-    elseif data.content == 'increase' then
-        local weight = CalorieCalData:convertWeightToLbs(requestedItem.weight)
-        local RER = CalorieCalData:calRER(weight, 'dog') -- maxCalories
-        local overEat = 0
-
-        overEat = Config.weightIncreaseByOverEat
-        local currentEstimatedFoodValue = requestedItem.info.food + CalorieCalData:convertWeightToLbs(data.amount)
-        if currentEstimatedFoodValue > RER then
-            mData = {
-                key = data.key,
-                content = RER * (Config.foodOverEat / 100)
-            }
-            overEat = RER - (RER * (Config.foodOverEat / 100))
-            if Player.PlayerData.items[item.slot] then
-                Player.PlayerData.items[item.slot].weight = Player.PlayerData.items[item.slot].weight +
-                    (overEat * (Config.weightIncreaseByOverEat / 100))
-            end
-            Player.Functions.SetInventory(Player.PlayerData.items, true)
-        elseif currentEstimatedFoodValue < RER and currentEstimatedFoodValue >= 0 then
-            mData = {
-                key = data.key,
-                content = requestedItem.info.food + (data.amount * (Config.foodOverEat / 100))
-            }
-        else
-            mData = {
-                key = data.key,
-                content = 500
-            }
-        end
-        TriggerClientEvent('QBCore:Notify', source, "Pet food value increased too: " .. mData.content)
     end
-    updateInfoHelper(Player, item.slot, mData)
-    TriggerClientEvent('keep-companion:client:updateFood', source, {
-        content = mData.content,
-        hash = Player.PlayerData.items[item.slot].info['hash']
-    })
 
-end
+    if current_pet_data.info.XP == 0 then
+        current_pet_data.info.XP = 75
+    end
 
-function Update_age(Player, data, item, source, requestedItem)
-    if type(requestedItem.info.age) == "number" and (data.content ~= nil or data.content ~= 0) and data.content <= 60 *
-        60 * 24 * 10 then
-        mData = {
-            key = data.key,
-            content = requestedItem.info.age + data.content
-        }
-        updateInfoHelper(Player, item.slot, mData)
+    current_pet_data.info.XP = current_pet_data.info.XP + calculate_next_xp_value(level)
+    -- increase level when pet reached max exp of current level
+    if current_pet_data.info.XP > current_level_max_xp(level) then
+        current_pet_data.info.level = level + 1
+        TriggerClientEvent('QBCore:Notify', source, pet_name .. " gain new level " .. current_pet_data.info.level)
     end
 end
 
-function Update_name(Player, data, item, source, requestedItem)
-    if requestedItem.info.name ~= data.content then
-        updateInfoHelper(Player, item.slot, data)
-        TriggerClientEvent('QBCore:Notify', source, "your pet name changed to " .. data.content)
-    else
-        TriggerClientEvent('QBCore:Notify', source, "your pet already named like that: " .. data.content)
+function Update:health(source, data, current_pet_data)
+    local pet_name = current_pet_data.info.name
+    local net_pet = NetworkGetEntityFromNetworkId(data.netId)
+    if net_pet == 0 then
+        return
     end
-    Pet:despawnPet(source, { info = {
-        hash = item.hash
-    } }, true)
+
+    local c_health = GetEntityHealth(net_pet)
+    print(c_health)
+    if current_pet_data.info.health == c_health then
+        return
+    end
+
+    if c_health <= 100 then
+        TriggerClientEvent('QBCore:Notify', source, pet_name .. " died!", 'error')
+        c_health = 0
+    end
+    current_pet_data.info.health = c_health
+    Pet:save_all_info(source, current_pet_data.info.hash) -- saving health should be outside loop to prevent some expolits
+end
+
+function Update:food(petData, process_type)
+    if petData == nil or process_type == nil then return end
+    -- if process_type == 'increase' then
+    --     local weight = CalorieCalData:convertWeightToLbs(requestedItem.weight)
+    --     local RER = CalorieCalData:calRER(weight, 'dog') -- maxCalories
+    --     local overEat = 0
+
+    --     overEat = Config.weightIncreaseByOverEat
+    --     local currentEstimatedFoodValue = requestedItem.info.food + CalorieCalData:convertWeightToLbs(data.amount)
+    --     if currentEstimatedFoodValue > RER then
+    --         mData = {
+    --             key = data.key,
+    --             content = RER * (Config.foodOverEat / 100)
+    --         }
+    --         overEat = RER - (RER * (Config.foodOverEat / 100))
+    --         if Player.PlayerData.items[item.slot] then
+    --             Player.PlayerData.items[item.slot].weight = Player.PlayerData.items[item.slot].weight +
+    --                 (overEat * (Config.weightIncreaseByOverEat / 100))
+    --         end
+    --         Player.Functions.SetInventory(Player.PlayerData.items, true)
+    --     elseif currentEstimatedFoodValue < RER and currentEstimatedFoodValue >= 0 then
+    --         mData = {
+    --             key = data.key,
+    --             content = requestedItem.info.food + (data.amount * (Config.foodOverEat / 100))
+    --         }
+    --     else
+    --         mData = {
+    --             key = data.key,
+    --             content = 500
+    --         }
+    --     end
+    --     TriggerClientEvent('QBCore:Notify', source, "Pet food value increased too: " .. mData.content)
+    --     return
+    -- end
+    if petData.info.food == 0 then
+        if petData.info.health == 0 or petData.info.health <= 100 then
+            -- force kill pet
+            petData.info.health = 0 -- rewrite it just in case value changed for some reason
+            print('pet is dead or died')
+            return
+        end
+        petData.info.health = petData.info.health - 0.2
+        return
+    end
+
+    if petData.info.food > 0 then
+        -- value reached zore or negetive value
+        -- local weight = CalorieCalData:convertWeightToLbs(requestedItem.weight)
+        -- local RER = CalorieCalData:calRER(weight, 'dog') -- maxCalories
+        -- -- step calculation ==> (1min / timeIterval) * foodCycle
+        -- local step = math.floor(RER / ((60 / Config.DataUpdateInterval) * Config.foodCycleEnd))
+
+        petData.info.food = petData.info.food - 1
+
+        -- make sure food value not negative
+        if petData.info.food < 0 then
+            petData.info.food = 0
+        end
+        return
+    end
 end
 
 -- ============================

@@ -1,18 +1,3 @@
-function calNextXp(level)
-    local maxExp = math.floor(math.floor((level + 300) * (2 ^ (level / 7))) / 4)
-    local minExp = math.floor(math.floor(((level - 1) + 300) * (2 ^ ((level - 1) / 7))) / 4)
-    local dif = maxExp - minExp
-    local pr = math.floor(maxExp / minExp)
-    local multi = 1
-    return math.floor(dif / (multi * (level + 1) * pr))
-end
-
---- return max xp for current level
----@param level integer
-function currentLvlExp(level)
-    return math.floor(math.floor((level + 300) * (2 ^ (level / 7))) / 4)
-end
-
 function makeEntityFaceEntity(entity1, entity2)
     local p1 = GetEntityCoords(entity1, true)
     local p2 = GetEntityCoords(entity2, true)
@@ -160,6 +145,10 @@ function CreateAPed(hash, pos)
     waitForModel(hash)
 
     ped = CreatePed(5, hash, pos.x, pos.y, pos.z, 0.0, true, false)
+
+    while not DoesEntityExist(ped) do
+        Wait(10)
+    end
 
     SetBlockingOfNonTemporaryEvents(ped, true)
     SetPedFleeAttributes(ped, 0, 0)
