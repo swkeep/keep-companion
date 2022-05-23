@@ -214,7 +214,19 @@
         ["shouldClose"] = true,
         ["combinable"] = nil,
         ["description"] = "Revive your pet!"
-    }
+    },
+	["petnametag"]              = {
+		["name"] = "petnametag",
+		["label"] = "Name tag",
+		["weight"] = 500,
+		["type"] = "item",
+		["image"] = "petnametag.png",
+		["unique"] = false,
+		["useable"] = true,
+		["shouldClose"] = true,
+		["combinable"] = nil,
+		["description"] = "Rename your pet"
+	}
 ```
 
 # step 3: qb-shop
