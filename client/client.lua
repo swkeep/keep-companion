@@ -530,7 +530,13 @@ RegisterNetEvent('keep-companion:client:rename_name_tagAction', function(name)
         return
     end
 
-    if activePed.itemData.info.hash == nil or type(name) ~= "string" or validation == false then
+    if activePed.itemData.info.hash == nil or type(name) ~= "string" then
+        QBCore.Functions.Notify(Lang:t('error.failed_to_start_procces'), 'error', 5000)
+        return
+    end
+
+    if type(validation) == "table" and next(validation) ~= nil then
+        QBCore.Functions.Notify(Lang:t('error.failed_to_validate_name'), 'error', 5000)
         if validation.reason == 'badword' then
             QBCore.Functions.Notify(Lang:t('error.badword_inside_pet_name'), 'error', 5000)
             print_table(validation.words)
@@ -539,8 +545,6 @@ RegisterNetEvent('keep-companion:client:rename_name_tagAction', function(name)
             QBCore.Functions.Notify(Lang:t('error.more_than_one_word_as_name'), 'error', 5000)
             return
         end
-
-        QBCore.Functions.Notify(Lang:t('error.failed_to_start_procces'), 'error', 5000)
         return
     end
 

@@ -8,6 +8,7 @@ local Translations = {
         string_type = 'wrong name type (only string)!',
         not_enough_first_aid = 'You need first aid to do this!',
         reached_max_allowed_pet = 'You can not have more than %s active pets!',
+        failed_to_validate_name = 'We can not validate this name try something else maybe!?',
         failed_to_rename = 'Failed to rename: %s',
         failed_to_rename_same_name = 'The previous name is the same as the new one: %s',
         not_meet_min_requirement_to_hunt = 'Your pet needs to lvl up in order to hunt. (min level: %s)',
