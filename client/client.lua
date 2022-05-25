@@ -134,21 +134,6 @@ function ActivePed:petsList()
     return tmp
 end
 
---- call xp for distance moved by ped
-function addXpForDistanceMoved(savedData)
-    local currentCoord = GetEntityCoords(savedData.entity)
-    local distance = #(currentCoord - savedData.lastCoord)
-    local index, petData = ActivePed:findByHash(savedData.itemData.info.hash)
-    distance = math.floor(distance)
-
-    petData.lastCoord = GetEntityCoords(petData.entity)
-
-    if distance > 0 and IsPedInAnyVehicle(savedData.entity, true) ~= 1 then
-
-
-    end
-end
-
 RegisterNetEvent('keep-companion:client:callCompanion')
 AddEventHandler('keep-companion:client:callCompanion', function(modelName, hostileTowardPlayer, item)
     -- add another layer when player spawn it inside Vehicle
@@ -174,21 +159,21 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
             QBCore.Functions.TriggerCallback('keep-companion:server:updatePedData', function(result)
                 if hostileTowardPlayer == true then
                     -- if player is not owner of pet it will attack player
-                    taskAttackTarget(ped, plyPed, 10000, item)
-                else
-                    TaskFollowTargetedPlayer(ped, plyPed, 3.0)
-                    -- add blip to entity
-                    if Config.Settings.PetMiniMap.showblip ~= nil and Config.Settings.PetMiniMap.showblip == true then
-                        createBlip({
-                            entity = ped,
-                            sprite = Config.Settings.PetMiniMap.sprite,
-                            colour = Config.Settings.PetMiniMap.colour,
-                            text = item.info.name,
-                            shortRange = false
-                        })
-                    end
-                    SetEntityAsMissionEntity(ped, true, true)
+                    QBCore.Functions.Notify('You are not owner of this pet.', 'error', 5000)
                 end
+
+                TaskFollowTargetedPlayer(ped, plyPed, 3.0)
+                -- add blip to entity
+                if Config.Settings.PetMiniMap.showblip ~= nil and Config.Settings.PetMiniMap.showblip == true then
+                    createBlip({
+                        entity = ped,
+                        sprite = Config.Settings.PetMiniMap.sprite,
+                        colour = Config.Settings.PetMiniMap.colour,
+                        text = item.info.name,
+                        shortRange = false
+                    })
+                end
+                SetEntityAsMissionEntity(ped, true, true)
 
                 -- init ped data inside client
                 ActivePed:new(modelName, hostileTowardPlayer, item, ped)
@@ -274,6 +259,10 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                         } },
                         distance = 1.5
                     })
+                end
+
+                if petData.hostile == true then
+                    TriggerServerEvent('keep-companion:server:despwan_not_owned_pet', petData.itemData.info.hash)
                 end
             end, {
                 item = item, model = model, entity = ped
@@ -366,7 +355,6 @@ function creatActivePetThread(ped, item)
         }
         while DoesEntityExist(ped) and fninished == false do
             afkWandering(timeOut, afk, plyPed, ped)
-            addXpForDistanceMoved(savedData)
 
             -- update every 10 sec
             if tmpcount >= count then
@@ -431,18 +419,15 @@ RegisterNetEvent('keep-companion:client:forceKill', function(hash)
 end)
 
 RegisterNetEvent('keep-companion:client:despawn')
-AddEventHandler('keep-companion:client:despawn', function(ped, item, revive)
+AddEventHandler('keep-companion:client:despawn', function(item, revive)
     if revive ~= nil and revive == true then
         -- revive skip animation
-        ActivePed:remove(ActivePed:findByHash(item.info.hash))
+        local index, pedData = ActivePed:findByHash(item.info.hash)
+        ActivePed:remove(index)
         TriggerServerEvent('keep-companion:server:setAsDespawned', item)
         return
     end
     local plyPed = PlayerPedId()
-    local currentItem = {
-        hash = item.info.hash,
-        slot = item.slot
-    }
 
     SetCurrentPedWeapon(plyPed, 0xA2719263, true)
     ClearPedTasks(plyPed)
@@ -456,7 +441,8 @@ AddEventHandler('keep-companion:client:despawn', function(ped, item, revive)
     }, {}, {}, {}, function()
         ClearPedTasks(plyPed)
         Citizen.CreateThread(function()
-            ActivePed:remove(ActivePed:findByHash(item.info.hash))
+            local index, pedData = ActivePed:findByHash(item.info.hash)
+            ActivePed:remove(index)
             TriggerServerEvent('keep-companion:server:setAsDespawned', item)
         end)
     end)
@@ -519,7 +505,6 @@ RegisterNetEvent('keep-companion:client:rename_name_tag', function(item)
     end
 end)
 
--- #TODO this event should be two events one get active pet and one for changing pet name
 RegisterNetEvent('keep-companion:client:rename_name_tagAction', function(name)
     -- process of updating pet's name
     local activePed = ActivePed:read() or nil
@@ -567,7 +552,7 @@ RegisterNetEvent('keep-companion:client:rename_name_tagAction', function(name)
     end)
 end)
 
-RegisterNetEvent('keep-companion:client:collar_process', function(name)
+RegisterNetEvent('keep-companion:client:collar_process', function()
     -- process of updating pet's owernship
     local activePed = ActivePed:read() or nil
 
@@ -581,62 +566,47 @@ RegisterNetEvent('keep-companion:client:collar_process', function(name)
         return
     end
 
-    if type(name) ~= "string" then
-        QBCore.Functions.Notify(Lang:t('error.string_type'), 'error', 5000)
-        return
-    end
-
-    CoreName.Functions.Progressbar("waitingForOwenership", "waiting for new owner",
-        Config.Settings.changePetNameDuration * 1000, false, false, {
-            disableMovement = false,
-            disableCarMovement = false,
-            disableMouse = false,
-            disableCombat = true
-        }, {}, {}, {}, function()
-        QBCore.Functions.TriggerCallback('keep-companion:server:renamePet', function(result)
-            if type(result) == "string" then
-                TriggerEvent('QBCore:Notify', "Your pet name changed to " .. result)
-            end
-        end, {
-            hash = activePed.itemData.info.hash or nil,
-            slot = activePed.itemData.slot or nil,
-            name = name
-        })
-    end)
-end)
-
-RegisterNetEvent('keep-oilrig:client:enterInformation', function(qbtarget)
     local inputData = exports['qb-input']:ShowInput({
-        header = "Assign oil rig: ",
-        submitText = "Assign",
-        inputs = { {
-            type = 'text',
-            isRequired = true,
-            name = 'name',
-            text = "enter rig name"
-        },
-        {
-            type = 'number',
-            isRequired = true,
-            name = 'cid',
-            text = "current player cid"
-        },
+        header = "New owner id: ",
+        submitText = "Confirm",
+        inputs = {
+            {
+                type = 'number',
+                isRequired = true,
+                name = 'cid',
+                text = "new owner id"
+            },
         }
     })
     if inputData then
-        if not inputData.name and not inputData.cid then
+        if not inputData.cid then
             return
         end
-        local netId = NetworkGetNetworkIdFromEntity(qbtarget.entity)
-
-        inputData.netId = netId
-        QBCore.Functions.TriggerCallback('keep-oilrig:server:regiserOilrig', function(result)
-            DeleteEntity(qbtarget.entity)
-            if result == true then
-                Wait(1500)
-                QBCore.Functions.Notify('Registering oilwell to: ' .. inputData.cid, "success")
-                loadData()
+        CoreName.Functions.Progressbar("waitingForOwenership", "waiting for new owner",
+            1 * 1000, false, false, {
+                disableMovement = false,
+                disableCarMovement = false,
+                disableMouse = false,
+                disableCombat = true
+            }, {}, {}, {},
+            function()
+                local c_pet = ActivePed:read()
+                if c_pet == nil then
+                    QBCore.Functions.Notify(Lang:t('error.no_pet_under_control'), 'error', 5000)
+                    return
+                end
+                local hash = ActivePed:read().itemData.info.hash
+                QBCore.Functions.TriggerCallback('keep-companion:server:collar_change_owenership', function(result)
+                    if result.state == false then
+                        QBCore.Functions.Notify(result.msg, 'error', 5000)
+                        return
+                    end
+                    QBCore.Functions.Notify(result.msg, 'success', 5000)
+                end, {
+                    new_owner_cid = inputData.cid,
+                    hash = hash,
+                })
             end
-        end, inputData)
+        )
     end
 end)

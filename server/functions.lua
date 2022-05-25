@@ -237,6 +237,52 @@ function Update:food(petData, process_type)
     end
 end
 
+QBCore.Functions.CreateCallback('keep-companion:server:collar_change_owenership', function(source, cb, data)
+    if type(data.new_owner_cid) == "string" then data.new_owner_cid = tonumber(data.new_owner_cid) end
+    if data.new_owner_cid == source then
+        cb({
+            state = false,
+            msg = 'You can not transfer your pet to yourself!'
+        })
+        return
+    end
+
+    local player = QBCore.Functions.GetPlayer(data.new_owner_cid)
+    if player == nil or next(data) == nil then
+        cb({
+            state = false,
+            msg = 'Could not find this new owner (wrong id)'
+        })
+        return
+    end
+
+    local hash = data.hash
+    local current_pet_data = Pet:findbyhash(source, hash)
+
+    if type(current_pet_data.info.owner) ~= "table" or next(current_pet_data.info.owner) == nil then
+        cb({
+            state = false,
+            msg = 'Can not transfer this pet missing current owner information!'
+        })
+        return
+    end
+
+    if player.Functions.RemoveItem('collarpet', 1) ~= true then
+        TriggerClientEvent('QBCore:Notify', source, 'Failed to remove from your inventory', 'error', 2500)
+        return
+    end
+
+    current_pet_data.info.owner = player.PlayerData.charinfo
+    Pet:save_all_info(source, hash)
+    Pet:despawnPet(source, { info = {
+        hash = hash
+    } }, true)
+    cb({
+        state = true,
+        msg = 'The transfer was successful. now you can give this pet to the new owner'
+    })
+end)
+
 -- ============================
 --           Cooldown
 -- ============================

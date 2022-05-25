@@ -50,7 +50,8 @@ function taskAttackTarget(ped, targetPed, fleeTimeout, item)
                 local distance = GetDistanceBetweenCoords(plyCoord, pedCoord)
                 if distance > maxDistance then
                     -- #TODO this should remove pet from server too
-                    ActivePed:remove(ActivePed:findByHash(item.info.hash))
+                    local index, petData = ActivePed:findByHash(item.info.hash)
+                    ActivePed:remove(index)
                     finished = true
                 end
                 Wait(1000)
