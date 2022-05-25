@@ -22,7 +22,7 @@ ActivePed = {
 -- itemData.info.name is pet's name
 
 --- inital pet data
-function ActivePed:new(model, hostile, item, ped)
+function ActivePed:new(model, hostile, item, ped, netId)
     -- set modelString and canHunt
     local index = (#self.data + 1)
     if self.data[index] == nil then
@@ -35,6 +35,7 @@ function ActivePed:new(model, hostile, item, ped)
 
     self.data[index]['model'] = model
     self.data[index]['entity'] = ped
+    self.data[index]['netId'] = netId
     self.data[index]['hostile'] = hostile
     self.data[index]['XP'] = item.info.XP
     self.data[index]['level'] = item.info.level
@@ -69,7 +70,7 @@ end
 
 --- clean current ped data
 function ActivePed:remove(index)
-    DeletePed(self.data[index].entity)
+    TriggerServerEvent('keep-companion:server:ForceRemoveNetEntity', NetworkGetNetworkIdFromEntity(self.data[index].entity))
     self.data[index] = nil
     -- assign onControl to valid value
     if #self.data == 0 then
@@ -156,14 +157,15 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
         Citizen.CreateThread(function()
             local spawnCoord = getSpawnLocation(plyPed)
             ped = CreateAPed(model, spawnCoord)
+            local netId = NetworkGetNetworkIdFromEntity(ped)
             QBCore.Functions.TriggerCallback('keep-companion:server:updatePedData', function(result)
                 if hostileTowardPlayer == true then
                     -- if player is not owner of pet it will attack player
                     QBCore.Functions.Notify('You are not owner of this pet.', 'error', 5000)
                 end
-
+                ClearPedTasks(ped)
                 TaskFollowTargetedPlayer(ped, plyPed, 3.0)
-                -- add blip to entity
+                -- -- add blip to entity
                 if Config.Settings.PetMiniMap.showblip ~= nil and Config.Settings.PetMiniMap.showblip == true then
                     createBlip({
                         entity = ped,
@@ -173,10 +175,9 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                         shortRange = false
                     })
                 end
-                SetEntityAsMissionEntity(ped, true, true)
 
                 -- init ped data inside client
-                ActivePed:new(modelName, hostileTowardPlayer, item, ped)
+                ActivePed:new(modelName, hostileTowardPlayer, item, ped, netId)
                 local index, petData = ActivePed:findByHash(item.info.hash)
                 -- check for variation data
                 if petData.itemData.info.variation ~= nil then
@@ -261,9 +262,9 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
                     })
                 end
 
-                if petData.hostile == true then
-                    TriggerServerEvent('keep-companion:server:despwan_not_owned_pet', petData.itemData.info.hash)
-                end
+                -- if petData.hostile == true then
+                --     TriggerServerEvent('keep-companion:server:despwan_not_owned_pet', petData.itemData.info.hash)
+                -- end
             end, {
                 item = item, model = model, entity = ped
             })
@@ -308,6 +309,11 @@ function request_healing_process(ped, item, process_type)
         end)
     end, 'firstaidforpet')
 end
+
+RegisterNetEvent('keep-companion:client:update_health_value', function(item, amount)
+    SetEntityHealth(item.entity, amount)
+end)
+
 
 --- when the player is AFK for a certain time pet will wander around
 ---@param timeOut table

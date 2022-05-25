@@ -12,8 +12,7 @@ local menu = {
         triggerNotification = { 'PETNAME is now following you!', 'PETNAME failed to follow you!' },
         action = function(plyped, activePed)
             doSomethingIfPedIsInsideVehicle(activePed.entity)
-            TaskFollowTargetedPlayer(activePed.entity, plyped, 3.0)
-            return true
+            return TaskFollowTargetedPlayer(activePed.entity, plyped, 3.0)
         end
     },
     [2] = {
@@ -136,6 +135,7 @@ end
 AddEventHandler('keep-companion:client:actionMenuDispatcher', function(option)
     local plyped = PlayerPedId()
     local activePed = ActivePed.read()
+    activePed.entity = NetworkGetEntityFromNetworkId(activePed.netId)
     for key, values in pairs(option.menu) do
         if option.type == values.TYPE then
             if values.action(plyped, activePed) == true then

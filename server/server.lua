@@ -149,7 +149,7 @@ function Pet:save_all_info(source, hash)
         Update:food(petData, 'decrease')
     else
         -- kill for hunger
-        TriggerClientEvent('keep-companion:client:forceKill', source, hash)
+        -- TriggerClientEvent('keep-companion:client:forceKill', source, hash)
     end
 
     if Player.PlayerData.items[slot] then
@@ -271,6 +271,7 @@ RegisterNetEvent('keep-companion:server:revivePet', function(item, process_type)
     if process_type == 'Heal' then
         msg = Lang:t('success.healing_was_successful')
         msg = string.format(msg, amount, maxHealth)
+        TriggerClientEvent('keep-companion:client:update_health_value', source, item, amount)
         TriggerClientEvent('QBCore:Notify', source, msg, 'success', 2500)
         return
     end
@@ -338,6 +339,7 @@ RegisterNetEvent('keep-companion:server:updateAllowedInfo', function(item, data)
     if type(data) ~= "table" or next(data) == nil then return end
     local Player = QBCore.Functions.GetPlayer(source)
     local current_pet_data = Pet:findbyhash(source, item.hash)
+    if current_pet_data == nil or current_pet_data == false then return end
     local requestedItem = Player.Functions.GetItemsByName(current_pet_data.name)
 
     if type(requestedItem) == "table" then
@@ -500,4 +502,9 @@ Citizen.CreateThread(function()
             count = 0
         end
     end
+end)
+
+RegisterNetEvent('keep-companion:server:ForceRemoveNetEntity', function(netId)
+    local net = NetworkGetEntityFromNetworkId(netId)
+    DeleteEntity(net)
 end)

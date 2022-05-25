@@ -10,7 +10,11 @@ function makeEntityFaceEntity(entity1, entity2)
 end
 
 function TaskFollowTargetedPlayer(follower, targetPlayer, distanceToStopAt)
+    ClearPedTasks(follower)
+    TaskGoToCoordAnyMeans(follower, GetEntityCoords(targetPlayer), 10.0, 0, 0, 0, 0)
+    Wait(5000)
     TaskFollowToOffsetOfEntity(follower, targetPlayer, 2.5, 2.5, 2.5, 5.0, 10.0, distanceToStopAt, 1)
+    return true
 end
 
 function wanderAroundWithDuration(ped, coord, radius, minimalLength, timeBetweenWalks)
