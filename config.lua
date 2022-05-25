@@ -12,6 +12,7 @@ Config.Settings = {
     firstAidHealthRecoverAmount = 50, -- 50% of their life
     PetMiniMap = { showblip = true, sprite = 442, colour = 2, shortRange = false },
     chaseDistance = 50.0,
+    chaseIndicator = true, -- huge marker on hunted target head
     fleeFromNotOwenerDistance = 60.0,
     petMenuKeybind = 'o' -- defalut keybind (players can change bind)
 }

@@ -164,7 +164,6 @@ function Update:health(source, data, current_pet_data)
     end
 
     local c_health = GetEntityHealth(net_pet)
-    print(c_health)
     if current_pet_data.info.health == c_health then
         return
     end
@@ -215,7 +214,6 @@ function Update:food(petData, process_type)
         if petData.info.health == 0 or petData.info.health <= 100 then
             -- force kill pet
             petData.info.health = 0 -- rewrite it just in case value changed for some reason
-            print('pet is dead or died')
             return
         end
         petData.info.health = petData.info.health - 0.2
