@@ -340,6 +340,14 @@
             info = {},
             type = 'item',
             slot = 13
+        },
+        [14] = {
+            name = 'petnametag',
+            price = 5000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 14
         }
     }
 
