@@ -126,11 +126,19 @@ local max_age = 60 * 60 * 24 * day
 
 function Pet:save_all_info(source, hash)
     local Player = QBCore.Functions.GetPlayer(source)
+    if Player == nil then return end
     local petData = Pet:findbyhash(source, hash)
-    local item = Player.Functions.GetItemByName(petData.name)
-    if item.info.hash ~= hash then
-        return
+    local items = Player.Functions.GetItemsByName(petData.name)
+    local slot = nil
+
+    -- find item
+    for key, pet_item in pairs(items) do
+        if pet_item.info.hash == hash then
+            slot = pet_item.slot
+            break
+        end
     end
+    if slot == nil then return end
 
     if petData.info.health > 100 then
         if petData.info.age >= max_age then
@@ -144,17 +152,15 @@ function Pet:save_all_info(source, hash)
         TriggerClientEvent('keep-companion:client:forceKill', source, hash)
     end
 
-    if Player.PlayerData.items[item.slot] then
+    if Player.PlayerData.items[slot] then
         petData.info.health = Round(petData.info.health, 2) -- round health value
-        Player.PlayerData.items[item.slot].info = petData.info
+        Player.PlayerData.items[slot].info = petData.info
     end
     Player.Functions.SetInventory(Player.PlayerData.items, true)
 end
 
 RegisterNetEvent('keep-companion:server:setAsDespawned', function(item)
-    if item == nil then
-        return
-    end
+    if item == nil then return end
     Pet:setAsDespawned(source, item)
 end)
 -- ============================
@@ -170,31 +176,37 @@ end)
 RegisterNetEvent('keep-companion:server:increaseFood', function(item)
     local Player = QBCore.Functions.GetPlayer(source)
     if Player == nil or item == nil then return end
-
-    if Player.Functions.RemoveItem('petfood', 1) == true then
-        local petData = Pet:findbyhash(source, item.info.hash)
-        petData.info.food = petData.info.food + 50
+    if Player.Functions.RemoveItem('petfood', 1) ~= true then
+        TriggerClientEvent('QBCore:Notify', source, 'Failed to remove from your inventory', 'error', 2500)
+        return
     end
+    local petData = Pet:findbyhash(source, item.info.hash)
+    petData.info.food = petData.info.food + 50
+    TriggerClientEvent('QBCore:Notify', source, 'Feeding was successful wait little bit to take effect!', 'success', 2500)
 end)
 
 -- change owenership
 QBCore.Functions.CreateUseableItem('collarpet', function(source, item)
-    local Player = QBCore.Functions.GetPlayer(source)
-    if Player == nil or item == nil then return end
     TriggerClientEvent('keep-companion:client:collar_process', source)
 end)
 
 -- rename - name tag
 QBCore.Functions.CreateUseableItem('petnametag', function(source, item)
+    local Player = QBCore.Functions.GetPlayer(source)
+    if Player == nil or item == nil then return end
     TriggerClientEvent('keep-companion:client:rename_name_tag', source, item)
 end)
 
 RegisterNetEvent('keep-companion:server:rename_name_tag', function(name)
     local Player = QBCore.Functions.GetPlayer(source)
     if Player == nil then return end
-    if Player.Functions.RemoveItem("petnametag", 1) == true then
-        TriggerClientEvent("keep-companion:client:rename_name_tagAction", source, name)
+
+    if Player.Functions.RemoveItem("petnametag", 1) ~= true then
+        TriggerClientEvent('QBCore:Notify', source, 'Failed to remove from your inventory', 'error', 2500)
+        return
     end
+
+    TriggerClientEvent("keep-companion:client:rename_name_tagAction", source, name)
 end)
 
 -- first aid - revive
@@ -305,29 +317,44 @@ end
 -- ================================================
 --          Item - Updating Information
 -- ================================================
-
-RegisterNetEvent('keep-companion:server:updateAllowedInfo', function(item, data)
-    -- #TODO optimize to just use one updateInfoHelper()
-    local Player = QBCore.Functions.GetPlayer(source)
-    local requestedItem = Player.PlayerData.items[item.slot] -- ask sever to give item's data
-    local current_pet_data = Pet:findbyhash(source, item.hash)
-
-    data = data or {}
-    if requestedItem == nil or item.hash ~= requestedItem.info.hash then
-        -- either item doesnt exist or player changed slot
-        requestedItem = FindWhereIsItem(Player, item, source)
+function FindWhereIsItem(Player, item, source)
+    if Player.PlayerData.items == nil or next(Player.PlayerData.items) == nil then
+        TriggerClientEvent('QBCore:Notify', source, "no items in inventory!")
+        return false
     end
-    if next(data) ~= nil and item.hash == requestedItem.info.hash then
-        -- listed by most frequent update method
-        if data.key == 'XP' then
-            -- #TODO trigger only when lostcoord is not same and pet is not inside vehicle
-            Update:xp(source, current_pet_data) -- rework done
-        elseif data.key == 'health' then
-            Update:health(source, data, current_pet_data) -- rework done
-        elseif data.key == 'owner' then
-            -- #TODO data.owner add later
+    for k, v in pairs(Player.PlayerData.items) do
+        if Player.PlayerData.items[k] ~= nil then
+            if Player.PlayerData.items[k].info.hash == item.hash then
+                local slot = Player.PlayerData.items[k].slot
+                return Player.PlayerData.items[slot]
+            end
         end
     end
+    TriggerClientEvent('QBCore:Notify', source, "Could not find pet")
+    return false
+end
+
+RegisterNetEvent('keep-companion:server:updateAllowedInfo', function(item, data)
+    if type(data) ~= "table" or next(data) == nil then return end
+    local Player = QBCore.Functions.GetPlayer(source)
+    local current_pet_data = Pet:findbyhash(source, item.hash)
+    local requestedItem = Player.Functions.GetItemsByName(current_pet_data.name)
+
+    if type(requestedItem) == "table" then
+        for key, pet_item in pairs(requestedItem) do
+            if pet_item.info.hash == item.hash then
+                requestedItem = pet_item
+            end
+        end
+        if requestedItem == false then return end
+    end
+
+    if data.key == 'XP' then
+        Update:xp(source, current_pet_data)
+        return
+    end
+
+    Update:health(source, data, current_pet_data)
 end)
 
 QBCore.Functions.CreateCallback('keep-companion:server:renamePet', function(source, cb, item)

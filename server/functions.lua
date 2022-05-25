@@ -239,6 +239,9 @@ end
 
 QBCore.Functions.CreateCallback('keep-companion:server:collar_change_owenership', function(source, cb, data)
     if type(data.new_owner_cid) == "string" then data.new_owner_cid = tonumber(data.new_owner_cid) end
+    local player_owner = QBCore.Functions.GetPlayer(source)
+    if player_owner == nil then return end
+    local player_new_owner = QBCore.Functions.GetPlayer(data.new_owner_cid)
     if data.new_owner_cid == source then
         cb({
             state = false,
@@ -247,8 +250,7 @@ QBCore.Functions.CreateCallback('keep-companion:server:collar_change_owenership'
         return
     end
 
-    local player = QBCore.Functions.GetPlayer(data.new_owner_cid)
-    if player == nil or next(data) == nil then
+    if player_new_owner == nil or next(data) == nil then
         cb({
             state = false,
             msg = 'Could not find this new owner (wrong id)'
@@ -267,19 +269,19 @@ QBCore.Functions.CreateCallback('keep-companion:server:collar_change_owenership'
         return
     end
 
-    if player.Functions.RemoveItem('collarpet', 1) ~= true then
+    if player_owner.Functions.RemoveItem('collarpet', 1) ~= true then
         TriggerClientEvent('QBCore:Notify', source, 'Failed to remove from your inventory', 'error', 2500)
         return
     end
 
-    current_pet_data.info.owner = player.PlayerData.charinfo
+    current_pet_data.info.owner = player_new_owner.PlayerData.charinfo
     Pet:save_all_info(source, hash)
     Pet:despawnPet(source, { info = {
         hash = hash
     } }, true)
     cb({
         state = true,
-        msg = 'The transfer was successful. now you can give this pet to the new owner'
+        msg = 'The transfer was successful. you can now give this pet to the new owner'
     })
 end)
 

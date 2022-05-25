@@ -583,7 +583,7 @@ RegisterNetEvent('keep-companion:client:collar_process', function()
             return
         end
         CoreName.Functions.Progressbar("waitingForOwenership", "waiting for new owner",
-            1 * 1000, false, false, {
+            Config.Settings.changePetNameDuration * 1000, false, false, {
                 disableMovement = false,
                 disableCarMovement = false,
                 disableMouse = false,
@@ -595,7 +595,6 @@ RegisterNetEvent('keep-companion:client:collar_process', function()
                     QBCore.Functions.Notify(Lang:t('error.no_pet_under_control'), 'error', 5000)
                     return
                 end
-                local hash = ActivePed:read().itemData.info.hash
                 QBCore.Functions.TriggerCallback('keep-companion:server:collar_change_owenership', function(result)
                     if result.state == false then
                         QBCore.Functions.Notify(result.msg, 'error', 5000)
@@ -604,7 +603,7 @@ RegisterNetEvent('keep-companion:client:collar_process', function()
                     QBCore.Functions.Notify(result.msg, 'success', 5000)
                 end, {
                     new_owner_cid = inputData.cid,
-                    hash = hash,
+                    hash = ActivePed:read().itemData.info.hash,
                 })
             end
         )
