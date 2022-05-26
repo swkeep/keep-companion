@@ -65,6 +65,7 @@ function initItem(source, item)
 
     -- inital variation
     item.info.variation = PetVariation:getRandomPedVariationsName(pet_information.model, true)
+
     initInfoHelper(Player, item.slot, item.info)
 
     -- do extras step if we want to cutomize pets

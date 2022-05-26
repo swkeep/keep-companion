@@ -315,7 +315,6 @@ for key, value in pairs(Config.pets) do
         if item.name ~= value.name then return end
         local model = value.model
         -- need inital values
-
         if type(item.info) ~= "table" or (type(item.info) == "table" and item.info.hash == nil) then
             -- init companion
             initItem(source, item)
@@ -455,10 +454,8 @@ QBCore.Commands.Add('addpet', 'add a pet to player inventory (Admin Only)', {}, 
     local PETname = args[1]
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    local info = {}
-    info.owner = Player.PlayerData.charinfo
 
-    Player.Functions.AddItem(PETname, 1, nil, info)
+    Player.Functions.AddItem(PETname, 1)
     TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items[PETname], "add")
 end, 'admin')
 

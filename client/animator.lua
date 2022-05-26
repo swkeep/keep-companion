@@ -47,6 +47,10 @@ local animationList = {
             ['indicate_low'] = {
                 animDictionary = 'creatures@rottweiler@indication@',
                 animationName = 'indicate_low'
+            },
+            ['playerdead'] = {
+                animDictionary = 'creatures@rottweiler@move',
+                animationName = 'dying'
             }
         },
         ['tricks'] = {

@@ -90,6 +90,20 @@ local menu = {
         action = function(plyped, activePed)
             getIntoCar()
         end
+    },
+    [7] = {
+        lable = 'Play dead',
+        TYPE = 'Playdead',
+        action = function(plyped, activePed)
+            if Animator(activePed.entity, activePed.model, 'misc', {
+                animation = 'playerdead',
+                c_timings = 'STOP_LAST_FRAME'
+            }) then
+                QBCore.Functions.Notify('this pet can not do that', 'error', 1500)
+            else
+                QBCore.Functions.Notify('Start', 'success', 1500)
+            end
+        end
     }
 }
 
