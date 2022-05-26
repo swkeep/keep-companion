@@ -212,8 +212,25 @@ end)
 
 -- first aid - revive
 QBCore.Functions.CreateUseableItem('firstaidforpet', function(source, item)
-    TriggerClientEvent('QBCore:Notify', source, Lang:t('info.use_3th_eye'), 'primary', 2500)
+    local Player = QBCore.Functions.GetPlayer(source)
+    if Player == nil then return end
+    print('firstaidforpet')
 end)
+
+QBCore.Functions.CreateUseableItem('petgroomingkit', function(source, item)
+    local Player = QBCore.Functions.GetPlayer(source)
+    if Player == nil then return end
+
+    print('petgroomingkit')
+end)
+
+
+QBCore.Functions.CreateUseableItem('petwaterbottleportable', function(source, item)
+    local Player = QBCore.Functions.GetPlayer(source)
+    if Player == nil then return end
+    TriggerClientEvent('keep-companion:client:start_feeding_animation', source)
+end)
+
 
 --- revive or heal pet by it's item's hash
 ---@param Player any
@@ -297,7 +314,9 @@ for key, value in pairs(Config.pets) do
     QBCore.Functions.CreateUseableItem(value.name, function(source, item)
         if item.name ~= value.name then return end
         local model = value.model
-        if type(item.info) == "table" and item.info.hash == nil then
+        -- need inital values
+
+        if type(item.info) ~= "table" or (type(item.info) == "table" and item.info.hash == nil) then
             -- init companion
             initItem(source, item)
             TriggerClientEvent('QBCore:Notify', source, Lang:t('success.pet_initialization_was_successful'), 'success', 2500)

@@ -46,23 +46,25 @@ function initItem(source, item)
     local random = math.random(1, 2)
     local gender = { true, false }
     local gen = gender[random]
-    local petVariation = ''
     local maxHealth = 200
+    item.info = {}
 
     item.info.hash = tostring(QBCore.Shared.RandomInt(2) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(1) ..
         QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
     item.info.name = NameGenerator('dog', random)
     item.info.gender = gen
     item.info.age = 0
+
     item.info.food = 100
+    item.info.thirst = 0
+
     item.info.owner = Player.PlayerData.charinfo
     item.info.level = 0
     item.info.XP = 0
-    item.info.health = pet_information.maxHealth
+    item.info.health = pet_information.maxHealth or maxHealth
 
     -- inital variation
-    petVariation = PetVariation:getRandomPedVariationsName(pet_information.model, true)
-    item.info.variation = petVariation
+    item.info.variation = PetVariation:getRandomPedVariationsName(pet_information.model, true)
     initInfoHelper(Player, item.slot, item.info)
 
     -- do extras step if we want to cutomize pets
