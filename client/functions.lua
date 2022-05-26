@@ -9,10 +9,12 @@ function makeEntityFaceEntity(entity1, entity2)
     SetEntityHeading(entity1, heading)
 end
 
-function TaskFollowTargetedPlayer(follower, targetPlayer, distanceToStopAt)
+function TaskFollowTargetedPlayer(follower, targetPlayer, distanceToStopAt, skip)
     ClearPedTasks(follower)
-    TaskGoToCoordAnyMeans(follower, GetEntityCoords(targetPlayer), 10.0, 0, 0, 0, 0)
-    Wait(5000)
+    if skip == false then
+        TaskGoToCoordAnyMeans(follower, GetEntityCoords(targetPlayer), 10.0, 0, 0, 0, 0)
+        Wait(5000)
+    end
     TaskFollowToOffsetOfEntity(follower, targetPlayer, 2.5, 2.5, 2.5, 5.0, 10.0, distanceToStopAt, 1)
     return true
 end

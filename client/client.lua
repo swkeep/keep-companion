@@ -154,121 +154,123 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
             disableCombat = false
         }, {}, {}, {}, function()
         ClearPedTasks(plyPed)
-        Citizen.CreateThread(function()
-            local spawnCoord = getSpawnLocation(plyPed)
-            ped = CreateAPed(model, spawnCoord)
-            local netId = NetworkGetNetworkIdFromEntity(ped)
-            QBCore.Functions.TriggerCallback('keep-companion:server:updatePedData', function(result)
-                if hostileTowardPlayer == true then
-                    -- if player is not owner of pet it will attack player
-                    QBCore.Functions.Notify('You are not owner of this pet.', 'error', 5000)
-                end
-                ClearPedTasks(ped)
-                TaskFollowTargetedPlayer(ped, plyPed, 3.0)
-                -- -- add blip to entity
-                if Config.Settings.PetMiniMap.showblip ~= nil and Config.Settings.PetMiniMap.showblip == true then
-                    createBlip({
-                        entity = ped,
-                        sprite = Config.Settings.PetMiniMap.sprite,
-                        colour = Config.Settings.PetMiniMap.colour,
-                        text = item.info.name,
-                        shortRange = false
-                    })
-                end
 
-                -- init ped data inside client
-                ActivePed:new(modelName, hostileTowardPlayer, item, ped, netId)
-                local index, petData = ActivePed:findByHash(item.info.hash)
-                -- check for variation data
-                if petData.itemData.info.variation ~= nil then
-                    PetVariation:setPedVariation(ped, modelName, petData.itemData.info.variation)
-                end
-                SetEntityMaxHealth(ped, petData.maxHealth)
-                SetEntityHealth(ped, math.floor(petData.itemData.info.health))
-                local currentHealth = GetEntityHealth(ped)
+        local spawnCoord = getSpawnLocation(plyPed)
+        ped = CreateAPed(model, spawnCoord)
+        local netId = NetworkGetNetworkIdFromEntity(ped)
+        QBCore.Functions.TriggerCallback('keep-companion:server:updatePedData', function(result)
+            if hostileTowardPlayer == true then
+                -- if player is not owner of pet it will attack player
+                QBCore.Functions.Notify('You are not owner of this pet.', 'error', 5000)
+            end
+            ClearPedTasks(ped)
+            TaskFollowTargetedPlayer(ped, plyPed, 3.0, true)
+            -- -- add blip to entity
 
-                if currentHealth <= 100 then
-                    exports['qb-target']:AddTargetEntity(ped, {
-                        options = { {
-                            icon = "fas fa-first-aid",
-                            label = "revive pet",
-                            canInteract = function(entity)
-                                if IsEntityDead(entity) == 1 and ActivePed.read() ~= nil then
-                                    return true
-                                else
-                                    return false
-                                end
-                            end,
-                            action = function(entity)
-                                if DoesEntityExist(entity) then
-                                    request_healing_process(ped, item, 'revive')
-                                    return true
-                                end
+            if Config.Settings.PetMiniMap.showblip ~= nil and Config.Settings.PetMiniMap.showblip == true then
+                createBlip({
+                    entity = ped,
+                    sprite = Config.Settings.PetMiniMap.sprite,
+                    colour = Config.Settings.PetMiniMap.colour,
+                    text = item.info.name,
+                    shortRange = false
+                })
+            end
+
+            -- init ped data inside client
+            ActivePed:new(modelName, hostileTowardPlayer, item, ped, netId)
+            local index, petData = ActivePed:findByHash(item.info.hash)
+
+            -- check for variation data
+            if petData.itemData.info.variation ~= nil then
+                PetVariation:setPedVariation(ped, modelName, petData.itemData.info.variation)
+            end
+            SetEntityMaxHealth(ped, petData.maxHealth)
+            SetEntityHealth(ped, math.floor(petData.itemData.info.health))
+            local currentHealth = GetEntityHealth(ped)
+
+            if currentHealth <= 100 then
+                exports['qb-target']:AddTargetEntity(ped, {
+                    options = { {
+                        icon = "fas fa-first-aid",
+                        label = "revive pet",
+                        canInteract = function(entity)
+                            if IsEntityDead(entity) == 1 and ActivePed.read() ~= nil then
+                                return true
+                            else
+                                return false
                             end
-                        } },
-                        distance = 1.5
-                    })
-                else
-                    creatActivePetThread(ped, item)
-                    exports['qb-target']:AddTargetEntity(ped, {
-                        options = { {
-                            icon = "fas fa-sack-dollar",
-                            label = "pet",
-                            canInteract = function(entity)
-                                if IsEntityDead(entity) == false then
-                                    return true
-                                else
-                                    return false
-                                end
-                            end,
-                            action = function(entity)
-                                makeEntityFaceEntity(PlayerPedId(), entity)
-                                makeEntityFaceEntity(entity, PlayerPedId())
-
-                                local playerPed = PlayerPedId()
-                                local coords = GetEntityCoords(playerPed)
-                                local forward = GetEntityForwardVector(playerPed)
-                                local x, y, z = table.unpack(coords + forward * 1.0)
-
-                                SetEntityCoords(entity, x, y, z, 0, 0, 0, 0)
-                                TaskPause(entity, 5000)
-
-                                Animator(entity, modelName, 'tricks', {
-                                    animation = 'petting_chop'
-                                })
-                                Animator(plyPed, 'A_C_Rottweiler', 'tricks', {
-                                    animation = 'petting_franklin'
-                                })
-
-                                TriggerServerEvent('hud:server:RelieveStress', Config.Balance.petStressReliefValue)
+                        end,
+                        action = function(entity)
+                            if DoesEntityExist(entity) then
+                                request_healing_process(ped, item, 'revive')
                                 return true
                             end
-                        }, {
-                            icon = "fas fa-first-aid",
-                            label = "Heal",
-                            canInteract = function(entity)
-                                if IsEntityDead(entity) == false then
-                                    return true
-                                else
-                                    return false
-                                end
-                            end,
-                            action = function(entity)
-                                request_healing_process(ped, item, 'Heal')
+                        end
+                    } },
+                    distance = 1.5
+                })
+            else
+                creatActivePetThread(ped, item)
+                exports['qb-target']:AddTargetEntity(ped, {
+                    options = { {
+                        icon = "fas fa-sack-dollar",
+                        label = "pet",
+                        canInteract = function(entity)
+                            if IsEntityDead(entity) == false then
                                 return true
+                            else
+                                return false
                             end
-                        } },
-                        distance = 1.5
-                    })
-                end
+                        end,
+                        action = function(entity)
+                            makeEntityFaceEntity(PlayerPedId(), entity)
+                            makeEntityFaceEntity(entity, PlayerPedId())
 
-                -- if petData.hostile == true then
-                --     TriggerServerEvent('keep-companion:server:despwan_not_owned_pet', petData.itemData.info.hash)
-                -- end
-            end, {
-                item = item, model = model, entity = ped
-            })
-        end)
+                            local playerPed = PlayerPedId()
+                            local coords = GetEntityCoords(playerPed)
+                            local forward = GetEntityForwardVector(playerPed)
+                            local x, y, z = table.unpack(coords + forward * 1.0)
+
+                            SetEntityCoords(entity, x, y, z, 0, 0, 0, 0)
+                            TaskPause(entity, 5000)
+
+                            Animator(entity, modelName, 'tricks', {
+                                animation = 'petting_chop'
+                            })
+                            Animator(plyPed, 'A_C_Rottweiler', 'tricks', {
+                                animation = 'petting_franklin'
+                            })
+
+                            TriggerServerEvent('hud:server:RelieveStress', Config.Balance.petStressReliefValue)
+                            return true
+                        end
+                    }, {
+                        icon = "fas fa-first-aid",
+                        label = "Heal",
+                        canInteract = function(entity)
+                            if IsEntityDead(entity) == false then
+                                return true
+                            else
+                                return false
+                            end
+                        end,
+                        action = function(entity)
+                            request_healing_process(ped, item, 'Heal')
+                            return true
+                        end
+                    } },
+                    distance = 1.5
+                })
+            end
+
+            if petData.hostile == true then
+                TriggerServerEvent('keep-companion:server:despwan_not_owned_pet', petData.itemData.info.hash)
+            end
+        end, {
+            item = item, model = model, entity = ped
+        })
+
     end)
 end)
 
