@@ -48,35 +48,36 @@ function Pet:spawnPet(source, model, item)
     if isSpawned == true then
         -- depsawn ped
         Pet:despawnPet(source, item, nil)
-    else
-        local limit = Pet:isMaxLimitPedReached(source)
-        if limit == true then
-            TriggerClientEvent('QBCore:Notify', source, string.format(Lang:t('error.reached_max_allowed_pet'), maxLimit), 'error', 2500)
-            return
-        end
-        local Player = QBCore.Functions.GetPlayer(source)
-        -- spawn ped
-        if item.weight == 500 then
-            -- need inital values
-            if Player.PlayerData.items[item.slot] then
-                Player.PlayerData.items[item.slot].weight = math.random(1000, 4500)
-            end
-            Player.Functions.SetInventory(Player.PlayerData.items, true)
-        end
-
-        if item.info.health <= 100 and item.info.health ~= 0 then
-            -- prevent 100 to stuck in data as health!
-            if Player.PlayerData.items[item.slot] then
-                Player.PlayerData.items[item.slot].info.health = 0
-            end
-            Player.Functions.SetInventory(Player.PlayerData.items, true)
-            return
-        end
-
-        -- if player that is spawning pet is not owener spawn pet as hostile toward that player
-        local owner = not (item.info.owner.phone == Player.PlayerData.charinfo.phone)
-        TriggerClientEvent('keep-companion:client:callCompanion', source, model, owner, item)
+        return
     end
+
+    local limit = Pet:isMaxLimitPedReached(source)
+    if limit == true then
+        TriggerClientEvent('QBCore:Notify', source, string.format(Lang:t('error.reached_max_allowed_pet'), maxLimit), 'error', 2500)
+        return
+    end
+
+    local Player = QBCore.Functions.GetPlayer(source)
+    -- spawn ped
+    if item.weight == 500 then
+        -- need inital values
+        if Player.PlayerData.items[item.slot] then
+            Player.PlayerData.items[item.slot].weight = math.random(1000, 4500)
+        end
+        Player.Functions.SetInventory(Player.PlayerData.items, true)
+    end
+
+    if item.info.health <= 100 and item.info.health ~= 0 then
+        -- prevent 100 to stuck in data as health!
+        if Player.PlayerData.items[item.slot] then
+            Player.PlayerData.items[item.slot].info.health = 0
+        end
+        Player.Functions.SetInventory(Player.PlayerData.items, true)
+        return
+    end
+
+    local owner = not (item.info.owner.phone == Player.PlayerData.charinfo.phone)
+    TriggerClientEvent('keep-companion:client:callCompanion', source, model, owner, item)
 end
 
 RegisterNetEvent('keep-companion:server:despwan_not_owned_pet', function(hash)
@@ -435,36 +436,10 @@ QBCore.Commands.Add('addpet', 'add a pet to player inventory (Admin Only)', {}, 
     local PETname = args[1]
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    local itemData = {
-        info = {}
-    }
-    local random = math.random(1, 2)
-    local gender = { true, false }
-    local gen = gender[random]
-    itemData.info.hash = tostring(
-        QBCore.Shared.RandomInt(2) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(1) ..
-        QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
-    itemData.info.name = NameGenerator('dog', random)
-    itemData.info.gender = gen
-    itemData.info.age = 0
-    itemData.info.food = 100
-    -- owener data
-    itemData.info.owner = Player.PlayerData.charinfo
-    -- inital level and xp
-    itemData.info.level = 0
-    itemData.info.XP = 0
-    -- inital variation
-    local petVariation = ''
-    local maxHealth = 200
-    for k, v in pairs(Config.pets) do
-        if v.name == PETname then
-            petVariation = PetVariation:getRandomPedVariationsName(v.model, true)
-            maxHealth = v.maxHealth
-        end
-    end
-    itemData.info.variation = petVariation
-    itemData.info.health = maxHealth
-    Player.Functions.AddItem(PETname, 1, nil, itemData.info)
+    local info = {}
+    info.owner = Player.PlayerData.charinfo
+
+    Player.Functions.AddItem(PETname, 1, nil, info)
     TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items[PETname], "add")
 end, 'admin')
 

@@ -2,6 +2,9 @@ QBCore = exports['qb-core']:GetCoreObject()
 PlayerData = QBCore.Functions.GetPlayerData()
 
 local isMenuOpen = false
+local alreadyHunting = {
+    state = false
+}
 
 local menu = {
     [1] = {
@@ -26,6 +29,12 @@ local menu = {
                 return false
             end
 
+            if alreadyHunting.state ~= false then
+                local msg = 'Aleardy hunting something'
+                QBCore.Functions.Notify(msg, 'error', 5000)
+                return
+            end
+
             if activePed.level <= min_lvl_to_hunt then
                 local msg = Lang:t('error.not_meet_min_requirement_to_hunt')
                 msg = string.format(msg, min_lvl_to_hunt)
@@ -34,10 +43,7 @@ local menu = {
             end
 
             doSomethingIfPedIsInsideVehicle(activePed.entity)
-            if attackLogic() ~= true then
-                return false
-            end
-            return true
+            return attackLogic(alreadyHunting)
         end
     },
     [3] = {
@@ -74,6 +80,7 @@ local menu = {
         lable = Lang:t('menu.wait'),
         TYPE = 'Wait',
         action = function(plyped, activePed)
+            doSomethingIfPedIsInsideVehicle(activePed.entity)
             ClearPedTasks(activePed.entity)
         end
     },

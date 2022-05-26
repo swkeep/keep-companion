@@ -166,26 +166,20 @@ end
 --- creates laser and force ped to move toward coord
 ---@param ped 'ped'
 function goThere(ped)
-    local activeLaser = true
-    while activeLaser do
-        Wait(0)
-        local color = {
-            r = 2,
-            g = 241,
-            b = 181,
-            a = 200
-        }
+    while true do
+        local color = { r = 2, g = 241, b = 181, a = 200 }
         local plyped = PlayerPedId()
         local position = GetEntityCoords(plyped)
         local coords, entity = RayCastGamePlayCamera(1000.0)
         Draw2DText('Press ~g~E~w~ To go there', 4, { 255, 255, 255 }, 0.4, 0.43, 0.888 + 0.025)
         if IsControlJustReleased(0, 38) then
             TaskGoToCoordAnyMeans(ped, coords, 10.0, 0, 0, 0, 0)
-            activeLaser = false
+            return
         end
         DrawLine(position.x, position.y, position.z, coords.x, coords.y, coords.z, color.r, color.g, color.b, color.a)
         DrawMarker(28, coords.x, coords.y, coords.z, 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, 0.1, 0.1, 0.1, color.r, color.g,
             color.b, color.a, false, true, 2, nil, nil, false)
+        Wait(0)
     end
 end
 
@@ -193,14 +187,14 @@ end
 function getIntoCar()
     local plyped = PlayerPedId()
     local ped = ActivePed:read().entity
-    local coords = GetEntityCoords(plyped)
-    local coords2 = GetEntityCoords(ped)
-    local distance = GetDistanceBetweenCoords(coords, coords2, true)
+    local player_coord = GetEntityCoords(plyped)
+    local pet_coord = GetEntityCoords(ped)
+    local distance = #(player_coord - pet_coord)
     if IsPedSittingInAnyVehicle(plyped) then
         if distance < 8 then
             local vehicle = GetVehiclePedIsUsing(plyped)
             local seatEmpty = 6
-            Citizen.Wait(200)
+            Wait(200)
             for i = 1, 5, 1 do
                 if IsVehicleSeatFree(vehicle, i - 2) then
                     SetPedIntoVehicle(ped, vehicle, i - 2)
@@ -223,9 +217,8 @@ function getIntoCar()
     end
 end
 
-function attackLogic()
-    local activeLaser = true
-    while activeLaser do
+function attackLogic(alreadyHunting)
+    while true do
         Wait(0)
         local color = {
             r = 2,
@@ -242,33 +235,33 @@ function attackLogic()
             if IsEntityAPed(entity) ~= 1 then
                 return false
             end
-            CreateThread(function()
-                local pet = ActivePed:read().entity
-                local finished = false
-                local chaseDistance = Config.Settings.chaseDistance
-                local indicator = Config.Settings.chaseIndicator
-                AttackTargetedPed(pet, entity)
 
-                while IsPedDeadOrDying(entity) == false and finished == false do
-                    -- draw every frame
-                    Wait(5)
-                    local pedCoord = GetEntityCoords(entity)
-                    local petCoord = GetEntityCoords(pet)
-                    local distance = GetDistanceBetweenCoords(pedCoord, petCoord)
+            local pet = ActivePed:read().entity
+            local chaseDistance = Config.Settings.chaseDistance
+            local indicator = Config.Settings.chaseIndicator
+            AttackTargetedPed(pet, entity)
+            alreadyHunting.state = true
+            while IsPedDeadOrDying(entity) == false do
+                -- draw every frame
+                Wait(5)
+                local pedCoord = GetEntityCoords(entity)
+                local petCoord = GetEntityCoords(pet)
+                local distance = GetDistanceBetweenCoords(pedCoord, petCoord)
 
-                    DrawMarker(2, pedCoord.x, pedCoord.y, pedCoord.z + 2, 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, 1.0, 1.0,
-                        1.0, 255, 128, 0, 50, false, true, 2, nil, nil, false)
+                DrawMarker(2, pedCoord.x, pedCoord.y, pedCoord.z + 2, 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, 1.0, 1.0,
+                    1.0, 255, 128, 0, 50, false, true, 2, nil, nil, false)
 
-                    if indicator ~= false and IsPedDeadOrDying(entity) ~= false then
-                        finished = true
-                    end
-                    if distance >= chaseDistance then
-                        finished = true
-                    end
+                if indicator ~= false and IsPedDeadOrDying(entity) ~= false then
+                    alreadyHunting.state = false
+                    return true
                 end
-                -- later ask server to give xp
-            end)
-            activeLaser = false
+                if distance >= chaseDistance then
+                    alreadyHunting.state = false
+                    return true
+                end
+            end
+            -- later ask server to give xp
+            alreadyHunting.state = false
             return true
         end
         -- target
@@ -279,15 +272,9 @@ function attackLogic()
 end
 
 function HuntandGrab(plyped, activePed)
-    local activeLaser = true
-    while activeLaser do
+    while true do
         Wait(0)
-        local color = {
-            r = 2,
-            g = 241,
-            b = 181,
-            a = 200
-        }
+        local color = { r = 2, g = 241, b = 181, a = 200 }
         local position = GetEntityCoords(plyped)
         local coords, entity = RayCastGamePlayCamera(1000.0)
         Draw2DText('Press ~g~E~w~ To go there', 4, { 255, 255, 255 }, 0.4, 0.43, 0.888 + 0.025)
@@ -297,49 +284,45 @@ function HuntandGrab(plyped, activePed)
                 QBCore.Functions.Notify('Could not do that', "error", 1500)
                 return
             end
-            CreateThread(function()
-                local finished = false
-                local indicator = Config.Settings.chaseIndicator
-                TaskFollowToOffsetOfEntity(pet, entity, 0.0, 0.0, 0.0, 5.0, 10.0, 1.0, 1)
-                while finished == false do
-                    local pedCoord = GetEntityCoords(entity)
-                    local petCoord = GetEntityCoords(pet)
-                    local distance = GetDistanceBetweenCoords(pedCoord, petCoord)
-                    if distance >= 50.0 then
-                        -- skip when to much distance
-                        finished = true
-                    else
-                        AttackTargetedPed(pet, entity)
-                        -- wait until pet kills target
-                        while IsPedDeadOrDying(entity) == false do
-                            Wait(250)
-                        end
-                        -- drag dead body
-                        SetEntityCoords(entity, GetOffsetFromEntityInWorldCoords(pet, 0.0, 0.25, 0.0))
-                        AttachEntityToEntity(entity, pet, 11816, 0.05, 0.05, 0.5, 0.0, 0.0, 0.0, false, false,
-                            false, false, 2, true)
-                        -- finish loop
-                        finished = true
-                    end
-                    Wait(500)
-                end
-                -- Detach entity when it has to much distance or it's near player
 
-                finished = false
-                TaskFollowToOffsetOfEntity(pet, plyped, 2.0, 2.0, 2.0, 1.0, 10.0, 3.0, 1)
-                while finished == false do
-                    local pedCoord = GetEntityCoords(plyped)
-                    local petCoord = GetEntityCoords(pet)
-                    local distance = GetDistanceBetweenCoords(pedCoord, petCoord)
-                    if entity ~= nil and distance < 3.0 or distance > 50.0 then
-                        DetachEntity(entity, true, false)
-                        ClearPedSecondaryTask(pet)
-                        finished = true
+            TaskFollowToOffsetOfEntity(pet, entity, 0.0, 0.0, 0.0, 5.0, 10.0, 1.0, 1)
+            while true do
+                local pedCoord = GetEntityCoords(entity)
+                local petCoord = GetEntityCoords(pet)
+                local distance = GetDistanceBetweenCoords(pedCoord, petCoord)
+                if distance >= 50.0 then
+                    -- skip when to much distance
+                    break
+                else
+                    AttackTargetedPed(pet, entity)
+                    -- wait until pet kills target
+                    while IsPedDeadOrDying(entity) == false do
+                        Wait(250)
                     end
-                    Wait(1000)
+                    -- drag dead body
+                    SetEntityCoords(entity, GetOffsetFromEntityInWorldCoords(pet, 0.0, 0.25, 0.0))
+                    AttachEntityToEntity(entity, pet, 11816, 0.05, 0.05, 0.5, 0.0, 0.0, 0.0, false, false,
+                        false, false, 2, true)
+                    -- finish loop
+                    break
                 end
-            end)
-            activeLaser = false
+                Wait(500)
+            end
+            -- Detach entity when it has to much distance or it's near player
+
+            TaskFollowToOffsetOfEntity(pet, plyped, 2.0, 2.0, 2.0, 1.0, 10.0, 3.0, 1)
+            while true do
+                local pedCoord = GetEntityCoords(plyped)
+                local petCoord = GetEntityCoords(pet)
+                local distance = GetDistanceBetweenCoords(pedCoord, petCoord)
+                if entity ~= nil and distance < 3.0 or distance > 50.0 then
+                    DetachEntity(entity, true, false)
+                    ClearPedSecondaryTask(pet)
+                    return
+                end
+                Wait(1000)
+            end
+            return -- just incase
         end
         DrawLine(position.x, position.y, position.z, coords.x, coords.y, coords.z, color.r, color.g, color.b, color.a)
         DrawMarker(28, coords.x, coords.y, coords.z, 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, 0.1, 0.1, 0.1, color.r, color.g,
@@ -372,7 +355,7 @@ end
 ---@return 'void'
 function AttackTargetedPed(AttackerPed, targetPed)
     if not AttackerPed and not targetPed then
-        return
+        return false
     end
     SetPedCombatAttributes(AttackerPed, 46, 1)
     TaskGoToEntityWhileAimingAtEntity(AttackerPed, targetPed, targetPed, 8.0, 1, 0, 15, 1, 1, 1566631136)
@@ -380,11 +363,10 @@ function AttackTargetedPed(AttackerPed, targetPed)
     SetRelationshipBetweenPed(AttackerPed)
     SetPedCombatMovement(AttackerPed, 3)
 
-    CreateThread(function()
-        while not IsPedDeadOrDying(targetPed) do
-            Wait(2000)
-            -- skip
-        end
-        TaskFollowTargetedPlayer(AttackerPed, PlayerPedId(), 3.0, false)
-    end)
+
+    while IsPedDeadOrDying(targetPed, 0) ~= 1 do
+        Wait(1000)
+        -- skip
+    end
+    TaskFollowTargetedPlayer(AttackerPed, PlayerPedId(), 3.0, false)
 end

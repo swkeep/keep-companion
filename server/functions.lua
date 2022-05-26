@@ -29,7 +29,7 @@ function NameGenerator(type, gender)
     return names[type][gender][math.random(1, size)]
 end
 
-function initInfoHelper(Player, slot, data)
+local function initInfoHelper(Player, slot, data)
     if Player.PlayerData.items[slot] then
         Player.PlayerData.items[slot].info = data
     end
