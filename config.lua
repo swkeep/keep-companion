@@ -1,6 +1,7 @@
 Config = Config or {}
 
 Config.Settings = {
+    let_players_cutomize_their_pet_after_purchase = true,
     callCompanionDuration = 2, -- sec
     despawnDuration = 3, -- sec
     itemUsageCooldown = 1, -- sec

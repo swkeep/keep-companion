@@ -408,3 +408,269 @@ end, false)
 RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
     PlayerData = val
 end)
+
+-- =======================================
+--           Customization menu
+-- =======================================
+
+RegisterNetEvent('keep-companion:client:initialization_process', function(item, pet_information)
+    if type(item) ~= "table" then
+        QBCore.Functions.Notify(Lang:t('error.failed_to_start_procces'), 'error', 5000)
+        return
+    end
+    TriggerEvent('keep-companion:client:openMenu_customization', {
+        item = item, pet_information = pet_information
+    })
+end)
+
+AddEventHandler('keep-companion:client:openMenu_customization', function(data)
+    openMenu_customization(data)
+end)
+
+AddEventHandler('keep-companion:client:openMenu_customization_rename', function(data)
+    openMenu_customization_rename(data)
+end)
+
+local function rename(data)
+    local inputData = exports['qb-input']:ShowInput(
+        {
+            header = "Type new name",
+            submitText = "Confirm",
+            inputs = {
+                {
+                    type = 'text',
+                    isRequired = true,
+                    name = 'name',
+                    text = "name"
+                },
+            }
+        }
+    )
+    if inputData then
+        if not inputData.name then
+            return
+        end
+        local validation = ValidatePetName(inputData.name, 12)
+
+        if type(validation) == "table" and next(validation) ~= nil then
+            QBCore.Functions.Notify(Lang:t('error.failed_to_validate_name'), 'error', 5000)
+            if validation.reason == 'badword' then
+                QBCore.Functions.Notify(Lang:t('error.badword_inside_pet_name'), 'error', 5000)
+                print_table(validation.words)
+                TriggerEvent('keep-companion:client:openMenu_customization_rename', data)
+                return
+            elseif validation.reason == 'maxCharacter' then
+                QBCore.Functions.Notify(Lang:t('error.more_than_one_word_as_name'), 'error', 5000)
+                TriggerEvent('keep-companion:client:openMenu_customization_rename', data)
+                return
+            end
+            return
+        end
+
+        data.item.info.name = inputData.name
+        TriggerEvent('keep-companion:client:openMenu_customization_rename', data)
+    end
+end
+
+AddEventHandler('keep-companion:client:openMenu_customization_rename:rename', function(data)
+    rename(data)
+end)
+
+AddEventHandler('keep-companion:client:openMenu_customization_select_variation', function(data)
+    if data.selected ~= nil then
+        data.item.info.variation = data.selected
+    end
+    openMenu_customization_select_variation(data)
+end)
+
+local function change_variation(data)
+    local item = data.item
+    local pet_information = data.pet_information
+
+    local openMenu = {
+        {
+            header = Lang:t('menu.menu_back'),
+            icon = 'fa-solid fa-angle-left',
+            params = {
+                event = "keep-companion:client:openMenu_customization_select_variation",
+                args = {
+                    item = item,
+                    pet_information = pet_information
+                }
+            }
+        },
+        {
+            header = 'Variation list',
+            icon = 'fa-solid fa-rectangle-list',
+            isMenuHeader = true
+        },
+    }
+
+    for key, value in pairs(pet_information.pet_variation_list) do
+        openMenu[#openMenu + 1] = {
+            header = 'Variation: ' .. value,
+            txt = 'select to take effect',
+            icon = 'fa-solid fa-brush',
+            params = {
+                event = "keep-companion:client:openMenu_customization_select_variation",
+                args = {
+                    selected = value,
+                    item = item,
+                    pet_information = pet_information
+                }
+            }
+        }
+    end
+
+    exports['qb-menu']:openMenu(openMenu)
+end
+
+AddEventHandler('keep-companion:client:openMenu_customization_variation:variation_menu', function(data)
+    change_variation(data)
+end)
+
+-- customization menu
+function openMenu_customization(data)
+    -- header
+    local c_name = data.item.info.name
+    local c_variation = data.item.info.variation
+
+    local openMenu = {
+        {
+            header = 'Customization menu',
+            icon = 'fa-solid fa-pen-to-square',
+            isMenuHeader = true
+        },
+        {
+            header = 'Rename',
+            txt = 'current name: ' .. c_name,
+            icon = 'fa-regular fa-keyboard',
+            params = {
+                event = "keep-companion:client:openMenu_customization_rename",
+                args = {
+                    item = data.item,
+                    pet_information = data.pet_information
+                },
+            }
+        },
+        {
+            header = 'Select variation',
+            txt = 'current color: ' .. c_variation,
+            icon = 'fa-solid fa-brush',
+            params = {
+                event = "keep-companion:client:openMenu_customization_select_variation",
+                args = {
+                    item = data.item,
+                    pet_information = data.pet_information
+                },
+            }
+        },
+        {
+            header = 'Confirm',
+            icon = 'fa-solid fa-circle-check',
+            params = {
+                event = "keep-companion:client:openMenu_customization:confirm",
+                args = {
+                    item = data.item,
+                    pet_information = data.pet_information
+                }
+            }
+        },
+        {
+            header = Lang:t('menu.menu_leave'),
+            txt = "",
+            icon = 'fa-solid fa-circle-xmark',
+            params = {
+                event = "qb-menu:closeMenu"
+            }
+        }
+    }
+
+    exports['qb-menu']:openMenu(openMenu)
+end
+
+function openMenu_customization_rename(data)
+    local item = data.item
+    local pet_information = data.pet_information
+
+    local c_name = item.info.name
+    -- header
+    local openMenu = {
+        {
+            header = Lang:t('menu.menu_back'),
+            icon = 'fa-solid fa-angle-left',
+            params = {
+                event = "keep-companion:client:openMenu_customization",
+                args = {
+                    item = item,
+                    pet_information = pet_information
+                },
+            }
+        },
+        {
+            header = 'Current name',
+            icon = 'fa-solid fa-pen-to-square',
+            txt = c_name,
+            isMenuHeader = true,
+            disabled = true
+        },
+        {
+            header = 'Rename',
+            icon = 'fa-regular fa-keyboard',
+            params = {
+                event = "keep-companion:client:openMenu_customization_rename:rename",
+                args = {
+                    item = item,
+                    pet_information = pet_information
+                },
+            }
+        },
+    }
+
+    exports['qb-menu']:openMenu(openMenu)
+end
+
+function openMenu_customization_select_variation(data)
+    -- header
+    local item = data.item
+    local pet_information = data.pet_information
+
+    local openMenu = {
+        {
+            header = Lang:t('menu.menu_back'),
+            icon = 'fa-solid fa-angle-left',
+            params = {
+                event = "keep-companion:client:openMenu_customization",
+                args = {
+                    item = item,
+                    pet_information = pet_information
+                }
+            }
+        },
+        {
+            header = 'Current color',
+            txt = item.info.variation,
+            icon = 'fa-solid fa-palette',
+            isMenuHeader = true,
+            disabled = true
+        },
+        {
+            header = 'Select variation',
+            txt = 'choice color of you pet',
+            icon = 'fa-solid fa-brush',
+            params = {
+                event = "keep-companion:client:openMenu_customization_variation:variation_menu",
+                args = {
+                    item = item,
+                    pet_information = pet_information
+                }
+            }
+        },
+    }
+
+    exports['qb-menu']:openMenu(openMenu)
+end
+
+AddEventHandler('keep-companion:client:openMenu_customization:confirm', function(data)
+    TriggerServerEvent('keep-companion:server:compelete_initialization_process', data.item)
+end)

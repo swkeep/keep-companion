@@ -198,10 +198,21 @@ function PetVariation:getRandomPedVariationsName(pedModel, justVariation)
     if justVariation ~= nil and justVariation == true then
         local tmp = {}
         for key, value in pairs(PetVariation[pedModel]) do
-            table.insert(tmp, key)
+            tmp[#tmp + 1] = key
         end
         return tmp[math.random(1, #tmp)] -- #TODO simple for now replace it with alias table later
     end
+end
+
+--- get all pets collor variation
+---@param pedModel any
+---@return table
+function PetVariation:getPedVariationsNameList(pedModel)
+    local tmp = {}
+    for key, value in pairs(PetVariation[pedModel]) do
+        tmp[#tmp + 1] = key
+    end
+    return tmp
 end
 
 --- find valid variation

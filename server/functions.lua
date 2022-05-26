@@ -42,33 +42,75 @@ end
 function initItem(source, item)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
+    local pet_information = find_pet_model_by_item_name(item.name)
     local random = math.random(1, 2)
     local gender = { true, false }
     local gen = gender[random]
+    local petVariation = ''
+    local maxHealth = 200
+
     item.info.hash = tostring(QBCore.Shared.RandomInt(2) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(1) ..
         QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
     item.info.name = NameGenerator('dog', random)
     item.info.gender = gen
     item.info.age = 0
     item.info.food = 100
-    -- owener data
     item.info.owner = Player.PlayerData.charinfo
-    -- inital level and xp
     item.info.level = 0
     item.info.XP = 0
+    item.info.health = pet_information.maxHealth
+
     -- inital variation
-    local petVariation = ''
-    local maxHealth = 200
+    petVariation = PetVariation:getRandomPedVariationsName(pet_information.model, true)
+    item.info.variation = petVariation
+    initInfoHelper(Player, item.slot, item.info)
+
+    -- do extras step if we want to cutomize pets
+    if Config.Settings.let_players_cutomize_their_pet_after_purchase then
+        local information = {
+            pet_variation_list = PetVariation:getPedVariationsNameList(pet_information.model),
+            pet_information = pet_information
+        }
+        TriggerClientEvent('keep-companion:client:initialization_process', src, item, information)
+    end
+end
+
+function find_pet_model_by_item_name(item_name)
     for k, v in pairs(Config.pets) do
-        if v.name == item.name then
-            petVariation = PetVariation:getRandomPedVariationsName(v.model, true)
-            maxHealth = v.maxHealth
+        if v.name == item_name then
+            return v
         end
     end
-    item.info.variation = petVariation
-    item.info.health = maxHealth
-    initInfoHelper(Player, item.slot, item.info)
 end
+
+RegisterNetEvent('keep-companion:server:compelete_initialization_process', function(item)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if not Player then return end
+    local pet_information = find_pet_model_by_item_name(item.name)
+    if not pet_information then return end
+    local items = Player.Functions.GetItemsByName(item.name)
+    if not items then return end
+
+    local sever_item = nil
+    for key, value in pairs(items) do
+        if value.info.hash == item.info.hash then
+            sever_item = value
+            break
+        end
+    end
+    if not sever_item then return end
+
+    -- force data that we don't want to get by client side
+    item.info.age = 0
+    item.info.food = 100
+    item.info.owner = Player.PlayerData.charinfo
+    item.info.level = 0
+    item.info.XP = 0
+    item.info.health = pet_information.maxHealth
+
+    initInfoHelper(Player, sever_item.slot, item.info)
+end)
 
 -- 1 --> 7 year old
 CalorieCalData = {

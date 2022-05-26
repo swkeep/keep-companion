@@ -71,6 +71,7 @@ end
 --- clean current ped data
 function ActivePed:remove(index)
     local netId = NetworkGetNetworkIdFromEntity(self.data[index].entity)
+    if not netId then return end
     TriggerServerEvent('keep-companion:server:ForceRemoveNetEntity', netId)
     self.data[index] = nil
     -- assign onControl to valid value
