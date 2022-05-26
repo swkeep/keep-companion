@@ -307,7 +307,7 @@ function request_healing_process(ped, item, process_type)
                 disableCombat = true
             }, {}, {}, {}, function()
             TriggerServerEvent('keep-companion:server:revivePet', current_pet, process_type)
-            TaskFollowTargetedPlayer(ped, plyID)
+            TaskFollowTargetedPlayer(ped, plyID, false)
         end)
     end, 'firstaidforpet')
 end

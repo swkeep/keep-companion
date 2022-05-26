@@ -385,6 +385,6 @@ function AttackTargetedPed(AttackerPed, targetPed)
             Wait(2000)
             -- skip
         end
-        TaskFollowTargetedPlayer(AttackerPed, PlayerPedId(), 3.0)
+        TaskFollowTargetedPlayer(AttackerPed, PlayerPedId(), 3.0, false)
     end)
 end

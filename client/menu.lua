@@ -12,7 +12,7 @@ local menu = {
         triggerNotification = { 'PETNAME is now following you!', 'PETNAME failed to follow you!' },
         action = function(plyped, activePed)
             doSomethingIfPedIsInsideVehicle(activePed.entity)
-            return TaskFollowTargetedPlayer(activePed.entity, plyped, 3.0)
+            return TaskFollowTargetedPlayer(activePed.entity, plyped, 3.0, false)
         end
     },
     [2] = {
