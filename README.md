@@ -226,7 +226,19 @@
 		["shouldClose"] = true,
 		["combinable"] = nil,
 		["description"] = "Rename your pet"
-	}
+	},
+    ["petwaterbottleportable"]  = {
+		["name"] = "petwaterbottleportable",
+		["label"] = "Portable water bottle",
+		["weight"] = 1000,
+		["type"] = "item",
+		["image"] = "petwaterbottleportable.png",
+		["unique"] = false,
+		["useable"] = true,
+		["shouldClose"] = true,
+		["combinable"] = nil,
+		["description"] = "Water bottle for your pets"
+	},
 ```
 
 # step 3: qb-shop
@@ -348,7 +360,15 @@
             info = {},
             type = 'item',
             slot = 14
-        }
+        },
+        [15] = {
+            name = 'petwaterbottleportable',
+            price = 5000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 14
+        },
     }
 
 ```
@@ -378,40 +398,44 @@
 
 ```javascript
 else if (
-            itemData.name == "keepcompanionhusky" ||
-            itemData.name == "keepcompanionrottweiler" ||
-            itemData.name == "keepcompanionmtlion" ||
-            itemData.name == "keepcompanionmtlion2" ||
-            itemData.name == "keepcompanioncat" ||
-            itemData.name == "keepcompanionpoodle" ||
-            itemData.name == "keepcompanionpug" ||
-            itemData.name == "keepcompanionretriever" ||
-            itemData.name == "keepcompanionshepherd" ||
-            itemData.name == "keepcompanionwesty"
-        ) {
-            let gender = itemData.info.gender;
-            gender ? (gender = "male") : (gender = "female");
-            $(".item-info-title").html("<p>" + itemData.info.name + "</p>");
-            $(".item-info-description").html(
-                "<p><strong>Owner Phone: </strong><span>" +
-                itemData.info.owner.phone +
-                "</span></p><p><strong>Variation: </strong><span>" +
-                `${itemData.info.variation}` +
-                "</span></p><p><strong>Gender: </strong><span>" +
-                `${gender}` +
-                "</span></p><p><strong>Health: </strong><span>" +
-                itemData.info.health +
-                "</span></p><p><strong>Xp/Max: </strong><span>" +
-                `${itemData.info.XP} / ${maxExp(itemData.info.level)}` +
-                "</span></p><p><strong>Level: </strong><span>" +
-                itemData.info.level +
-                "</span></p><p><strong>Age: </strong><span>" +
-                callAge(itemData.info.age) +
-                "</span></p><p><strong>Food: </strong><span>" +
-                itemData.info.food +
-                "</span></p>"
-            );
-        }
+    itemData.name == "keepcompanionhusky" ||
+    itemData.name == "keepcompanionrottweiler" ||
+    itemData.name == "keepcompanionmtlion" ||
+    itemData.name == "keepcompanionmtlion2" ||
+    itemData.name == "keepcompanioncat" ||
+    itemData.name == "keepcompanionpoodle" ||
+    itemData.name == "keepcompanionpug" ||
+    itemData.name == "keepcompanionretriever" ||
+    itemData.name == "keepcompanionshepherd" ||
+    itemData.name == "keepcompanionwesty"
+) {
+    let gender = itemData.info.gender;
+    gender ? (gender = "male") : (gender = "female");
+    $(".item-info-title").html("<p>" + itemData.info.name + "</p>");
+    $(".item-info-description").html(
+        "<p><strong>Owner Phone: </strong><span>" +
+        itemData.info.owner.phone +
+        "</span></p><p><strong>Variation: </strong><span>" +
+        `${itemData.info.variation}` +
+        "</span></p><p><strong>Gender: </strong><span>" +
+        `${gender}` +
+        "</span></p><p><strong>Health: </strong><span>" +
+        itemData.info.health +
+        "</span></p><p><strong>Xp/Max: </strong><span>" +
+        `${itemData.info.XP} / ${maxExp(itemData.info.level)}` +
+        "</span></p><p><strong>Level: </strong><span>" +
+        itemData.info.level +
+        "</span></p><p><strong>Age: </strong><span>" +
+        callAge(itemData.info.age) +
+        "</span></p><p><strong>Food: </strong><span>" +
+        itemData.info.food +
+        "</span></p>"
+    );
+}
+else if (itemData.name == "petwaterbottleportable") {
+    $(".item-info-title").html("<p>" + itemData.label + "</p>");
+    $(".item-info-description").html("<p>capacity(L): " + itemData.info.liter + "</p>");
+}
 ```
 
 - and add this codes at end of inventory\js\app.js
