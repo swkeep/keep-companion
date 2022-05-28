@@ -45,14 +45,13 @@ function initItem(source, item)
     local pet_information = find_pet_model_by_item_name(item.name)
     local random = math.random(1, 2)
     local gender = { true, false }
-    local gen = gender[random]
     local maxHealth = 200
     item.info = {}
 
     item.info.hash = tostring(QBCore.Shared.RandomInt(2) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(1) ..
         QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
     item.info.name = NameGenerator('dog', random)
-    item.info.gender = gen
+    item.info.gender = gender[random]
     item.info.age = 0
 
     item.info.food = 100
@@ -107,6 +106,7 @@ RegisterNetEvent('keep-companion:server:compelete_initialization_process', funct
     -- force data that we don't want to get by client side
     item.info.age = 0
     item.info.food = 100
+    item.info.thirst = 0
     item.info.owner = Player.PlayerData.charinfo
     item.info.level = 0
     item.info.XP = 0
@@ -197,7 +197,8 @@ function Update:xp(source, current_pet_data)
     -- increase level when pet reached max exp of current level
     if current_pet_data.info.XP > current_level_max_xp(level) then
         current_pet_data.info.level = level + 1
-        TriggerClientEvent('QBCore:Notify', source, pet_name .. " gain new level " .. current_pet_data.info.level)
+        local msg = string.format(Lang:t('info.level_up'), pet_name, current_pet_data.info.level)
+        TriggerClientEvent('QBCore:Notify', source, msg)
     end
 end
 
@@ -214,7 +215,8 @@ function Update:health(source, data, current_pet_data)
     end
 
     if c_health <= 100 then
-        TriggerClientEvent('QBCore:Notify', source, pet_name .. " died!", 'error')
+        local msg = string.format(Lang:t('error.pet_died'), pet_name)
+        TriggerClientEvent('QBCore:Notify', source, msg, 'error')
         c_health = 0
     end
     current_pet_data.info.health = c_health
@@ -282,6 +284,30 @@ function Update:food(petData, process_type)
     end
 end
 
+local thirst_value_increase_per_tick = Config.core_items.waterbottle.settings.thirst_value_increase_per_tick
+function Update:thirst(petData, process_type)
+    if petData == nil or process_type == nil then return end
+    if petData.info.thirst >= 100.0 then
+        if petData.info.health == 0 or petData.info.health <= 100 then
+            petData.info.health = 0
+            petData.info.thirst = 100
+            return
+        end
+        petData.info.health = petData.info.health - 0.5
+        return
+    end
+
+    if petData.info.thirst <= 100 then
+        petData.info.thirst = petData.info.thirst + thirst_value_increase_per_tick
+
+        -- make sure thirst value not negative
+        if petData.info.thirst < 0 then
+            petData.info.thirst = 0
+        end
+        return
+    end
+end
+
 QBCore.Functions.CreateCallback('keep-companion:server:collar_change_owenership', function(source, cb, data)
     if type(data.new_owner_cid) == "string" then data.new_owner_cid = tonumber(data.new_owner_cid) end
     local player_owner = QBCore.Functions.GetPlayer(source)
@@ -290,7 +316,7 @@ QBCore.Functions.CreateCallback('keep-companion:server:collar_change_owenership'
     if data.new_owner_cid == source then
         cb({
             state = false,
-            msg = 'You can not transfer your pet to yourself!'
+            msg = Lang:t('error.failed_to_transfer_ownership_same_owner')
         })
         return
     end
@@ -298,7 +324,7 @@ QBCore.Functions.CreateCallback('keep-companion:server:collar_change_owenership'
     if player_new_owner == nil or next(data) == nil then
         cb({
             state = false,
-            msg = 'Could not find this new owner (wrong id)'
+            msg = Lang:t('error.failed_to_transfer_ownership_could_not_find_new_owner_id')
         })
         return
     end
@@ -309,13 +335,13 @@ QBCore.Functions.CreateCallback('keep-companion:server:collar_change_owenership'
     if type(current_pet_data.info.owner) ~= "table" or next(current_pet_data.info.owner) == nil then
         cb({
             state = false,
-            msg = 'Can not transfer this pet missing current owner information!'
+            msg = Lang:t('error.failed_to_transfer_ownership_missing_current_owner')
         })
         return
     end
 
     if player_owner.Functions.RemoveItem('collarpet', 1) ~= true then
-        TriggerClientEvent('QBCore:Notify', source, 'Failed to remove from your inventory', 'error', 2500)
+        TriggerClientEvent('QBCore:Notify', source, Lang:t('error.failed_to_remove_item_from_inventory'), 'error', 2500)
         return
     end
 
@@ -326,7 +352,7 @@ QBCore.Functions.CreateCallback('keep-companion:server:collar_change_owenership'
     } }, true)
     cb({
         state = true,
-        msg = 'The transfer was successful. you can now give this pet to the new owner'
+        msg = Lang:t('success.successful_ownership_transfer')
     })
 end)
 

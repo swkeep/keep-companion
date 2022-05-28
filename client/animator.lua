@@ -48,7 +48,7 @@ local animationList = {
                 animDictionary = 'creatures@rottweiler@indication@',
                 animationName = 'indicate_low'
             },
-            ['playerdead'] = {
+            ['play_dead'] = {
                 animDictionary = 'creatures@rottweiler@move',
                 animationName = 'dying'
             }
@@ -349,44 +349,28 @@ local correctionList = {
     ['A_C_Cat_01'] = animationList.cat,
     ['PLAYER'] = animationList.PLAYER
 }
--- missexile2 fra0_ig_14_chop_sniff_fwds
--- missexile2 taunt_01 taunt_02
--- missfra0_chop_find chop_bark_at_ballas
--- missfra0_chop_find fra0_ig_14_chop_sniff_fwds
-
--- 014704 random@nigel@1c take_collar_cam 3966
--- 014705 random@nigel@1c take_collar_dog 3966
--- 014706 random@nigel@1c take_collar_dogfacial 3966
--- 014707 random@nigel@1c take_collar_trevor 3966
-
---- missfra1leadinoutfra_1_int_trevor _trevor_leadin_loop_chop <<<< sleep with feared face!
---- misschop_vehicle@back_of_van chop_sit_loop chop_lean_back_loop chop_growl_to_sit chop_growl chop_bark
--- fix_agy_int1-1 a_c_chop_02_dual-1 <<<< sleep
--- options = {
---     animation = ?, -- if not icluded sciprt will pick one random animation inside list
---     c_timings = ?,
--- }
 
 function Animator(pedHandle, pedModel, state, options)
-    -- #TODO sequential animation
-    -- choose random animation if it's not included
-    if options == nil then
-        options = {}
-    end
+    if type(pedHandle) ~= 'number' then assert(pedHandle, 'pedhandle is not a number') return false end
+    if type(options) ~= 'table' then assert(table, 'Failed to load options table') return false end
+
+    -- find a random animaiton if animation is not defined by request
     if options.animation == nil then
         local tmp = {}
         for key, value in pairs(correctionList[pedModel][state]) do
-            table.insert(tmp, key)
+            tmp[#tmp + 1] = key
         end
         options.animation = tmp[math.random(1, #tmp)]
         while correctionList[pedModel][state][options.animation].sequential ~= nil do
             options.animation = tmp[math.random(1, #tmp)]
         end
     end
+
     if correctionList[pedModel] == nil or correctionList[pedModel][state] == nil or
         correctionList[pedModel][state][options.animation] == nil then
         return false
     end
+
     -- sequential animation logic
     if correctionList[pedModel][state][options.animation].sequential ~= nil and
         correctionList[pedModel][state][options.animation].sequential == true then
@@ -454,23 +438,22 @@ function Animator(pedHandle, pedModel, state, options)
         -- skip rest of functions when we have to play sequential
         return
     end
+
+    -- QBCore.Functions.Notify(Lang:t('menu.action_menu.error.pet_unable_to_do_that'), 'error', 1500)
+
+    -- QBCore.Functions.Notify(Lang:t('menu.general_menu_items.success'), 'success', 1500)
+
+
     local c_animDictionary = correctionList[pedModel][state][options.animation].animDictionary
     local c_animationName = correctionList[pedModel][state][options.animation].animationName
 
-    if options ~= nil then
-        if options.c_timings ~= nil then
-            excuteAnimation(pedHandle, c_animDictionary, c_animationName, options.c_timings)
-        else
-            excuteAnimation(pedHandle, c_animDictionary, c_animationName)
-        end
-    else
-        return
-    end
+    excuteAnimation(pedHandle, c_animDictionary, c_animationName, options.c_timings)
 end
 
 function excuteAnimation(pedHandle, c_animDictionary, c_animationName, c_timings)
     local flag = 0
     local slow = -1
+
     if c_timings ~= nil then
         if c_timings == 'REPEAT' then
             flag = 1
@@ -486,6 +469,25 @@ function excuteAnimation(pedHandle, c_animDictionary, c_animationName, c_timings
             flag = -1
         end
     end
+
     waitForAnimation(c_animDictionary)
     TaskPlayAnim(pedHandle, c_animDictionary, c_animationName, 8.0, -8, slow, flag, 0, false, false, false)
 end
+
+-- missexile2 fra0_ig_14_chop_sniff_fwds
+-- missexile2 taunt_01 taunt_02
+-- missfra0_chop_find chop_bark_at_ballas
+-- missfra0_chop_find fra0_ig_14_chop_sniff_fwds
+
+-- 014704 random@nigel@1c take_collar_cam 3966
+-- 014705 random@nigel@1c take_collar_dog 3966
+-- 014706 random@nigel@1c take_collar_dogfacial 3966
+-- 014707 random@nigel@1c take_collar_trevor 3966
+
+--- missfra1leadinoutfra_1_int_trevor _trevor_leadin_loop_chop <<<< sleep with feared face!
+--- misschop_vehicle@back_of_van chop_sit_loop chop_lean_back_loop chop_growl_to_sit chop_growl chop_bark
+-- fix_agy_int1-1 a_c_chop_02_dual-1 <<<< sleep
+-- options = {
+--     animation = ?, -- if not icluded sciprt will pick one random animation inside list
+--     c_timings = ?,
+-- }

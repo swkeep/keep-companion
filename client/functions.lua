@@ -38,34 +38,6 @@ function wanderAroundWithDuration(ped, coord, radius, minimalLength, timeBetween
     end)
 end
 
---- func desc
----@param ped 'ped'
----@param targetPed 'ped'
----@param fleeTimeout integer
-function taskAttackTarget(ped, targetPed, fleeTimeout, item)
-    TaskCombatPed(ped, targetPed, 0, 16)
-    CreateThread(function()
-        Wait(fleeTimeout)
-        TaskSmartFleePed(ped, targetPed, 100.0, 10.0, 0, 0)
-        if item ~= nil then
-            local maxDistance = Config.Settings.fleeFromNotOwenerDistance
-            local finished = false
-            while DoesEntityExist(ped) and finished == false do
-                local plyCoord = GetEntityCoords(targetPed)
-                local pedCoord = GetEntityCoords(ped)
-                local distance = GetDistanceBetweenCoords(plyCoord, pedCoord)
-                if distance > maxDistance then
-                    -- #TODO this should remove pet from server too
-                    local index, petData = ActivePed:findByHash(item.info.hash)
-                    ActivePed:remove(index)
-                    finished = true
-                end
-                Wait(1000)
-            end
-        end
-    end)
-end
-
 --- remove Relationship againt player.
 ---@param ped 'ped'
 function removeRelationship(ped)
@@ -190,30 +162,31 @@ function getIntoCar()
     local player_coord = GetEntityCoords(plyped)
     local pet_coord = GetEntityCoords(ped)
     local distance = #(player_coord - pet_coord)
-    if IsPedSittingInAnyVehicle(plyped) then
-        if distance < 8 then
-            local vehicle = GetVehiclePedIsUsing(plyped)
-            local seatEmpty = 6
-            Wait(200)
-            for i = 1, 5, 1 do
-                if IsVehicleSeatFree(vehicle, i - 2) then
-                    SetPedIntoVehicle(ped, vehicle, i - 2)
-                    Animator(ped, ActivePed.read().model, 'siting', {
-                        c_timings = 'REPEAT'
-                    })
-                    seatEmpty = i - 2
-                    goto here
-                end
-            end
-            ::here::
-            if seatEmpty == 6 then
-                TriggerEvent('QBCore:Notify', "No empty seat!")
-            end
-        else
-            TriggerEvent('QBCore:Notify', "To far")
+    if not IsPedSittingInAnyVehicle(plyped) then
+        QBCore.Functions.Notify(Lang:t('error.need_to_be_inside_car'), "error", 1500)
+        return
+    end
+    if distance > 8 then
+        QBCore.Functions.Notify(Lang:t('error.to_far'), "error", 1500)
+        return
+    end
+    local vehicle = GetVehiclePedIsUsing(plyped)
+    local seatEmpty = 6
+
+    for i = 1, 5, 1 do
+        if IsVehicleSeatFree(vehicle, i - 2) then
+            SetPedIntoVehicle(ped, vehicle, i - 2)
+            Animator(ped, ActivePed.read().model, 'siting', {
+                c_timings = 'REPEAT'
+            })
+            seatEmpty = i - 2
+            break
         end
-    else
-        TriggerEvent('QBCore:Notify', "you need to be inside a car")
+    end
+
+    if seatEmpty == 6 then
+        QBCore.Functions.Notify(Lang:t('error.no_empty_seat'), "error", 1500)
+        return
     end
 end
 
@@ -281,7 +254,7 @@ function HuntandGrab(plyped, activePed)
         if IsControlJustReleased(0, 38) then
             local pet = activePed.entity
             if IsPedAPlayer(entity) == 1 or IsEntityAPed(entity) == false or entity == pet then
-                QBCore.Functions.Notify('Could not do that', "error", 1500)
+                QBCore.Functions.Notify(Lang:t('error.could_not_do_that'), "error", 1500)
                 return
             end
 
