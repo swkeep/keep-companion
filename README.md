@@ -367,7 +367,7 @@
             amount = 50,
             info = {},
             type = 'item',
-            slot = 14
+            slot = 15
         },
     }
 
