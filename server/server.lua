@@ -240,7 +240,7 @@ local function save_info_waterbottle(Player, item, amount)
     Player.Functions.SetInventory(Player.PlayerData.items, true)
 end
 
-local function drink(source, item)
+local function fillwater_bottle(source, item)
     local Player = QBCore.Functions.GetPlayer(source)
     if Player == nil then return end
     local max_c = Config.core_items.waterbottle.settings.max_capacity
@@ -283,12 +283,22 @@ QBCore.Functions.CreateUseableItem(core_items.waterbottle.item_name, function(so
 end)
 
 RegisterNetEvent('keep-companion:server:filling_event', function(item)
-    drink(source, item)
+    fillwater_bottle(source, item)
 end)
 
 QBCore.Functions.CreateCallback('keep-companion:server:decrease_thirst', function(source, cb, data)
     local player = QBCore.Functions.GetPlayer(source)
     local pet_water_bottle = player.Functions.GetItemByName(Config.core_items.waterbottle.item_name)
+
+    if pet_water_bottle.info == nil then
+        TriggerClientEvent('QBCore:Notify', source, 'You should wash water bottle first!', 'error', 2500)
+        return
+    end
+
+    if pet_water_bottle.info.liter == nil then
+        TriggerClientEvent('QBCore:Notify', source, 'You should wash water bottle first!', 'error', 2500)
+        return
+    end
 
     pet_water_bottle.info.liter = pet_water_bottle.info.liter - Config.core_items.waterbottle.settings.water_bottle_refill_value
     if pet_water_bottle.info.liter < 0 then

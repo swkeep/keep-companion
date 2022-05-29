@@ -233,7 +233,7 @@
 		["weight"] = 1000,
 		["type"] = "item",
 		["image"] = "petwaterbottleportable.png",
-		["unique"] = false,
+		["unique"] = true,
 		["useable"] = true,
 		["shouldClose"] = true,
 		["combinable"] = nil,
