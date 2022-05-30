@@ -237,7 +237,19 @@
 		["useable"] = true,
 		["shouldClose"] = true,
 		["combinable"] = nil,
-		["description"] = "Water bottle for your pets"
+		["description"] = "Flask to store water for your pets"
+	},
+    ["petgroomingkit"]  = {
+		["name"] = "petgroomingkit",
+		["label"] = "Pet Grooming Kit",
+		["weight"] = 1000,
+		["type"] = "item",
+		["image"] = "petgroomingkit.png",
+		["unique"] = true,
+		["useable"] = true,
+		["shouldClose"] = true,
+		["combinable"] = nil,
+		["description"] = "Pet Grooming Kit"
 	},
 ```
 
@@ -368,6 +380,14 @@
             info = {},
             type = 'item',
             slot = 15
+        },
+        [16] = {
+            name = 'petgroomingkit',
+            price = 5000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 16
         },
     }
 
