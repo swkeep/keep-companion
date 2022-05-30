@@ -35,7 +35,7 @@ local menu = {
                 return
             end
 
-            if activePed.level <= min_lvl_to_hunt then
+            if activePed.itemData.info.level <= min_lvl_to_hunt then
                 local msg = Lang:t('menu.action_menu.error.not_meet_min_requirement_to_hunt')
                 msg = string.format(msg, min_lvl_to_hunt)
                 QBCore.Functions.Notify(msg, 'error', 5000)
@@ -56,7 +56,7 @@ local menu = {
                 return false
             end
 
-            if activePed.level <= min_lvl_to_hunt then
+            if activePed.itemData.info.level <= min_lvl_to_hunt then
                 local msg = Lang:t('menu.action_menu.error.not_meet_min_requirement_to_hunt')
                 msg = string.format(msg, min_lvl_to_hunt)
                 QBCore.Functions.Notify(msg, 'error', 5000)

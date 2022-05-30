@@ -287,6 +287,9 @@ end
 local thirst_value_increase_per_tick = Config.core_items.waterbottle.settings.thirst_value_increase_per_tick
 function Update:thirst(petData, process_type)
     if petData == nil or process_type == nil then return end
+    if petData.info.thirst == nil then
+        petData.info.thirst = 0.0
+    end
     if petData.info.thirst >= 100.0 then
         if petData.info.health == 0 or petData.info.health <= 100 then
             petData.info.health = 0
