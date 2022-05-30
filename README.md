@@ -429,6 +429,9 @@ else if (
         callAge(itemData.info.age) +
         "</span></p><p><strong>Food: </strong><span>" +
         itemData.info.food +
+        "</span></p>" +
+        "</span></p><p><strong>Thirst: </strong><span>" +
+        itemData.info.thirst +
         "</span></p>"
     );
 }
