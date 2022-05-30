@@ -71,7 +71,11 @@ function initItem(source, item)
     if Config.Settings.let_players_cutomize_their_pet_after_purchase then
         local information = {
             pet_variation_list = PetVariation:getPedVariationsNameList(pet_information.model),
-            pet_information = pet_information
+            pet_information = pet_information,
+            disable = {
+                rename = false
+            },
+            type = 'init'
         }
         TriggerClientEvent('keep-companion:client:initialization_process', src, item, information)
     end
@@ -85,15 +89,45 @@ function find_pet_model_by_item_name(item_name)
     end
 end
 
-RegisterNetEvent('keep-companion:server:compelete_initialization_process', function(item)
+RegisterNetEvent('keep-companion:server:compelete_initialization_process', function(item, process_type)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     if not Player then return end
+    TriggerEvent('keep-companion:server:keep-companion:server:compelete_initialization_process_last_step', source, item, Player, process_type)
+    Player.Functions.RemoveItem(Config.core_items.groomingkit.item_name, 1)
+end)
+
+RegisterNetEvent('keep-companion:server:keep-companion:server:compelete_initialization_process_last_step', function(src, item, Player, process_type)
+    local petData = Pet:findbyhash(src, item.info.hash)
     local pet_information = find_pet_model_by_item_name(item.name)
     if not pet_information then return end
     local items = Player.Functions.GetItemsByName(item.name)
     if not items then return end
 
+    if process_type == Config.core_items.groomingkit.item_name then
+        if Player.PlayerData.charinfo.phone ~= petData.info.owner.phone then
+            TriggerClientEvent('QBCore:Notify', src, Lang:t('error.not_owner_of_pet'), 'error', 2500)
+            return
+        end
+        -- force data that we don't want to get by client side
+        item.info.age = petData.info.age
+        item.info.food = petData.info.food
+        item.info.thirst = petData.info.thirst
+        -- check owner
+        item.info.owner = Player.PlayerData.charinfo
+        item.info.level = petData.info.level
+        item.info.XP = petData.info.XP
+        item.info.health = petData.info.health
+    else
+        -- force data that we don't want to get by client side
+        item.info.age = 0
+        item.info.food = 100
+        item.info.thirst = 0
+        item.info.owner = Player.PlayerData.charinfo
+        item.info.level = 0
+        item.info.XP = 0
+        item.info.health = pet_information.maxHealth
+    end
     local sever_item = nil
     for key, value in pairs(items) do
         if value.info.hash == item.info.hash then
@@ -103,16 +137,12 @@ RegisterNetEvent('keep-companion:server:compelete_initialization_process', funct
     end
     if not sever_item then return end
 
-    -- force data that we don't want to get by client side
-    item.info.age = 0
-    item.info.food = 100
-    item.info.thirst = 0
-    item.info.owner = Player.PlayerData.charinfo
-    item.info.level = 0
-    item.info.XP = 0
-    item.info.health = pet_information.maxHealth
 
     initInfoHelper(Player, sever_item.slot, item.info)
+    if process_type == Config.core_items.groomingkit.item_name then
+        TriggerClientEvent('QBCore:Notify', src, Lang:t('success.successful_grooming'), 'success', 2500)
+        Pet:despawnPet(src, petData, true) -- despawn dead pet
+    end
 end)
 
 -- 1 --> 7 year old

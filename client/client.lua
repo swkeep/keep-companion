@@ -306,7 +306,7 @@ function request_healing_process(ped, item, process_type)
             TriggerServerEvent('keep-companion:server:revivePet', current_pet, process_type)
             TaskFollowTargetedPlayer(ped, plyID, false)
         end)
-    end, 'firstaidforpet')
+    end, Config.core_items.firstaid.item_name)
 end
 
 RegisterNetEvent('keep-companion:client:update_health_value', function(item, amount)

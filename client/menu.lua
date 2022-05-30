@@ -440,15 +440,32 @@ end)
 -- =======================================
 --           Customization menu
 -- =======================================
+RegisterNetEvent('keep-companion:client:start_grooming_process', function()
+    local activePed = ActivePed:read()
+    if type(activePed) ~= "table" then
+        QBCore.Functions.Notify(Lang:t('error.no_pet_under_control'), 'error', 5000)
+        return
+    end
+    TriggerServerEvent('keep-companion:server:grooming_process', activePed.itemData)
+end)
 
 RegisterNetEvent('keep-companion:client:initialization_process', function(item, pet_information)
     if type(item) ~= "table" then
         QBCore.Functions.Notify(Lang:t('error.failed_to_start_procces'), 'error', 5000)
         return
     end
-    TriggerEvent('keep-companion:client:openMenu_customization', {
-        item = item, pet_information = pet_information
-    })
+    if pet_information.type == 'init' then
+        TriggerEvent('keep-companion:client:openMenu_customization', {
+            item = item, pet_information = pet_information
+        })
+        return
+    end
+    QBCore.Functions.TriggerCallback("QBCore:HasItem", function(hasitem)
+        if not hasitem then QBCore.Functions.Notify('you need grooming kit', 'error', 5000) return end
+        TriggerEvent('keep-companion:client:openMenu_customization', {
+            item = item, pet_information = pet_information
+        })
+    end, Config.core_items.groomingkit.item_name)
 end)
 
 AddEventHandler('keep-companion:client:openMenu_customization', function(data)
@@ -575,6 +592,7 @@ function openMenu_customization(data)
             header = Lang:t('menu.customization_menu.btn_rename'),
             txt = Lang:t('menu.customization_menu.btn_txt_btn_rename') .. c_name,
             icon = 'fa-regular fa-keyboard',
+            disabled = data.pet_information.disable.rename,
             params = {
                 event = "keep-companion:client:openMenu_customization_rename",
                 args = {
@@ -701,5 +719,5 @@ function openMenu_customization_select_variation(data)
 end
 
 AddEventHandler('keep-companion:client:openMenu_customization:confirm', function(data)
-    TriggerServerEvent('keep-companion:server:compelete_initialization_process', data.item)
+    TriggerServerEvent('keep-companion:server:compelete_initialization_process', data.item, data.pet_information.type)
 end)

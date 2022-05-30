@@ -33,7 +33,8 @@ local Translations = {
         healing_was_successful = "Your pet healed for: %s maxHealth: %s",
         successful_revive = '%s your pet revived',
         successful_ownership_transfer = 'The transfer was successful. you can now give this pet to the new owner',
-        successful_drinking = 'drinking was successful wait a little bit to take effect'
+        successful_drinking = 'drinking was successful wait a little bit to take effect',
+        successful_grooming = 'grooming was successful',
     },
     info = {
         use_3th_eye = 'Use your 3th eye on your pet',

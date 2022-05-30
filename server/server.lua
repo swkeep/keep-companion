@@ -227,7 +227,22 @@ end)
 QBCore.Functions.CreateUseableItem(core_items.groomingkit.item_name, function(source, item)
     local Player = QBCore.Functions.GetPlayer(source)
     if Player == nil then return end
-    print('petgroomingkit')
+    TriggerClientEvent('keep-companion:client:start_grooming_process', source)
+end)
+
+RegisterNetEvent('keep-companion:server:grooming_process', function(item)
+    local pet_information = find_pet_model_by_item_name(item.name)
+
+    local information = {
+        pet_variation_list = PetVariation:getPedVariationsNameList(pet_information.model),
+        pet_information = pet_information,
+        disable = {
+            rename = true
+        },
+        type = Config.core_items.groomingkit.item_name
+    }
+
+    TriggerClientEvent('keep-companion:client:initialization_process', source, item, information)
 end)
 
 local function save_info_waterbottle(Player, item, amount)
