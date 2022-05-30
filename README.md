@@ -6,9 +6,10 @@
 
 - XP and leveling system
 - Food system
+- thirst sytem
 - Health system (heal and revive)
 - Auto naming (At first usage) & Renaming
-- Random pet variation
+- pet variation
 - Control pet's actions
 - Pet shop
 - Pet animation
@@ -17,13 +18,6 @@
 # WIP status:
 
 - Pls, note this project is a work in progress.
-
-- WIP features:
-
-1. XP calculation
-2. Food calculation
-3. Transfer ownership (not available right now)
-4. Combat XP calculation
 
 ## Usage
 
