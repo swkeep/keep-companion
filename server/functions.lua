@@ -93,18 +93,20 @@ RegisterNetEvent('keep-companion:server:compelete_initialization_process', funct
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     if not Player then return end
+
     TriggerEvent('keep-companion:server:keep-companion:server:compelete_initialization_process_last_step', source, item, Player, process_type)
+    if process_type == 'init' then return end
     Player.Functions.RemoveItem(Config.core_items.groomingkit.item_name, 1)
 end)
 
 RegisterNetEvent('keep-companion:server:keep-companion:server:compelete_initialization_process_last_step', function(src, item, Player, process_type)
-    local petData = Pet:findbyhash(src, item.info.hash)
     local pet_information = find_pet_model_by_item_name(item.name)
     if not pet_information then return end
     local items = Player.Functions.GetItemsByName(item.name)
     if not items then return end
 
     if process_type == Config.core_items.groomingkit.item_name then
+        local petData = Pet:findbyhash(src, item.info.hash)
         if Player.PlayerData.charinfo.phone ~= petData.info.owner.phone then
             TriggerClientEvent('QBCore:Notify', src, Lang:t('error.not_owner_of_pet'), 'error', 2500)
             return

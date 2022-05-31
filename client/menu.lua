@@ -479,7 +479,7 @@ end)
 local function rename(data)
     local inputData = exports['qb-input']:ShowInput(
         {
-            header = Lang:t('menu.customization_menu.rename.inputs'),
+            header = Lang:t('menu.customization_menu.rename.inputs.header'),
             submitText = Lang:t('menu.general_menu_items.confirm'),
             inputs = {
                 {
