@@ -421,6 +421,30 @@
             type = 'item',
             slot = 16
         },
+        [17] = {
+            name = 'keepcompanionrabbit',
+            price = 15000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 17
+        },
+        [18] = {
+            name = 'keepcompanionhen',
+            price = 5000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 18
+        },
+        [19] = {
+            name = 'keepcompanioncoyote',
+            price = 50000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 19
+        },
     }
 
 ```
