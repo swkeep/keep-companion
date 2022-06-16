@@ -99,6 +99,24 @@ Config.pets = {
         model = 'A_C_Husky',
         maxHealth = 350,
         distinct = 'yes dog'
+    },
+    [11] = {
+        name = 'keepcompanionhen',
+        model = 'A_C_Hen',
+        maxHealth = 350,
+        distinct = 'no hen'
+    },
+    [12] = {
+        name = 'keepcompanionrabbit',
+        model = 'A_C_Rabbit_01',
+        maxHealth = 350,
+        distinct = 'no rabbit'
+    },
+    [13] = {
+        name = 'keepcompanioncoyote',
+        model = 'A_C_Coyote',
+        maxHealth = 350,
+        distinct = 'no cat'
     }
 }
 

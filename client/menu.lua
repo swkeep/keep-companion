@@ -306,6 +306,10 @@ function get_correct_icon(model)
             for w in value.distinct:gmatch("%S+") do
                 if w == 'dog' then
                     return 'fa-solid fa-dog'
+                elseif w == 'rabbit' then
+                    return 'fa-solid fa-paw'
+                elseif w == 'hen' then
+                    return 'fa-solid fa-kiwi-bird'
                 end
             end
         end
@@ -316,8 +320,9 @@ end
 AddEventHandler('keep-companion:client:main_menu', function()
     local name = ActivePed.read().itemData.info.name
     local model = ActivePed.read().model
+    print('s')
     local icon = get_correct_icon(model)
-
+    print(icon)
     local header = string.format(Lang:t('menu.main_menu.header'), name)
     local sub_header = Lang:t('menu.main_menu.sub_header')
 

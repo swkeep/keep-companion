@@ -167,7 +167,63 @@ PetVariation = {
             drawableId = 0,
             textureId = 2
         }
-    }
+    },
+    ['A_C_Coyote'] = {
+        ['gray'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 0
+        },
+        ['lightGray'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 1
+        },
+        ['brown'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 2
+        },
+        ['lightBrown'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 3
+        },
+        ['darkBrown'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 3
+        },
+    },
+    ['A_C_Hen'] = {
+        ['brown'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 0
+        },
+    },
+    ['A_C_Rabbit_01'] = {
+        ['brown'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 0
+        },
+        ['DarkBrown'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 1
+        },
+        ['LightBrown'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 2
+        },
+        ['gray'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 3
+        },
+    },
 }
 
 --- set color/variation of peds
