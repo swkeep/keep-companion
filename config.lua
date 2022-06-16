@@ -154,3 +154,17 @@ Config.core_items = {
         }
     }
 }
+
+
+-- K9 Settings
+
+local illegal_items = {
+    'weed_brick',
+    'coke_small_brick',
+    'coke_brick'
+}
+
+Config.k9 = {
+    illegal_items = illegal_items,
+    indicator = true,
+}

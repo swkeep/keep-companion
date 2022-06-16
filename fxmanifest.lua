@@ -16,9 +16,11 @@ client_scripts {
      'client/functions.lua',
      'client/client.lua',
      'client/menu.lua',
-     'client/c_util.lua' }
+     'client/c_util.lua'
+}
 
 server_scripts {
+     '@oxmysql/lib/MySQL.lua',
      'server/functions.lua',
      'server/server.lua'
 }

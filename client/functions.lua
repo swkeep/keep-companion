@@ -303,6 +303,83 @@ function HuntandGrab(plyped, activePed)
     end
 end
 
+function get_player_cid()
+    local players = GetActivePlayers()
+
+    for _, player in pairs(players) do
+        if player == PlayerId() then
+            return _
+        end
+    end
+    return false
+end
+
+function SearchLogic(plyped, activePed)
+    if not PlayerJob then return end
+    if not (PlayerJob.name == 'police') then
+        QBCore.Functions.Notify('You are not allowed to do this action', "error", 1500)
+        return
+    end
+
+    if not PlayerJob.onduty == true then
+        QBCore.Functions.Notify('You Must be on duty to do this action', "error", 1500)
+        return
+    end
+
+    ClearPedTasks(ActivePed:read().entity)
+    local pedCoord = GetEntityCoords(PlayerPedId())
+    local closestPlayer = QBCore.Functions.GetClosestPlayer(pedCoord)
+    if closestPlayer == -1 then
+        return
+    end
+    local closestped = QBCore.Functions.GetClosestPed(pedCoord)
+    local finished = false
+    CreateThread(function()
+        while finished == false do
+            -- draw every frame
+            Wait(5)
+            local pedCoord = GetEntityCoords(closestped)
+
+            DrawMarker(2, pedCoord.x, pedCoord.y, pedCoord.z + 2, 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, 1.0, 1.0,
+                1.0, 255, 128, 0, 50, false, true, 2, nil, nil, false)
+        end
+    end)
+
+    Animator(activePed.entity, activePed.model, 'misc', {
+        animation = 'indicate_low',
+        sequentialTimings = {
+            -- How close the value is to the Timeout value determines how fast the script moves to the next animation.
+            [1] = 6, -- start animation Timeout ==> 1sec(6s-5s) to loop
+            [2] = 0, -- loop animation Timeout  ==> 6sec(6s-0s) to exit
+            [3] = 2, -- exit animation Timeout  ==> 4sec(6s-2s) to end
+            step = 1,
+            Timeout = 6
+        }
+    })
+
+    Wait(3000)
+
+    local player_server_id = GetPlayerServerId(closestPlayer[1])
+    QBCore.Functions.TriggerCallback('keep-companion:server:search_inventory', function(result)
+        if result then
+            SetAnimalMood(activePed.entity, 1)
+            PlayAnimalVocalization(activePed.entity, 3, 'bark')
+            Animator(activePed.entity, activePed.model, 'misc', {
+                animation = 'indicate_high',
+                sequentialTimings = {
+                    -- How close the value is to the Timeout value determines how fast the script moves to the next animation.
+                    [1] = 6, -- start animation Timeout ==> 1sec(6s-5s) to loop
+                    [2] = 0, -- loop animation Timeout  ==> 6sec(6s-0s) to exit
+                    [3] = 2, -- exit animation Timeout  ==> 4sec(6s-2s) to end
+                    step = 1,
+                    Timeout = 6
+                }
+            })
+        end
+        finished = true
+    end, player_server_id)
+end
+
 --- if player is inside a vehicle we need to relocate ped location so they won't sucide
 ---@param ped 'ped'
 function doSomethingIfPedIsInsideVehicle(ped)

@@ -1,10 +1,19 @@
 QBCore = exports['qb-core']:GetCoreObject()
-PlayerData = QBCore.Functions.GetPlayerData()
 
 local isMenuOpen = false
+PlayerData = nil
+PlayerJob = nil
+
 local alreadyHunting = {
     state = false
 }
+
+local function updatePlayerJob()
+    repeat
+        Wait(10)
+    until QBCore.Functions.GetPlayerData().job ~= nil
+    PlayerJob = QBCore.Functions.GetPlayerData().job
+end
 
 -- action menu
 local menu = {
@@ -90,8 +99,110 @@ local menu = {
         action = function(plyped, activePed)
             getIntoCar()
         end
+    },
+    [7] = {
+        lable = 'Search Person',
+        TYPE = 'SearchPerson',
+        action = function(plyped, activePed)
+            SearchLogic(plyped, activePed)
+        end
+    },
+    [8] = {
+        lable = 'Search Car',
+        TYPE = 'SearchCar',
+        action = function(plyped, activePed)
+            local vehicle = QBCore.Functions.GetClosestVehicle()
+            k9SearchVehicle(vehicle, activePed)
+        end
     }
 }
+
+-- function Draw3DText(x, y, z, text)
+--     local onScreen, _x, _y = World3dToScreen2d(x, y, z)
+--     local px, py, pz = table.unpack(GetGameplayCamCoords())
+
+--     if onScreen then
+--         SetTextScale(0.35, 0.35)
+--         SetTextFont(4)
+--         SetTextProportional(1)
+--         SetTextColour(255, 255, 255, 215)
+--         SetTextDropShadow(0, 0, 0, 55)
+--         SetTextEdge(0, 0, 0, 150)
+--         SetTextDropShadow()
+--         SetTextOutline()
+--         SetTextEntry("STRING")
+--         SetTextCentre(1)
+--         AddTextComponentString(text)
+--         DrawText(_x, _y)
+--     end
+-- end
+
+local coo = {
+    [1] = {
+        offset = vector4(-1.5, 0.0, 0.0, -90.0),
+    },
+    [2] = {
+        offset = vector4(0.0, -2.8, 0.0, 0.0),
+    },
+    -- [3] = {
+    --     offset = vector4(1.5, 0.0, 0.0, -270.0),
+    -- },
+}
+function k9SearchVehicle(veh, activePed)
+    if not PlayerJob then return end
+    if not (PlayerJob.name == 'police') then
+        QBCore.Functions.Notify('You are not allowed to do this action', "error", 1500)
+        return
+    end
+
+    if not PlayerJob.onduty == true then
+        QBCore.Functions.Notify('You Must be on duty to do this action', "error", 1500)
+        return
+    end
+
+    for key, value in pairs(coo) do
+        local vehHead = GetEntityHeading(veh)
+        local plate = GetVehicleNumberPlateText(veh)
+        local pos = GetOffsetFromEntityInWorldCoords(veh, value.offset.x, value.offset.y, value.offset.z)
+        TaskFollowNavMeshToCoord(activePed.entity, pos, 3.0, -1, 0.0, true, 0)
+        Wait(4000)
+        TaskAchieveHeading(activePed.entity, vehHead + value.offset.w, -1)
+        Wait(2000)
+        QBCore.Functions.TriggerCallback('keep-companion:server:search_vehicle', function(result)
+            if result then
+                SetAnimalMood(activePed.entity, 1)
+                PlayAnimalVocalization(activePed.entity, 3, 'bark')
+                Animator(activePed.entity, activePed.model, 'misc', {
+                    animation = 'indicate_high',
+                    sequentialTimings = {
+                        -- How close the value is to the Timeout value determines how fast the script moves to the next animation.
+                        [1] = 6, -- start animation Timeout ==> 1sec(6s-5s) to loop
+                        [2] = 0, -- loop animation Timeout  ==> 6sec(6s-0s) to exit
+                        [3] = 2, -- exit animation Timeout  ==> 4sec(6s-2s) to end
+                        step = 1,
+                        Timeout = 6
+                    }
+                })
+                return
+            end
+            Animator(activePed.entity, activePed.model, 'siting', {
+                animation = 'sit',
+                sequentialTimings = {
+                    -- How close the value is to the Timeout value determines how fast the script moves to the next animation.
+                    [1] = 6, -- start animation Timeout ==> 1sec(6s-5s) to loop
+                    [2] = 0, -- loop animation Timeout  ==> 6sec(6s-0s) to exit
+                    [3] = 2, -- exit animation Timeout  ==> 4sec(6s-2s) to end
+                    step = 1,
+                    Timeout = 6
+                }
+            })
+        end, {
+            key = key,
+            plate = plate
+        })
+        Wait(3000)
+    end
+end
 
 function k9EnterVehicle(k9, veh)
     local vehCoords = GetEntityCoords(veh)
@@ -104,14 +215,17 @@ function k9EnterVehicle(k9, veh)
     TaskAchieveHeading(k, GetEntityHeading(veh), -1)
     RequestAnimDict("creatures@rottweiler@in_vehicle@van", true)
     RequestAnimDict("creatures@rottweiler@amb@world_dog_sitting@base", true)
-    while not HasAnimDictLoaded("creatures@rottweiler@in_vehicle@van") or not HasAnimDictLoaded("creatures@rottweiler@amb@world_dog_sitting@base") do
+    while not HasAnimDictLoaded("creatures@rottweiler@in_vehicle@van") or
+        not HasAnimDictLoaded("creatures@rottweiler@amb@world_dog_sitting@base") do
         Citizen.Wait(0)
     end
     TaskPlayAnim(k9, "creatures@rottweiler@in_vehicle@van", "get_in", 8.0, -4.0, -1, 2, 0.0, false, false, false)
     Wait(1100)
     ClearPedTasks(k9)
-    AttachEntityToEntity(k9, veh, GetEntityBoneIndexByName(veh, "chassis"), 0.0, -0.8, 0.6, 0.0, 0.0, 0.0, false, false, false, false, 0, true)
-    TaskPlayAnim(k9, "creatures@rottweiler@amb@world_dog_sitting@base", "base", 8.0, -4.0, -1, 1, 0.0, false, false, false)
+    AttachEntityToEntity(k9, veh, GetEntityBoneIndexByName(veh, "chassis"), 0.0, -0.8, 0.6, 0.0, 0.0, 0.0, false, false,
+        false, false, 0, true)
+    TaskPlayAnim(k9, "creatures@rottweiler@amb@world_dog_sitting@base", "base", 8.0, -4.0, -1, 1, 0.0, false, false,
+        false)
     Wait(500)
     SetVehicleDoorShut(veh, 5, false)
 end
@@ -408,7 +522,7 @@ AddEventHandler('keep-companion:client:switchControl_event', function(option)
 end)
 
 local function IsPoliceOrEMS()
-    return (PlayerData.job.name == "police" or PlayerData.job.name == "ambulance")
+    return (PlayerJob.name == "police" or PlayerJob.name == "ambulance")
 end
 
 local function IsDowned()
@@ -421,13 +535,16 @@ end
 
 RegisterKeyMapping('+showMenu', 'show pet menu', 'keyboard', Config.Settings.petMenuKeybind)
 RegisterCommand('+showMenu', function()
-    if ((IsDowned() and IsPoliceOrEMS()) or not IsDowned()) and not Ishandcuffed() and not IsPauseMenuActive() and not isMenuOpen then
+    updatePlayerJob()
+    if ((IsDowned() and IsPoliceOrEMS()) or not IsDowned()) and not Ishandcuffed() and not IsPauseMenuActive() and
+        not isMenuOpen then
         local doesPlayerHavePet = ActivePed:read()
 
         if doesPlayerHavePet == nil then
             QBCore.Functions.Notify(Lang:t('error.no_pet_under_control'), 'error', 5000)
             return
         end
+
         TriggerEvent('keep-companion:client:main_menu')
     end
 end, false)

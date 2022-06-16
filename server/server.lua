@@ -53,7 +53,8 @@ function Pet:spawnPet(source, model, item)
 
     local limit = Pet:isMaxLimitPedReached(source)
     if limit == true then
-        TriggerClientEvent('QBCore:Notify', source, string.format(Lang:t('error.reached_max_allowed_pet'), maxLimit), 'error', 2500)
+        TriggerClientEvent('QBCore:Notify', source, string.format(Lang:t('error.reached_max_allowed_pet'), maxLimit),
+            'error', 2500)
         return
     end
 
@@ -247,7 +248,7 @@ end)
 
 local function save_info_waterbottle(Player, item, amount)
     if Player.PlayerData.items[item.slot] then
-        if type(Player.PlayerData.items[item.slot].info) ~= 'table' then
+        if Player.PlayerData.items[item.slot].info == nil or type(Player.PlayerData.items[item.slot].info) ~= 'table' then
             Player.PlayerData.items[item.slot].info = {}
         end
         Player.PlayerData.items[item.slot].info.liter = amount
@@ -269,7 +270,8 @@ local function fillwater_bottle(source, item)
         elseif item.info.liter == max_c then
             amount = max_c
 
-            TriggerClientEvent('QBCore:Notify', source, 'filling already filled bottle has no effect on capacity', 'error', 2500)
+            TriggerClientEvent('QBCore:Notify', source, 'filling already filled bottle has no effect on capacity',
+                'error', 2500)
         else
             amount = item.info.liter + water_bottle_refill_value
             if amount >= max_c then
@@ -307,15 +309,19 @@ QBCore.Functions.CreateCallback('keep-companion:server:decrease_thirst', functio
 
     if pet_water_bottle.info == nil then
         TriggerClientEvent('QBCore:Notify', source, 'You should wash water bottle first!', 'error', 2500)
+        print('issue with nill info: https://github.com/swkeep/keep-companion/issues/25')
         return
     end
 
     if pet_water_bottle.info.liter == nil then
         TriggerClientEvent('QBCore:Notify', source, 'You should wash water bottle first!', 'error', 2500)
+        print('maybe use your water bottle when there is some water_bottle s in your inventory')
+        print('developer: issue with nill info -> liter: https://github.com/swkeep/keep-companion/issues/25')
         return
     end
 
-    pet_water_bottle.info.liter = pet_water_bottle.info.liter - Config.core_items.waterbottle.settings.water_bottle_refill_value
+    pet_water_bottle.info.liter = pet_water_bottle.info.liter -
+        Config.core_items.waterbottle.settings.water_bottle_refill_value
     if pet_water_bottle.info.liter < 0 then
         TriggerClientEvent('QBCore:Notify', source, Lang:t('error.not_enough_water_in_your_bottle'), 'error', 2500)
         return
@@ -408,7 +414,8 @@ for key, value in pairs(Config.pets) do
         if type(item.info) ~= "table" or (type(item.info) == "table" and item.info.hash == nil) then
             -- init companion
             initItem(source, item)
-            TriggerClientEvent('QBCore:Notify', source, Lang:t('success.pet_initialization_was_successful'), 'success', 2500)
+            TriggerClientEvent('QBCore:Notify', source, Lang:t('success.pet_initialization_was_successful'), 'success',
+                2500)
             return
         end
 
@@ -424,6 +431,62 @@ for key, value in pairs(Config.pets) do
     end)
 end
 
+local function search_inventory(cid)
+    local Player = QBCore.Functions.GetPlayer(cid)
+    if not Player then return false end
+    local count = 0
+    for k, illegal_item in pairs(Config.k9.illegal_items) do
+        local item = Player.Functions.GetItemByName(illegal_item)
+        if item then
+            count = count + 1
+            if count > 0 then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+QBCore.Functions.CreateCallback('keep-companion:server:search_inventory', function(source, cb, cid)
+    local res = search_inventory(cid)
+    if not res then
+        TriggerClientEvent('QBCore:Notify', source, 'K9 could not find anything!', 'error', 2500)
+        cb(res)
+        return
+    end
+    -- TriggerClientEvent('QBCore:Notify', source, 'K9 found something', 'success', 2500)
+    cb(res)
+end)
+
+local function search_vehicle(Type, plate)
+    local items_list = nil
+    if Type == 1 then
+        items_list = MySQL.Sync.fetchAll('SELECT * FROM gloveboxitems WHERE plate = ?', { plate })
+    elseif Type == 2 then
+        items_list = MySQL.Sync.fetchAll('SELECT * FROM trunkitems WHERE plate = ?', { plate })
+    end
+    local items = json.decode(items_list[1].items)
+    local illegal_items = Config.k9.illegal_items
+    for key, item in pairs(items) do
+        for k, i_name in pairs(illegal_items) do
+            if item.name == i_name then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+QBCore.Functions.CreateCallback('keep-companion:server:search_vehicle', function(source, cb, data)
+    local res = search_vehicle(data.key, data.plate)
+    if not res then
+        TriggerClientEvent('QBCore:Notify', source, 'K9 could not find anything!', 'error', 2500)
+        cb(res)
+        return
+    end
+    TriggerClientEvent('QBCore:Notify', source, 'K9 found something', 'success', 2500)
+    cb(res)
+end)
 -- ================================================
 --          Item - Updating Information
 -- ================================================
