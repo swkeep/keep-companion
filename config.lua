@@ -185,4 +185,8 @@ local illegal_items = {
 Config.k9 = {
     illegal_items = illegal_items,
     indicator = true,
+    models = {
+        'A_C_Rottweiler',
+        'A_C_shepherd'
+    }
 }

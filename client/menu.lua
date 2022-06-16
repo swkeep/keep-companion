@@ -15,6 +15,15 @@ local function updatePlayerJob()
     PlayerJob = QBCore.Functions.GetPlayerData().job
 end
 
+local function isModelK9(model)
+    for key, k9 in pairs(Config.k9.models) do
+        if model == k9 then
+            return true
+        end
+    end
+    return false
+end
+
 -- action menu
 local menu = {
     [1] = {
@@ -110,6 +119,11 @@ local menu = {
     [8] = {
         lable = 'Search Car',
         TYPE = 'SearchCar',
+        show = function(activePed)
+            if not PlayerJob then return false end
+            if not (PlayerJob.name == 'police') then return false end
+            return isModelK9(activePed.model)
+        end,
         action = function(plyped, activePed)
             local vehicle = QBCore.Functions.GetClosestVehicle()
             k9SearchVehicle(vehicle, activePed)
@@ -148,7 +162,12 @@ local coo = {
     --     offset = vector4(1.5, 0.0, 0.0, -270.0),
     -- },
 }
+
 function k9SearchVehicle(veh, activePed)
+    if not isModelK9(activePed.model) then
+        QBCore.Functions.Notify('This pet can not do that!', "error", 1500)
+        return
+    end
     if not PlayerJob then return end
     if not (PlayerJob.name == 'police') then
         QBCore.Functions.Notify('You are not allowed to do this action', "error", 1500)
@@ -320,9 +339,7 @@ end
 AddEventHandler('keep-companion:client:main_menu', function()
     local name = ActivePed.read().itemData.info.name
     local model = ActivePed.read().model
-    print('s')
     local icon = get_correct_icon(model)
-    print(icon)
     local header = string.format(Lang:t('menu.main_menu.header'), name)
     local sub_header = Lang:t('menu.main_menu.sub_header')
 
@@ -382,6 +399,11 @@ AddEventHandler('keep-companion:client:action_menu', function()
     }
 
     for key, value in pairs(menu) do
+        if value.show then
+            if not value.show(ActivePed.read()) then
+                goto here
+            end
+        end
         openMenu[#openMenu + 1] = {
             header = value.lable,
             icon = 'fa-solid fa-' .. key,
@@ -394,6 +416,7 @@ AddEventHandler('keep-companion:client:action_menu', function()
                 }
             }
         }
+        ::here::
     end
 
     openMenu[#openMenu + 1] = {
