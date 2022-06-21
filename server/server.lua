@@ -490,7 +490,7 @@ local function search_vehicle(Type, plate)
     elseif Type == 2 then
         items_list = MySQL.Sync.fetchAll('SELECT * FROM trunkitems WHERE plate = ?', { plate })
     end
-    if items_list then
+    if items_list and items_list[1] and items_list[1].items then
         local items = json.decode(items_list[1].items)
         local illegal_items = Config.k9.illegal_items
         for key, item in pairs(items) do
