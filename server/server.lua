@@ -479,21 +479,21 @@ QBCore.Functions.CreateCallback('keep-companion:server:search_inventory', functi
         cb(res)
         return
     end
-    -- TriggerClientEvent('QBCore:Notify', source, 'K9 found something', 'success', 2500)
     cb(res)
 end)
 
 local function search_vehicle(Type, plate)
+    local illegal_items = Config.k9.illegal_items
     local items_list = nil
+
     if Type == 1 then
-        items_list = MySQL.Sync.fetchAll('SELECT * FROM gloveboxitems WHERE plate = ?', { plate })
+        items_list = exports[Config.inventory_name]:getGloveboxes(plate)
     elseif Type == 2 then
-        items_list = MySQL.Sync.fetchAll('SELECT * FROM trunkitems WHERE plate = ?', { plate })
+        items_list = exports[Config.inventory_name]:getTruck(plate)
     end
-    if items_list and items_list[1] and items_list[1].items then
-        local items = json.decode(items_list[1].items)
-        local illegal_items = Config.k9.illegal_items
-        for key, item in pairs(items) do
+
+    if items_list then
+        for key, item in pairs(items_list.items) do
             for k, i_name in pairs(illegal_items) do
                 if item.name == i_name then
                     return true

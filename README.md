@@ -558,3 +558,18 @@ function currentLvlExp(xp) {
   }
 }
 ```
+
+#K9
+
+- important steps for k9 to work
+- first open you inventory script qb-inventory/server/main.lua
+- find this event
+
+```lua
+RegisterNetEvent('inventory:server:SetIsOpenState')
+```
+
+- add code below after or before this event (not inside it!)
+  ![shop](https://raw.githubusercontent.com/swkeep/keep-companion/main/.github/images/new_k9_patch.PNG)
+
+- then go to script confing file find Config.inventory_name and change it to your inventory's name

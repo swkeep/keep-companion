@@ -175,7 +175,7 @@ Config.core_items = {
 
 
 -- K9 Settings
-
+Config.inventory_name = 'qb-inventory'
 local illegal_items = {
     'weed_brick',
     'coke_small_brick',
@@ -184,7 +184,6 @@ local illegal_items = {
 
 Config.k9 = {
     illegal_items = illegal_items,
-    indicator = true,
     models = {
         'A_C_Rottweiler',
         'A_C_shepherd'
