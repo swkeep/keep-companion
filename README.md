@@ -486,7 +486,7 @@ else if (
     itemData.name == "keepcompanionwesty" ||
     itemData.name == "keepcompanioncoyote" ||
     itemData.name == "keepcompanionrabbit" ||
-    itemData.name == "keepcompanionhen" ||
+    itemData.name == "keepcompanionhen"
 ) {
     let gender = itemData.info.gender;
     gender ? (gender = "male") : (gender = "female");
