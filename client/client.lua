@@ -269,44 +269,43 @@ AddEventHandler('keep-companion:client:callCompanion', function(modelName, hosti
 end)
 
 function request_healing_process(ped, item, process_type)
-    QBCore.Functions.TriggerCallback("QBCore:HasItem", function(hasitem)
-        if not hasitem then QBCore.Functions.Notify(Lang:t('error.not_enough_first_aid'), 'error', 5000) return end
+    local hasitem = QBCore.Functions.HasItem(Config.core_items.firstaid.item_name)
+    if not hasitem then QBCore.Functions.Notify(Lang:t('error.not_enough_first_aid'), 'error', 5000) return end
 
-        local plyID = PlayerPedId()
-        local timeout = Config.core_items.firstaid.settings.duration
-        local current_pet = ActivePed.data[ActivePed:findByHash(item.info.hash)]
+    local plyID = PlayerPedId()
+    local timeout = Config.core_items.firstaid.settings.duration
+    local current_pet = ActivePed.data[ActivePed:findByHash(item.info.hash)]
 
-        if process_type == 'Heal' then
-            timeout = timeout * math.floor(Config.core_items.firstaid.settings.healing_duration_multiplier)
-            makeEntityFaceEntity(ped, plyID) -- pet face owner
-            TaskPause(ped, 5000)
-        else
-            timeout = timeout * math.floor(Config.core_items.firstaid.settings.revive_duration_multiplier)
-        end
-        makeEntityFaceEntity(plyID, ped) -- owner face pet
+    if process_type == 'Heal' then
+        timeout = timeout * math.floor(Config.core_items.firstaid.settings.healing_duration_multiplier)
+        makeEntityFaceEntity(ped, plyID) -- pet face owner
+        TaskPause(ped, 5000)
+    else
+        timeout = timeout * math.floor(Config.core_items.firstaid.settings.revive_duration_multiplier)
+    end
+    makeEntityFaceEntity(plyID, ped) -- owner face pet
 
-        Animator(plyID, "PLAYER", 'revive', {
-            animation = 'tendtodead',
-            sequentialTimings = {
-                [1] = timeout,
-                [2] = 0,
-                [3] = 0,
-                step = 1,
-                Timeout = timeout
-            }
-        })
-        -- firstaidforpet
-        CoreName.Functions.Progressbar("reviveing", "Reviveing",
-            timeout * 1000, false, false, {
-                disableMovement = true,
-                disableCarMovement = true,
-                disableMouse = false,
-                disableCombat = true
-            }, {}, {}, {}, function()
-            TriggerServerEvent('keep-companion:server:revivePet', current_pet, process_type)
-            TaskFollowTargetedPlayer(ped, plyID, false)
-        end)
-    end, Config.core_items.firstaid.item_name)
+    Animator(plyID, "PLAYER", 'revive', {
+        animation = 'tendtodead',
+        sequentialTimings = {
+            [1] = timeout,
+            [2] = 0,
+            [3] = 0,
+            step = 1,
+            Timeout = timeout
+        }
+    })
+    -- firstaidforpet
+    CoreName.Functions.Progressbar("reviveing", "Reviveing",
+        timeout * 1000, false, false, {
+            disableMovement = true,
+            disableCarMovement = true,
+            disableMouse = false,
+            disableCombat = true
+        }, {}, {}, {}, function()
+        TriggerServerEvent('keep-companion:server:revivePet', current_pet, process_type)
+        TaskFollowTargetedPlayer(ped, plyID, false)
+    end)
 end
 
 RegisterNetEvent('keep-companion:client:update_health_value', function(item, amount)
@@ -379,7 +378,8 @@ function creatActivePetThread(ped, item)
 
             -- update health
             local currentHealth = GetEntityHealth(savedData.entity)
-            if IsPedDeadOrDying(savedData.entity) == false and savedData.maxHealth ~= currentHealth and savedData.health ~=
+            if IsPedDeadOrDying(savedData.entity) == false and savedData.maxHealth ~= currentHealth and
+                savedData.health ~=
                 currentHealth then
                 -- ped is still alive
                 TriggerServerEvent('keep-companion:server:updateAllowedInfo', {
@@ -477,12 +477,13 @@ RegisterNetEvent('keep-companion:client:start_feeding_animation', function()
         return
     end
 
-    CoreName.Functions.Progressbar("feeding", "Feeding", Config.core_items.food.settings.duration * 1000, false, false, {
-        disableMovement = false,
-        disableCarMovement = false,
-        disableMouse = false,
-        disableCombat = false
-    }, {}, {}, {}, function()
+    CoreName.Functions.Progressbar("feeding", "Feeding", Config.core_items.food.settings.duration * 1000, false, false,
+        {
+            disableMovement = false,
+            disableCarMovement = false,
+            disableMouse = false,
+            disableCombat = false
+        }, {}, {}, {}, function()
         TriggerServerEvent('keep-companion:server:increaseFood', current_pet.itemData)
     end)
 end)
@@ -505,12 +506,13 @@ function start_drinking_animation()
         return
     end
 
-    CoreName.Functions.Progressbar("pet_drinking", "drinking", Config.core_items.waterbottle.settings.duration * 1000, false, false, {
-        disableMovement = false,
-        disableCarMovement = false,
-        disableMouse = false,
-        disableCombat = false
-    }, {}, {}, {}, function()
+    CoreName.Functions.Progressbar("pet_drinking", "drinking", Config.core_items.waterbottle.settings.duration * 1000,
+        false, false, {
+            disableMovement = false,
+            disableCarMovement = false,
+            disableMouse = false,
+            disableCombat = false
+        }, {}, {}, {}, function()
         QBCore.Functions.TriggerCallback('keep-companion:server:decrease_thirst', function(result)
 
         end, current_pet.itemData)
@@ -518,12 +520,13 @@ function start_drinking_animation()
 end
 
 RegisterNetEvent('keep-companion:client:filling_animation', function(item)
-    CoreName.Functions.Progressbar("filling_animation", "filling bottle", Config.core_items.waterbottle.settings.duration * 1000, false, false, {
-        disableMovement = false,
-        disableCarMovement = false,
-        disableMouse = false,
-        disableCombat = false
-    }, {}, {}, {}, function()
+    CoreName.Functions.Progressbar("filling_animation", "filling bottle",
+        Config.core_items.waterbottle.settings.duration * 1000, false, false, {
+            disableMovement = false,
+            disableCarMovement = false,
+            disableMouse = false,
+            disableCombat = false
+        }, {}, {}, {}, function()
         TriggerServerEvent('keep-companion:server:filling_event', item)
     end)
 end)

@@ -585,12 +585,12 @@ RegisterNetEvent('keep-companion:client:initialization_process', function(item, 
         })
         return
     end
-    QBCore.Functions.TriggerCallback("QBCore:HasItem", function(hasitem)
-        if not hasitem then QBCore.Functions.Notify('you need grooming kit', 'error', 5000) return end
-        TriggerEvent('keep-companion:client:openMenu_customization', {
-            item = item, pet_information = pet_information
-        })
-    end, Config.core_items.groomingkit.item_name)
+    local hasitem = QBCore.Functions.HasItem(Config.core_items.groomingkit.item_name)
+
+    if not hasitem then QBCore.Functions.Notify('you need grooming kit', 'error', 5000) return end
+    TriggerEvent('keep-companion:client:openMenu_customization', {
+        item = item, pet_information = pet_information
+    })
 end)
 
 AddEventHandler('keep-companion:client:openMenu_customization', function(data)
