@@ -15,15 +15,15 @@ function NameGenerator(type, gender)
             "Loki", "Moose", "George", "Samson", "Coco", "Benny", "Thor", "Rufus", "Prince", "Chester", "Brutus",
             "Scooter", "Chico", "Spike", "Gunner", "Sparky", "Mickey", "Kobe", "Chase", "Oreo", "Frankie", "Mac",
             "Benji", "Bubba", "Champ", "Brady", "Elvis", "Copper", "Cash", "Archie", "Walter" },
-        { "Bella", "Lucy", "Daisy", "Molly", "Lola", "Sophie", "Sadie", "Maggie", "Chloe", "Bailey", "Roxy",
-            "Zoey", "Lily", "Luna", "Coco", "Stella", "Gracie", "Abby", "Penny", "Zoe", "Ginger", "Ruby", "Rosie",
-            "Lilly", "Ellie", "Mia", "Sasha", "Lulu", "Pepper", "Nala", "Lexi", "Lady", "Emma", "Riley", "Dixie",
-            "Annie", "Maddie", "Piper", "Princess", "Izzy", "Maya", "Olive", "Cookie", "Roxie", "Angel", "Belle",
-            "Layla", "Missy", "Cali", "Honey", "Millie", "Harley", "Marley", "Holly", "Kona", "Shelby", "Jasmine",
-            "Ella", "Charlie", "Minnie", "Willow", "Phoebe", "Callie", "Scout", "Katie", "Dakota", "Sugar", "Sandy",
-            "Josie", "Macy", "Trixie", "Winnie", "Peanut", "Mimi", "Hazel", "Mocha", "Cleo", "Hannah", "Athena",
-            "Lacey", "Sassy", "Lucky", "Bonnie", "Allie", "Brandy", "Sydney", "Casey", "Gigi", "Baby", "Madison",
-            "Heidi", "Sally", "Shadow", "Cocoa", "Pebbles", "Misty", "Nikki", "Lexie", "Grace", "Sierra" } }
+            { "Bella", "Lucy", "Daisy", "Molly", "Lola", "Sophie", "Sadie", "Maggie", "Chloe", "Bailey", "Roxy",
+                "Zoey", "Lily", "Luna", "Coco", "Stella", "Gracie", "Abby", "Penny", "Zoe", "Ginger", "Ruby", "Rosie",
+                "Lilly", "Ellie", "Mia", "Sasha", "Lulu", "Pepper", "Nala", "Lexi", "Lady", "Emma", "Riley", "Dixie",
+                "Annie", "Maddie", "Piper", "Princess", "Izzy", "Maya", "Olive", "Cookie", "Roxie", "Angel", "Belle",
+                "Layla", "Missy", "Cali", "Honey", "Millie", "Harley", "Marley", "Holly", "Kona", "Shelby", "Jasmine",
+                "Ella", "Charlie", "Minnie", "Willow", "Phoebe", "Callie", "Scout", "Katie", "Dakota", "Sugar", "Sandy",
+                "Josie", "Macy", "Trixie", "Winnie", "Peanut", "Mimi", "Hazel", "Mocha", "Cleo", "Hannah", "Athena",
+                "Lacey", "Sassy", "Lucky", "Bonnie", "Allie", "Brandy", "Sydney", "Casey", "Gigi", "Baby", "Madison",
+                "Heidi", "Sally", "Shadow", "Cocoa", "Pebbles", "Misty", "Nikki", "Lexie", "Grace", "Sierra" } }
     }
     local size = #names[type][gender]
     return names[type][gender][math.random(1, size)]
@@ -48,7 +48,8 @@ function initItem(source, item)
     local maxHealth = 200
     item.info = {}
 
-    item.info.hash = tostring(QBCore.Shared.RandomInt(2) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(1) ..
+    item.info.hash = tostring(QBCore.Shared.RandomInt(2) ..
+        QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(1) ..
         QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(4))
     item.info.name = NameGenerator('dog', random)
     item.info.gender = gender[random]
@@ -94,58 +95,60 @@ RegisterNetEvent('keep-companion:server:compelete_initialization_process', funct
     local Player = QBCore.Functions.GetPlayer(src)
     if not Player then return end
 
-    TriggerEvent('keep-companion:server:keep-companion:server:compelete_initialization_process_last_step', source, item, Player, process_type)
+    TriggerEvent('keep-companion:server:keep-companion:server:compelete_initialization_process_last_step', source, item,
+        Player, process_type)
     if process_type == 'init' then return end
     Player.Functions.RemoveItem(Config.core_items.groomingkit.item_name, 1)
 end)
 
-RegisterNetEvent('keep-companion:server:keep-companion:server:compelete_initialization_process_last_step', function(src, item, Player, process_type)
-    local pet_information = find_pet_model_by_item_name(item.name)
-    if not pet_information then return end
-    local items = Player.Functions.GetItemsByName(item.name)
-    if not items then return end
+RegisterNetEvent('keep-companion:server:keep-companion:server:compelete_initialization_process_last_step',
+    function(src, item, Player, process_type)
+        local pet_information = find_pet_model_by_item_name(item.name)
+        if not pet_information then return end
+        local items = Player.Functions.GetItemsByName(item.name)
+        if not items then return end
 
-    if process_type == Config.core_items.groomingkit.item_name then
-        local petData = Pet:findbyhash(src, item.info.hash)
-        if Player.PlayerData.charinfo.phone ~= petData.info.owner.phone then
-            TriggerClientEvent('QBCore:Notify', src, Lang:t('error.not_owner_of_pet'), 'error', 2500)
-            return
+        if process_type == Config.core_items.groomingkit.item_name then
+            local petData = Pet:findbyhash(src, item.info.hash)
+            if Player.PlayerData.charinfo.phone ~= petData.info.owner.phone then
+                TriggerClientEvent('QBCore:Notify', src, Lang:t('error.not_owner_of_pet'), 'error', 2500)
+                return
+            end
+            -- force data that we don't want to get by client side
+            item.info.age = petData.info.age
+            item.info.food = petData.info.food
+            item.info.thirst = petData.info.thirst
+            -- check owner
+            item.info.owner = Player.PlayerData.charinfo
+            item.info.level = petData.info.level
+            item.info.XP = petData.info.XP
+            item.info.health = petData.info.health
+        else
+            -- force data that we don't want to get by client side
+            item.info.age = 0
+            item.info.food = 100
+            item.info.thirst = 0
+            item.info.owner = Player.PlayerData.charinfo
+            item.info.level = 0
+            item.info.XP = 0
+            item.info.health = pet_information.maxHealth
         end
-        -- force data that we don't want to get by client side
-        item.info.age = petData.info.age
-        item.info.food = petData.info.food
-        item.info.thirst = petData.info.thirst
-        -- check owner
-        item.info.owner = Player.PlayerData.charinfo
-        item.info.level = petData.info.level
-        item.info.XP = petData.info.XP
-        item.info.health = petData.info.health
-    else
-        -- force data that we don't want to get by client side
-        item.info.age = 0
-        item.info.food = 100
-        item.info.thirst = 0
-        item.info.owner = Player.PlayerData.charinfo
-        item.info.level = 0
-        item.info.XP = 0
-        item.info.health = pet_information.maxHealth
-    end
-    local sever_item = nil
-    for key, value in pairs(items) do
-        if value.info.hash == item.info.hash then
-            sever_item = value
-            break
+        local sever_item = nil
+        for key, value in pairs(items) do
+            if value.info.hash == item.info.hash then
+                sever_item = value
+                break
+            end
         end
-    end
-    if not sever_item then return end
+        if not sever_item then return end
 
 
-    initInfoHelper(Player, sever_item.slot, item.info)
-    if process_type == Config.core_items.groomingkit.item_name then
-        TriggerClientEvent('QBCore:Notify', src, Lang:t('success.successful_grooming'), 'success', 2500)
-        Pet:despawnPet(src, petData, true) -- despawn dead pet
-    end
-end)
+        initInfoHelper(Player, sever_item.slot, item.info)
+        if process_type == Config.core_items.groomingkit.item_name then
+            TriggerClientEvent('QBCore:Notify', src, Lang:t('success.successful_grooming'), 'success', 2500)
+            Pet:despawnPet(src, item, true) -- despawn dead pet
+        end
+    end)
 
 -- 1 --> 7 year old
 CalorieCalData = {
@@ -257,38 +260,6 @@ end
 
 function Update:food(petData, process_type)
     if petData == nil or process_type == nil then return end
-    -- if process_type == 'increase' then
-    --     local weight = CalorieCalData:convertWeightToLbs(requestedItem.weight)
-    --     local RER = CalorieCalData:calRER(weight, 'dog') -- maxCalories
-    --     local overEat = 0
-
-    --     overEat = Config.weightIncreaseByOverEat
-    --     local currentEstimatedFoodValue = requestedItem.info.food + CalorieCalData:convertWeightToLbs(data.amount)
-    --     if currentEstimatedFoodValue > RER then
-    --         mData = {
-    --             key = data.key,
-    --             content = RER * (Config.foodOverEat / 100)
-    --         }
-    --         overEat = RER - (RER * (Config.foodOverEat / 100))
-    --         if Player.PlayerData.items[item.slot] then
-    --             Player.PlayerData.items[item.slot].weight = Player.PlayerData.items[item.slot].weight +
-    --                 (overEat * (Config.weightIncreaseByOverEat / 100))
-    --         end
-    --         Player.Functions.SetInventory(Player.PlayerData.items, true)
-    --     elseif currentEstimatedFoodValue < RER and currentEstimatedFoodValue >= 0 then
-    --         mData = {
-    --             key = data.key,
-    --             content = requestedItem.info.food + (data.amount * (Config.foodOverEat / 100))
-    --         }
-    --     else
-    --         mData = {
-    --             key = data.key,
-    --             content = 500
-    --         }
-    --     end
-    --     TriggerClientEvent('QBCore:Notify', source, "Pet food value increased too: " .. mData.content)
-    --     return
-    -- end
     if petData.info.food == 0 then
         if petData.info.health == 0 or petData.info.health <= 100 then
             -- force kill pet
@@ -300,12 +271,6 @@ function Update:food(petData, process_type)
     end
 
     if petData.info.food > 0 then
-        -- value reached zore or negetive value
-        -- local weight = CalorieCalData:convertWeightToLbs(requestedItem.weight)
-        -- local RER = CalorieCalData:calRER(weight, 'dog') -- maxCalories
-        -- -- step calculation ==> (1min / timeIterval) * foodCycle
-        -- local step = math.floor(RER / ((60 / Config.DataUpdateInterval) * Config.foodCycleEnd))
-
         petData.info.food = petData.info.food - 1
 
         -- make sure food value not negative
