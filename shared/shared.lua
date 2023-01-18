@@ -224,6 +224,13 @@ PetVariation = {
             textureId = 3
         },
     },
+    ['A_C_Rat'] = {
+        ['normal'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 0
+        },
+    },
 }
 
 --- set color/variation of peds

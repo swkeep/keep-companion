@@ -117,7 +117,13 @@ Config.pets = {
         model = 'A_C_Coyote',
         maxHealth = 350,
         distinct = 'no cat'
-    }
+    },
+    [14] = {
+        name = 'keepcompanionrat',
+        model = 'A_C_Rat',
+        maxHealth = 150,
+        distinct = 'no cat'
+    },
 }
 
 Config.core_items = {

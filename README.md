@@ -210,6 +210,18 @@
 		["combinable"] = nil,
 		["description"] = "Hen is your royal companion!"
 	},
+    ["keepcompanionrat"] = {
+        ["name"] = "keepcompanionrat",
+        ["label"] = "Rat",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "A_C_Rat.png",
+        ["unique"] = true,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = nil,
+        ["description"] = "Your royal companion!"
+    },
     ---
     ["petfood"] = {
         ["name"] = "petfood",
