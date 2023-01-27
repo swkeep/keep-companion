@@ -295,6 +295,66 @@
 		["combinable"] = nil,
 		["description"] = "Pet Grooming Kit"
 	},
+    ["keepcompanionrat"] = {
+        ["name"] = "keepcompanionrat",
+        ["label"] = "Rat",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "A_C_Rat.png",
+        ["unique"] = true,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = nil,
+        ["description"] = "Your royal companion!"
+    },---new
+    ["keepcompanioncormorant"] = {
+        ["name"] = "keepcompanioncormorant",
+        ["label"] = "Rat",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "A_C_cormorant.png",
+        ["unique"] = true,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = nil,
+        ["description"] = "Your royal companion!"
+    },
+    ["keepcompanioncow"] = {
+        ["name"] = "keepcompanioncow",
+        ["label"] = "Rat",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "a_c_cow.png",
+        ["unique"] = true,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = nil,
+        ["description"] = "Your royal companion!"
+    },
+    ["keepcompaniondeer"] = {
+        ["name"] = "keepcompanionadeer",
+        ["label"] = "Rat",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "a_c_deer.png",
+        ["unique"] = true,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = nil,
+        ["description"] = "Your royal companion!"
+    },
+    ["keepcompanionpig"] = {
+        ["name"] = "keepcompanionpig",
+        ["label"] = "Rat",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "a_c_pig.png",
+        ["unique"] = true,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = nil,
+        ["description"] = "Your royal companion!"
+    },
 ```
 
 # step 3: qb-shop
