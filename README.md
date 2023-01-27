@@ -587,6 +587,11 @@ else if (
     itemData.name == "keepcompanionwesty" ||
     itemData.name == "keepcompanioncoyote" ||
     itemData.name == "keepcompanionrabbit" ||
+    itemData.name == "keepcompanionrat" ||
+    itemData.name == "keepcompanioncormorant" ||
+    itemData.name == "keepcompanioncow" ||
+    itemData.name == "keepcompaniondeer" ||
+    itemData.name == "keepcompanionpig" ||
     itemData.name == "keepcompanionhen"
 ) {
     let gender = itemData.info.gender;
