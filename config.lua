@@ -137,12 +137,6 @@ Config.pets = {
         distinct = 'no cat'
     },
     [17] = {
-        name = 'keepcompaniondeer',
-        model = 'a_c_deer',
-        maxHealth = 150,
-        distinct = 'no cat'
-    },
-    [18] = {
         name = 'keepcompanionpig',
         model = 'a_c_pig',
         maxHealth = 250,
