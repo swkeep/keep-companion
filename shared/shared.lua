@@ -231,6 +231,34 @@ PetVariation = {
             textureId = 0
         },
     },
+    ['A_C_cormorant'] = {
+        ['normal'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 0
+        },
+    },
+    ['a_c_cow'] = {
+        ['normal'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 0
+        },
+    },
+    ['a_c_deer'] = {
+        ['normal'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 0
+        },
+    },
+    ['a_c_pig'] = {
+        ['normal'] = {
+            componentId = 0,
+            drawableId = 0,
+            textureId = 0
+        },
+    },
 }
 
 --- set color/variation of peds
