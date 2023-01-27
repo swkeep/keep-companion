@@ -295,21 +295,10 @@
 		["combinable"] = nil,
 		["description"] = "Pet Grooming Kit"
 	},
-    ["keepcompanionrat"] = {
-        ["name"] = "keepcompanionrat",
-        ["label"] = "Rat",
-        ["weight"] = 500,
-        ["type"] = "item",
-        ["image"] = "A_C_Rat.png",
-        ["unique"] = true,
-        ["useable"] = true,
-        ["shouldClose"] = true,
-        ["combinable"] = nil,
-        ["description"] = "Your royal companion!"
-    },---new
+    ---new
     ["keepcompanioncormorant"] = {
         ["name"] = "keepcompanioncormorant",
-        ["label"] = "Rat",
+        ["label"] = "Cormorant",
         ["weight"] = 500,
         ["type"] = "item",
         ["image"] = "A_C_cormorant.png",
@@ -321,7 +310,7 @@
     },
     ["keepcompanioncow"] = {
         ["name"] = "keepcompanioncow",
-        ["label"] = "Rat",
+        ["label"] = "Cow",
         ["weight"] = 500,
         ["type"] = "item",
         ["image"] = "a_c_cow.png",
@@ -333,7 +322,7 @@
     },
     ["keepcompaniondeer"] = {
         ["name"] = "keepcompanionadeer",
-        ["label"] = "Rat",
+        ["label"] = "Deer",
         ["weight"] = 500,
         ["type"] = "item",
         ["image"] = "a_c_deer.png",
@@ -345,7 +334,7 @@
     },
     ["keepcompanionpig"] = {
         ["name"] = "keepcompanionpig",
-        ["label"] = "Rat",
+        ["label"] = "Pig",
         ["weight"] = 500,
         ["type"] = "item",
         ["image"] = "a_c_pig.png",
@@ -516,6 +505,46 @@
             info = {},
             type = 'item',
             slot = 19
+        },
+         [20] = {
+            name = 'keepcompanionrat',
+            price = 50000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 20
+        },
+         [21] = {
+            name = 'keepcompanioncormorant',
+            price = 50000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 21
+        },
+         [22] = {
+            name = 'keepcompanioncow',
+            price = 50000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 22
+        },
+         [23] = {
+            name = 'keepcompaniondeer',
+            price = 50000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 23
+        },
+        [24] = {
+            name = 'keepcompanionpig',
+            price = 50000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 23
         },
     }
 
