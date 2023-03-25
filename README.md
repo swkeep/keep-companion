@@ -1,6 +1,12 @@
-# keep-companion
 
-- qbcore pet script
+# keep-companion - qbcore pet script
+
+<h1> || UPDATE || </h1>
+
+- Added 3 New Animals
+
+
+
 
 ## Features
 
