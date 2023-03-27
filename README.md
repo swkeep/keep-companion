@@ -1,6 +1,12 @@
-# keep-companion
 
-- qbcore pet script
+# keep-companion - qbcore pet script
+
+<h1> || UPDATE || </h1>
+
+- Added 3 New Animals
+
+
+
 
 ## Features
 
@@ -295,6 +301,55 @@
 		["combinable"] = nil,
 		["description"] = "Pet Grooming Kit"
 	},
+    ---new
+    ["keepcompanioncormorant"] = {
+        ["name"] = "keepcompanioncormorant",
+        ["label"] = "Cormorant",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "A_C_cormorant.png",
+        ["unique"] = true,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = nil,
+        ["description"] = "Your royal companion!"
+    },
+    ["keepcompanioncow"] = {
+        ["name"] = "keepcompanioncow",
+        ["label"] = "Cow",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "a_c_cow.png",
+        ["unique"] = true,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = nil,
+        ["description"] = "Your royal companion!"
+    },
+    ["keepcompaniondeer"] = {
+        ["name"] = "keepcompanionadeer",
+        ["label"] = "Deer",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "a_c_deer.png",
+        ["unique"] = true,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = nil,
+        ["description"] = "Your royal companion!"
+    },
+    ["keepcompanionpig"] = {
+        ["name"] = "keepcompanionpig",
+        ["label"] = "Pig",
+        ["weight"] = 500,
+        ["type"] = "item",
+        ["image"] = "a_c_pig.png",
+        ["unique"] = true,
+        ["useable"] = true,
+        ["shouldClose"] = true,
+        ["combinable"] = nil,
+        ["description"] = "Your royal companion!"
+    },
 ```
 
 # step 3: qb-shop
@@ -457,6 +512,46 @@
             type = 'item',
             slot = 19
         },
+         [20] = {
+            name = 'keepcompanionrat',
+            price = 50000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 20
+        },
+         [21] = {
+            name = 'keepcompanioncormorant',
+            price = 50000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 21
+        },
+         [22] = {
+            name = 'keepcompanioncow',
+            price = 50000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 22
+        },
+         [23] = {
+            name = 'keepcompaniondeer',
+            price = 50000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 23
+        },
+        [24] = {
+            name = 'keepcompanionpig',
+            price = 50000,
+            amount = 50,
+            info = {},
+            type = 'item',
+            slot = 23
+        },
     }
 
 ```
@@ -498,6 +593,11 @@ else if (
     itemData.name == "keepcompanionwesty" ||
     itemData.name == "keepcompanioncoyote" ||
     itemData.name == "keepcompanionrabbit" ||
+    itemData.name == "keepcompanionrat" ||
+    itemData.name == "keepcompanioncormorant" ||
+    itemData.name == "keepcompanioncow" ||
+    itemData.name == "keepcompaniondeer" ||
+    itemData.name == "keepcompanionpig" ||
     itemData.name == "keepcompanionhen"
 ) {
     let gender = itemData.info.gender;

@@ -124,6 +124,24 @@ Config.pets = {
         maxHealth = 150,
         distinct = 'no cat'
     },
+    [15] = {
+        name = 'keepcompanioncormorant',
+        model = 'A_C_cormorant',
+        maxHealth = 150,
+        distinct = 'no cat'
+    },
+    [16] = {
+        name = 'keepcompanioncow',
+        model = 'a_c_cow',
+        maxHealth = 250,
+        distinct = 'no cat'
+    },
+    [17] = {
+        name = 'keepcompanionpig',
+        model = 'a_c_pig',
+        maxHealth = 250,
+        distinct = 'no cat'
+    },
 }
 
 Config.core_items = {
